@@ -1,11 +1,12 @@
 /**
  * チェックリスト型CTA — フロント表示（保存マークアップ）
+ * ボタンは内包した CTAボタンブロック（madoguchi/cta-button）が描画する。
  */
 
-import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { useBlockProps, RichText, InnerBlocks } from '@wordpress/block-editor';
 
 export default function save({ attributes }) {
-	const { heading, lead, items, note, buttonLabel, buttonUrl } = attributes;
+	const { heading, lead, items, note } = attributes;
 	const blockProps = useBlockProps.save({ className: 'checklist-cta' });
 
 	return (
@@ -39,17 +40,9 @@ export default function save({ attributes }) {
 					value={ note }
 				/>
 			</p>
-			<p className="checklist-cta__action">
-				<a className="checklist-cta__button" href={ buttonUrl }>
-					<span className="checklist-cta__button-icon" aria-hidden="true"></span>
-					<RichText.Content
-						tagName="span"
-						className="checklist-cta__button-label"
-						value={ buttonLabel }
-					/>
-					<span className="checklist-cta__button-arrow" aria-hidden="true"></span>
-				</a>
-			</p>
+			<div className="checklist-cta__action">
+				<InnerBlocks.Content />
+			</div>
 		</div>
 	);
 }

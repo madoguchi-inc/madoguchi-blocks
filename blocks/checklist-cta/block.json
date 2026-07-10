@@ -5,7 +5,7 @@
 	"title": "チェックリスト型CTA",
 	"category": "design",
 	"icon": "yes-alt",
-	"description": "囲み枠つきのチェックリスト型CTA。見出し・チェック項目・ボタン文言を記事ごとに編集できます。",
+	"description": "囲み枠つきのチェックリスト型CTA。見出し・チェック項目を記事ごとに編集でき、ボタンにはCTAボタンブロックを使用します。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
@@ -30,14 +30,6 @@
 		"note": {
 			"type": "string",
 			"default": ""
-		},
-		"buttonLabel": {
-			"type": "string",
-			"default": "【無料】対応できる不用品回収業者を確認する"
-		},
-		"buttonUrl": {
-			"type": "string",
-			"default": "#cv_form"
 		}
 	}
 }
