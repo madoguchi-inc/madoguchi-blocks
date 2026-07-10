@@ -10,11 +10,23 @@
 - **著者情報** … 名前・肩書き・プロフィール・アイコン・CTA を文中に挿入。`schema.org/Person` の構造化データ（JSON-LD）を同梱（SEO/LLMO対応）
 - **口コミ・レビュー** … 吹き出し＋人物アイコンのレビュー。`schema.org/Review` の構造化データ（JSON-LD）を同梱（SEO/LLMO対応）
 
-### REST API でも同一デザイン（style 埋め込み）
+### REST API でも同一デザイン（style 埋め込み・配信先CSSから隔離）
 
-REST API 経由（`content.rendered`）でブロックを取得すると、最初の `madoguchi/*` ブロックの直前に
+REST API 経由（`content.rendered`）でブロックを取得すると、本文の先頭に
 プラグインの CSS が `<style>` として1回だけインライン同梱されます。これにより headless 構成や
 他サイトへ配信しても同じデザインを再現できます（通常のフロント表示では従来どおり enqueue した CSS を使用）。
+
+REST 用には**配信先サイトのテーマCSSの影響を受けない専用CSS**（`build/style-rest.css`、
+`tools/build-rest-css.js` がビルド時に自動生成）を同梱します:
+
+- **rem → px 固定化** … 配信先の root font-size（`html { font-size }`）に依存しない
+- **全宣言に `!important` 付与** … `.entry-content p` など配信先のどんなセレクタにも負けない
+  （ブロック単位のインライン設定を壊さないよう、カスタムプロパティ・CTAボタン系などは除外）
+- **スコープ付きリセット** … ブロック配下を `all: revert` で UA 既定に戻し、配信先テーマの
+  `p` / `a` / `ul` 等への装飾を遮断。フォント・`box-sizing` はブロック側で自前定義
+
+ブロックの**外側**（記事の通常の段落など）には一切影響しません。
+なお配信先が `!important` 付きで指定したスタイルまでは打ち消せません（CSSの仕様上の限界）。
 
 ### ブランドカラー（メディア別）
 
