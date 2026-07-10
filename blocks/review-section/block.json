@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/review-section",
+	"title": "口コミ・レビュー",
+	"category": "design",
+	"icon": "format-status",
+	"description": "利用者の口コミ・レビューセクション。schema.org の構造化データ（JSON-LD）を同梱し、検索エンジンやAIに口コミとして認識されやすくします。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"render": "file:./render.php",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": "利用者の口コミ"
+		},
+		"itemName": {
+			"type": "string",
+			"default": ""
+		},
+		"reviews": {
+			"type": "array",
+			"default": []
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"bubbleRadius": {
+			"type": "number",
+			"default": 12
+		},
+		"bodyFontSize": {
+			"type": "number",
+			"default": 14
+		}
+	}
+}

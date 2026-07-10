@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/author-box",
+	"title": "著者情報",
+	"category": "design",
+	"icon": "admin-users",
+	"description": "記事の著者情報（名前・肩書き・プロフィール・アイコン・CTA）を文中に挿入できます。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"render": "file:./render.php",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"default": ""
+		},
+		"role": {
+			"type": "string",
+			"default": ""
+		},
+		"bio": {
+			"type": "string",
+			"default": ""
+		},
+		"avatarUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"borderColor": {
+			"type": "string",
+			"default": ""
+		},
+		"borderWidth": {
+			"type": "number",
+			"default": 1
+		},
+		"borderRadius": {
+			"type": "number",
+			"default": 14
+		}
+	}
+}

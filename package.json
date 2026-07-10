@@ -1,0 +1,23 @@
+{
+	"name": "madoguchi-blocks",
+	"version": "1.1.1",
+	"description": "記事内に設置できるカスタム Gutenberg ブロック集（テーマ非依存）",
+	"private": true,
+	"author": "Madoguchi Inc.",
+	"license": "UNLICENSED",
+	"scripts": {
+		"start": "wp-scripts start src/index.js --output-path build",
+		"build": "bash build.sh",
+		"build:js": "wp-scripts build src/index.js --output-path build",
+		"build:css": "sass scss/style.scss build/style.css --style=compressed --no-source-map",
+		"lint:js": "wp-scripts lint-js src",
+		"package": "bash package.sh"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^30.19.0",
+		"sass": "^1.77.0"
+	},
+	"overrides": {
+		"chokidar": "^3.6.0"
+	}
+}

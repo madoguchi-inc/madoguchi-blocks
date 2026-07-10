@@ -1,0 +1,19 @@
+// madoguchi-blocks — スタンドアロン用の変数・ミックスイン
+// （元テーマの $variable / $mixin から、ブロックが使う分だけを self-contained に定義）
+
+// build/style.css から見た画像アセットの相対パス
+$img_path           : "../assets/img/";
+
+$font_color         : #000;
+$font_color_light   : #666;
+$color_orange       : #f56f00;
+$line_height        : 1.625;
+$line_height_narrow : 1.4;
+$transition_duration: 0.2s;
+
+// 元テーマの mq-max(md) 相当（SP: 896px 以下）。引数は互換のため受け取るだけ。
+@mixin mq-max($breakpoint) {
+	@media screen and (max-width: 896px) {
+		@content;
+	}
+}

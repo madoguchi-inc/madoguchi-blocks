@@ -1,0 +1,180 @@
+/*--------------------------------------------------------------
+# 口コミ・レビュー
+--------------------------------------------------------------*/
+
+.review-section {
+	margin: 2em 0;
+
+	&__heading {
+		margin: 0 0 0.6em !important;
+		font-weight: bold;
+		font-size: 2.2rem;
+		line-height: $line_height_narrow !important;
+
+		&::after {
+			display: block;
+			width: 64px;
+			height: 4px;
+			margin-top: 8px;
+			background: var(--md-brand, #f56f00);
+			border-radius: 2px;
+			content: "";
+		}
+
+		@include mq-max(md) {
+			font-size: 4.6vw;
+		}
+	}
+
+	&__summary {
+		display: flex;
+		gap: 8px;
+		align-items: baseline;
+		margin: 0 0 1em !important;
+	}
+
+	&__summary-score {
+		font-weight: bold;
+		font-size: 2.4rem;
+		color: var(--md-brand, #f56f00);
+	}
+
+	&__summary-meta {
+		color: $font_color_light;
+		font-size: 1.3rem;
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+
+	&__empty {
+		margin: 0 !important;
+		padding: 16px;
+		color: $font_color_light;
+		font-size: 1.4rem;
+		text-align: center;
+		background: #f7f7f7;
+		border-radius: 10px;
+	}
+}
+
+.review-card {
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+
+	&__avatar {
+		flex: 0 0 auto;
+		width: 60px;
+		height: 60px;
+		overflow: hidden;
+		border-radius: 50%;
+
+		@include mq-max(md) {
+			width: 14vw;
+			height: 14vw;
+		}
+	}
+
+	&__avatar-svg {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	&__body {
+		position: relative;
+		flex: 1 1 auto;
+		min-width: 0;
+		padding: 14px 16px;
+		background: #fff;
+		border: 1px solid #eee;
+		border-radius: var(--md-bubble-radius, 12px);
+		box-shadow: 0 2px 8px rgba(#000, 0.04);
+
+		// 吹き出しの三角
+		&::before {
+			position: absolute;
+			top: 16px;
+			left: -8px;
+			width: 0;
+			height: 0;
+			border-width: 6px 8px 6px 0;
+			border-style: solid;
+			border-color: transparent #eee transparent transparent;
+			content: "";
+		}
+
+		&::after {
+			position: absolute;
+			top: 16px;
+			left: -6px;
+			width: 0;
+			height: 0;
+			border-width: 6px 8px 6px 0;
+			border-style: solid;
+			border-color: transparent #fff transparent transparent;
+			content: "";
+		}
+	}
+
+	&__head {
+		display: flex;
+		gap: 8px;
+		align-items: baseline;
+		flex-wrap: wrap;
+	}
+
+	&__author {
+		font-weight: bold;
+		font-size: 1.4rem;
+	}
+
+	&__attribute {
+		color: $font_color_light;
+		font-size: 1.2rem;
+	}
+
+	&__rating {
+		margin-top: 4px;
+	}
+
+	&__stars {
+		position: relative;
+		display: inline-block;
+		font-size: 1.5rem;
+		line-height: 1;
+		color: #ddd;
+
+		&::before {
+			letter-spacing: 2px;
+			content: "★★★★★";
+		}
+	}
+
+	&__stars-fill {
+		position: absolute;
+		top: 0;
+		left: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		color: #f5b81b;
+
+		&::before {
+			letter-spacing: 2px;
+			content: "★★★★★";
+		}
+	}
+
+	&__text {
+		margin: 0.5em 0 0 !important;
+		color: $font_color;
+		font-size: var(--md-review-body, 1.4rem);
+		line-height: $line_height !important;
+		// テキストエリアの改行をそのまま反映する
+		white-space: pre-line;
+	}
+}

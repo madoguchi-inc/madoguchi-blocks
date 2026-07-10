@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+// 変数・ミックスイン
+@import "prelude";
+
+// 各ブロックのスタイル（フロント＝エディタ共通）
+@import "checklist-cta/block";
+@import "condition-card/block";
+@import "condition-cards/block";
+@import "author-box/block";
+@import "review-section/block";
+@import "comparison-table/block";
+@import "cta-button/block";

@@ -1,0 +1,75 @@
+/*--------------------------------------------------------------
+# CTAボタン
+--------------------------------------------------------------*/
+
+.cta-button-wrap {
+	margin: 1.5em 0;
+}
+
+.cta-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 16px 32px;
+	// .entry-content a の color / underline を打ち消す（インラインstyleが優先される）
+	color: #fff;
+	font-weight: bold;
+	font-size: 1.8rem;
+	line-height: $line_height_narrow;
+	text-align: center;
+	text-decoration: none !important;
+	background: var(--md-brand, #f56f00);
+	border-radius: 10px;
+	box-shadow: 0 4px 0 rgba(#000, 0.15);
+	transition: $transition_duration;
+
+	&:hover {
+		transform: translateY(2px);
+		box-shadow: 0 2px 0 rgba(#000, 0.15);
+	}
+
+	@include mq-max(md) {
+		font-size: 4.4vw;
+	}
+
+	// ボタン内テキストの一部（バッジ風）
+	&__badge {
+		display: inline-block;
+		padding: 3px 12px;
+		color: var(--md-brand, #f56f00);
+		font-size: 1.1rem;
+		font-weight: bold;
+		line-height: 1.5;
+		white-space: nowrap;
+		background: #fff;
+		border-radius: 999px;
+
+		@include mq-max(md) {
+			font-size: 2.9vw;
+		}
+	}
+
+	&__label {
+		display: inline-block;
+	}
+
+	// 比較テーブルのセル内で使うコンパクト版（見た目はCTAボタンに統一）
+	&--table {
+		width: 100%;
+		gap: 6px;
+		padding: 10px 14px;
+		font-size: 1.3rem;
+		white-space: nowrap;
+		box-shadow: 0 2px 0 rgba(#000, 0.15);
+
+		&:hover {
+			transform: translateY(1px);
+			box-shadow: 0 1px 0 rgba(#000, 0.15);
+		}
+
+		@include mq-max(md) {
+			font-size: 3.4vw;
+		}
+	}
+}

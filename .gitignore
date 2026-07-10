@@ -1,0 +1,5 @@
+# 依存（npm ci / npm install で復元）
+node_modules/
+
+# package.sh が生成する配布 zip の出力先
+dist-zip/

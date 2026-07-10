@@ -1,0 +1,130 @@
+/*--------------------------------------------------------------
+# 条件カード（条件別カードリンクの子）
+# ①アイコンのみ ②イラスト入り の2バリエーションに対応。
+# 主要色はメディア別ブランドカラー（--md-brand）を使用。
+--------------------------------------------------------------*/
+
+$card_border       : #f3e3ad;
+$card_border_hover : #f5b81b;
+
+.condition-card {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	padding: 20px 24px;
+	// .entry-content a の color / underline を打ち消す
+	color: $font_color !important;
+	text-decoration: none !important;
+	background: #fff;
+	border: 2px solid $card_border;
+	border-radius: 14px;
+	box-shadow: 0 2px 8px rgba(#000, 0.05);
+	transition: $transition_duration;
+
+	&:hover {
+		transform: translateY(-3px);
+		border-color: $card_border_hover;
+		box-shadow: 0 8px 18px rgba(#000, 0.12);
+	}
+
+	@include mq-max(md) {
+		gap: 3.5vw;
+		padding: 4.5vw;
+	}
+
+	// ---- メディア（アイコン / イラスト）----
+	&__media {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 auto;
+	}
+
+	&__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 52px;
+		height: 52px;
+		color: var(--md-brand, #f56f00);
+		background: rgba(#f56f00, 0.08);
+		border-radius: 50%;
+
+		@include mq-max(md) {
+			width: 12vw;
+			height: 12vw;
+		}
+	}
+
+	&__image {
+		width: 72px;
+		height: 72px;
+		object-fit: contain;
+
+		@include mq-max(md) {
+			width: 18vw;
+			height: 18vw;
+		}
+	}
+
+	// イラスト入りは少し余白を広げる
+	&--illustration {
+		gap: 18px;
+	}
+
+	// ---- コンテンツ ----
+	&__content {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	&__title {
+		// .entry-content p の margin / line-height を打ち消す
+		margin: 0 !important;
+		font-weight: bold;
+		font-size: 1.8rem;
+		line-height: $line_height_narrow !important;
+
+		@include mq-max(md) {
+			font-size: 4.2vw;
+		}
+	}
+
+	&__desc {
+		margin: 0.5em 0 0 !important;
+		color: $font_color_light;
+		font-size: 1.4rem;
+		line-height: $line_height !important;
+
+		@include mq-max(md) {
+			font-size: 3.7vw;
+		}
+	}
+
+	&__link {
+		display: inline-flex;
+		align-items: center;
+		margin-top: 1em;
+		color: var(--md-brand, #f56f00);
+		font-weight: bold;
+		font-size: 1.5rem;
+
+		@include mq-max(md) {
+			font-size: 3.9vw;
+		}
+	}
+
+	&__link-arrow {
+		width: 0.85em;
+		height: 0.85em;
+		margin-left: 0.4em;
+		background-color: var(--md-brand, #f56f00);
+		mask: url($img_path + "iconamoon_arrow-up-2.svg") no-repeat center / contain;
+		-webkit-mask: url($img_path + "iconamoon_arrow-up-2.svg") no-repeat center / contain;
+		transition: $transition_duration;
+	}
+
+	&:hover &__link-arrow {
+		transform: translateX(3px);
+	}
+}

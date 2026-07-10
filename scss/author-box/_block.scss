@@ -1,0 +1,88 @@
+/*--------------------------------------------------------------
+# 著者情報
+--------------------------------------------------------------*/
+
+.author-box {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	margin: 2em 0;
+	padding: 20px 24px;
+	background: #fafafa;
+	border: var(--md-border-width, 1px) solid var(--md-border-color, #ededed);
+	border-radius: var(--md-radius, 14px);
+
+	@include mq-max(md) {
+		padding: 4.5vw;
+	}
+
+	&__avatar {
+		flex: 0 0 auto;
+		width: 64px;
+		height: 64px;
+		overflow: hidden;
+		background: #e6e6e6;
+		border-radius: 50%;
+
+		img,
+		svg {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		@include mq-max(md) {
+			width: 14vw;
+			height: 14vw;
+		}
+	}
+
+	&__body {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	&__role {
+		margin: 0 !important;
+		color: $font_color_light;
+		font-size: 1.2rem;
+		line-height: $line_height_narrow !important;
+
+		@include mq-max(md) {
+			font-size: 3.3vw;
+		}
+	}
+
+	&__name {
+		margin: 0.1em 0 0 !important;
+		font-weight: bold;
+		font-size: 1.7rem;
+		line-height: $line_height_narrow !important;
+
+		@include mq-max(md) {
+			font-size: 4.2vw;
+		}
+	}
+
+	&__bio {
+		margin: 0.6em 0 0 !important;
+		color: $font_color;
+		font-size: 1.4rem;
+		line-height: $line_height !important;
+		white-space: pre-line;
+
+		@include mq-max(md) {
+			font-size: 3.7vw;
+		}
+	}
+
+	// 内部に置いた子ブロック（CTAボタン等）
+	&__inner {
+		margin-top: 0.8em;
+
+		.cta-button-wrap {
+			margin: 0;
+		}
+	}
+}

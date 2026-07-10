@@ -1,0 +1,269 @@
+/*--------------------------------------------------------------
+# 買取業者比較テーブル（親＋行ブロック / CSSグリッド）
+--------------------------------------------------------------*/
+
+.comparison-table {
+	margin: 2em 0;
+
+	&__caption {
+		margin: 0 0 0.8em !important;
+		font-weight: bold;
+		font-size: 2rem;
+		line-height: $line_height_narrow !important;
+
+		@include mq-max(md) {
+			font-size: 4.4vw;
+		}
+	}
+
+	// 横スクロール領域
+	&__scroll {
+		position: relative;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		border: 1px solid #eee;
+		border-radius: 12px;
+	}
+
+	// グリッド本体（grid-template-columns はインラインで指定）
+	// min-width は付けない。列の最小トラック幅の合計がコンテナを超えたときだけ
+	// スクロール領域内で横スクロールが発生する。
+	// 文字サイズは --md-table-size を基準にし、各セルは em で相対指定する。
+	&__grid {
+		display: grid;
+		font-size: var(--md-table-size, 1.4rem);
+	}
+
+	// 行ラッパーは display:contents で、セルを親グリッドの直接要素にする
+	&__row {
+		display: contents;
+	}
+
+	&__gcell {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 12px 14px;
+		text-align: center;
+		border-right: 1px solid #ededed;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	// 最終列（CTA）は右罫線なし
+	&__gcell--cta {
+		border-right: 0;
+	}
+
+	&__gcell--head {
+		font-weight: bold;
+		font-size: 0.93em;
+		white-space: nowrap;
+		background: #f6f6f6;
+		border-bottom: 1px solid #ececec;
+	}
+
+	// 店名列（固定）
+	&__gcell--name {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		align-items: flex-start;
+		text-align: left;
+		background: #fff;
+		box-shadow: 4px 0 6px rgba(#000, 0.04);
+	}
+
+	&__gcell--head#{&}__gcell--name {
+		z-index: 3;
+		background: #f6f6f6;
+	}
+
+	&__shop {
+		font-weight: bold;
+		font-size: 1.07em;
+		word-break: break-word;
+	}
+
+	&__rating {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2px 6px;
+		align-items: center;
+		margin-top: 4px;
+	}
+
+	&__stars {
+		position: relative;
+		display: inline-block;
+		font-size: 0.95em;
+		line-height: 1;
+		color: #ddd;
+
+		&::before {
+			content: "★★★★★";
+		}
+	}
+
+	&__stars-fill {
+		position: absolute;
+		top: 0;
+		left: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		color: #f5b81b;
+
+		&::before {
+			content: "★★★★★";
+		}
+	}
+
+	&__score {
+		font-weight: bold;
+		font-size: 0.95em;
+		color: #f5820b;
+	}
+
+	// CTA列に置かれたブロック（CTAボタン等）をセル幅になじませる
+	// ※padding/font-size はブロック側のインライン指定が優先されるため、
+	//   コンパクトな既定値は行テンプレート側で与える。
+	&__gcell--cta {
+		// ボタンの周囲に余白を確保
+		padding: 12px 16px;
+
+		.cta-button-wrap {
+			box-sizing: border-box;
+			width: 100%;
+			margin: 0;
+		}
+
+		// width:100% がセル幅を超えないよう border-box にする（はみ出し防止）
+		.cta-button {
+			box-sizing: border-box;
+			width: 100%;
+		}
+	}
+
+	// スクロール可能ヒント（実際に横スクロールが発生するときだけ表示）
+	&__hint {
+		display: none;
+		margin: 6px 0 0 !important;
+		color: $font_color_light;
+		font-size: 1.2rem;
+		text-align: center;
+	}
+
+	&.is-scrollable &__hint {
+		display: block;
+	}
+}
+
+/*--------------------------------------------------------------
+# エディタ専用UI（フロントには出ない）
+--------------------------------------------------------------*/
+
+// 列の編集チップ（親ブロック）
+.comparison-table__columns-edit {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+	margin: 10px 0;
+	padding: 8px 10px;
+	font-size: 13px;
+	background: #f7f7f7;
+	border-radius: 8px;
+}
+
+.comparison-table__columns-edit-label {
+	color: #757575;
+}
+
+.comparison-table__columns-edit-fixed,
+.comparison-table__col-chip--cta {
+	padding: 4px 8px;
+	color: #999;
+	font-size: 12px;
+}
+
+.comparison-table__col-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px 8px;
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 6px;
+
+	.comparison-table__col-label {
+		min-width: 3em;
+		outline: none;
+	}
+}
+
+.comparison-table__col-remove {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	padding: 0;
+	color: #fff;
+	font-size: 12px;
+	line-height: 1;
+	cursor: pointer;
+	background: #c00;
+	border: 0;
+	border-radius: 50%;
+	opacity: 0.55;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
+// 行の編集カード（子ブロック）
+.comparison-row-edit {
+	margin: 8px 0;
+	padding: 10px 12px;
+	background: #fff;
+	border: 1px solid #e2e4e7;
+	border-radius: 10px;
+
+	&__field {
+		display: flex;
+		gap: 8px;
+		align-items: baseline;
+		padding: 5px 0;
+
+		& + & {
+			border-top: 1px dashed #eee;
+		}
+	}
+
+	&__field--cta {
+		display: block;
+	}
+
+	&__lbl {
+		flex: 0 0 88px;
+		color: #757575;
+		font-size: 12px;
+	}
+
+	&__name {
+		font-weight: bold;
+		outline: none;
+	}
+
+	&__val {
+		outline: none;
+	}
+
+	&__rating {
+		margin-left: 8px;
+		color: #f5820b;
+		font-size: 12px;
+	}
+}

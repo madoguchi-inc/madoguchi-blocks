@@ -1,0 +1,35 @@
+/*--------------------------------------------------------------
+# 条件別カードリンク（親）
+--------------------------------------------------------------*/
+
+.condition-cards {
+	margin: 2em 0;
+
+	&__heading {
+		// .entry-content p の margin / line-height を打ち消す
+		margin: 0 0 1em !important;
+		font-weight: bold;
+		font-size: 2.2rem;
+		line-height: $line_height_narrow !important;
+
+		&::after {
+			display: block;
+			width: 64px;
+			height: 4px;
+			margin-top: 8px;
+			background: var(--md-brand, #f56f00);
+			border-radius: 2px;
+			content: "";
+		}
+
+		@include mq-max(md) {
+			font-size: 4.6vw;
+		}
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+}

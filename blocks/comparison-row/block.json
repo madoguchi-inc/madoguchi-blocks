@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/comparison-row",
+	"title": "比較テーブルの行",
+	"category": "design",
+	"icon": "editor-justify",
+	"description": "買取業者比較テーブルの1行（1業者）。店名・評価・各列の値と、CTA列に置くブロックを持ちます。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"render": "file:./render.php",
+	"parent": [ "madoguchi/comparison-table" ],
+	"usesContext": [ "madoguchi/comparisonColumns" ],
+	"supports": {
+		"html": false,
+		"reusable": false
+	},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"default": ""
+		},
+		"rating": {
+			"type": "number",
+			"default": 0
+		},
+		"values": {
+			"type": "array",
+			"default": []
+		}
+	}
+}

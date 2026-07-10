@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/condition-cards",
+	"title": "条件別カードリンク",
+	"category": "design",
+	"icon": "grid-view",
+	"description": "条件別おすすめ記事へのカード型内部リンク集。見出しとカードを記事ごとに編集できます。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"heading": {
+			"type": "string",
+			"default": ""
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		}
+	}
+}

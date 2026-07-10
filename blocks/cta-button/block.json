@@ -1,0 +1,87 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/cta-button",
+	"title": "CTAボタン",
+	"category": "design",
+	"icon": "button",
+	"description": "記事内に自在に置けるCTAボタン。背景色・文字色・角丸・整列・余白を設定でき、ボタン内テキストの一部をバッジ風に表示できます。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"render": "file:./render.php",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"text": {
+			"type": "string",
+			"default": ""
+		},
+		"badgeText": {
+			"type": "string",
+			"default": ""
+		},
+		"badgePosition": {
+			"type": "string",
+			"default": "before"
+		},
+		"badgeGap": {
+			"type": "number",
+			"default": 10
+		},
+		"badgeFontSize": {
+			"type": "number",
+			"default": 11
+		},
+		"url": {
+			"type": "string",
+			"default": ""
+		},
+		"backgroundColor": {
+			"type": "string",
+			"default": ""
+		},
+		"bgType": {
+			"type": "string",
+			"default": "solid"
+		},
+		"gradientFrom": {
+			"type": "string",
+			"default": ""
+		},
+		"gradientTo": {
+			"type": "string",
+			"default": ""
+		},
+		"gradientAngle": {
+			"type": "number",
+			"default": 90
+		},
+		"textColor": {
+			"type": "string",
+			"default": "#ffffff"
+		},
+		"borderRadius": {
+			"type": "number",
+			"default": 10
+		},
+		"fontSize": {
+			"type": "number",
+			"default": 18
+		},
+		"align": {
+			"type": "string",
+			"default": "center"
+		},
+		"margin": {
+			"type": "object",
+			"default": {}
+		},
+		"padding": {
+			"type": "object",
+			"default": { "top": "16px", "right": "32px", "bottom": "16px", "left": "32px" }
+		}
+	}
+}
