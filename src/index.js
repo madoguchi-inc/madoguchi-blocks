@@ -40,6 +40,10 @@ import ctaMeta from '../blocks/cta-button/block.json';
 import ctaEdit from './cta-button/edit';
 import ctaSave from './cta-button/save';
 
+import recommendMeta from '../blocks/recommend-card/block.json';
+import recommendEdit from './recommend-card/edit';
+import recommendSave from './recommend-card/save';
+
 // 子（condition-card）を先に登録してから親を登録する
 // （checklist / condition-card は旧マークアップからの自動移行用に deprecated を持つ）
 registerBlockType( checklistMeta, { edit: checklistEdit, save: checklistSave, deprecated: checklistDeprecated });
@@ -52,3 +56,4 @@ registerBlockType( reviewMeta, { edit: reviewEdit, save: reviewSave });
 registerBlockType( comparisonRowMeta, { edit: comparisonRowEdit, save: comparisonRowSave });
 registerBlockType( comparisonMeta, { edit: comparisonEdit, save: comparisonSave });
 registerBlockType( ctaMeta, { edit: ctaEdit, save: ctaSave });
+registerBlockType( recommendMeta, { edit: recommendEdit, save: recommendSave });

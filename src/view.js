@@ -18,10 +18,10 @@
 		});
 	}
 
-	// 条件カード（新マークアップ）: カード全体のクリックを内側のCTAボタンへ委譲する
-	// （旧マークアップはカード自体が <a> のため div のカードだけが対象）
+	// 条件カード・おすすめリンクカード（ボタン強調）: カード全体のクリックを内側のCTAボタンへ委譲する
+	// （カード自体が <a> のもの＝旧条件カード・チェックリスト風は div でないため対象外）
 	function initCardLinks() {
-		var cards = document.querySelectorAll( 'div.condition-card' );
+		var cards = document.querySelectorAll( 'div.condition-card, div.recommend-card' );
 		cards.forEach( function( card ) {
 			var link = card.querySelector( 'a.cta-button' );
 			if ( ! link ) {

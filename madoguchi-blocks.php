@@ -118,6 +118,7 @@ function madoguchi_blocks_register() {
 		'comparison-row',
 		'comparison-table',
 		'cta-button',
+		'recommend-card',
 	);
 	foreach ( $blocks as $block ) {
 		$dir = MADOGUCHI_BLOCKS_DIR . 'blocks/' . $block;
