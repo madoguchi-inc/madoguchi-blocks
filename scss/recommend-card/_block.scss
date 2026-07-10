@@ -7,10 +7,10 @@
 
 .recommend-card {
 	display: flex;
-	gap: 20px;
+	gap: 16px;
 	align-items: center;
 	margin: 1.5em 0;
-	padding: 24px 28px;
+	padding: 18px 22px;
 	// .entry-content a の color / underline を打ち消す
 	color: $font_color !important;
 	text-decoration: none !important;
@@ -18,8 +18,8 @@
 	transition: $transition_duration;
 
 	@include mq-max(md) {
-		gap: 4vw;
-		padding: 4.5vw;
+		gap: 3.5vw;
+		padding: 4vw;
 	}
 
 	// ---- メディア（アイコン / イラスト）----
@@ -34,27 +34,27 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 88px;
-		height: 88px;
+		width: 72px;
+		height: 72px;
 		color: var(--md-brand, $color_orange);
 		background: #fff;
 		border-radius: 50%;
 		box-shadow: 0 2px 8px rgba(#000, 0.06);
 
 		@include mq-max(md) {
-			width: 17vw;
-			height: 17vw;
+			width: 15vw;
+			height: 15vw;
 		}
 	}
 
 	&__image {
-		width: 88px;
-		height: 88px;
+		width: 72px;
+		height: 72px;
 		object-fit: contain;
 
 		@include mq-max(md) {
-			width: 18vw;
-			height: 18vw;
+			width: 16vw;
+			height: 16vw;
 		}
 	}
 
@@ -67,8 +67,8 @@
 	// ピル型ラベル（空欄なら出力されない）
 	&__label {
 		display: inline-block;
-		margin: 0 0 0.6em !important;
-		padding: 4px 14px;
+		margin: 0 0 0.5em !important;
+		padding: 3px 12px;
 		color: var(--md-brand, $color_orange);
 		font-weight: bold;
 		font-size: 1.2rem;
@@ -114,7 +114,7 @@
 
 		// アイコンと本文の間の点線区切り
 		.recommend-card__media {
-			padding-right: 20px;
+			padding-right: 16px;
 			border-right: 2px dotted #f6c9a3;
 			border-right: 2px dotted color-mix(in srgb, var(--md-brand, #{$color_orange}) 35%, #fff);
 
@@ -125,7 +125,7 @@
 
 		// 内包するCTAボタン（コンテンツ幅いっぱいに表示）
 		.recommend-card__action {
-			margin-top: 1em;
+			margin-top: 0.7em;
 
 			.cta-button-wrap {
 				margin: 0;

@@ -11,7 +11,7 @@ $card_border_hover : #f5b81b;
 	display: flex;
 	gap: 16px;
 	align-items: center;
-	padding: 20px 24px;
+	padding: 16px 20px;
 	// .entry-content a の color / underline を打ち消す
 	color: $font_color !important;
 	text-decoration: none !important;
@@ -29,7 +29,7 @@ $card_border_hover : #f5b81b;
 
 	@include mq-max(md) {
 		gap: 3.5vw;
-		padding: 4.5vw;
+		padding: 4vw;
 	}
 
 	// ---- メディア（アイコン / イラスト）----
@@ -103,7 +103,7 @@ $card_border_hover : #f5b81b;
 
 	// ---- CTAボタン（madoguchi/cta-button を内包）----
 	&__action {
-		margin-top: 1em;
+		margin-top: 0.65em;
 
 		.cta-button-wrap {
 			margin: 0;
