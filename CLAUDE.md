@@ -38,6 +38,8 @@ npm run lint:js       # ESLint (wp-scripts)
 
 各サイトに導入後、**GitHub リリースを更新元とした自動更新**に対応（[plugin-update-checker](https://github.com/YahnisElsts/plugin-update-checker) v5.7 を `lib/` に同梱）。
 
+> **リリース作業のルール**: リリースを行う際は `.claude/rules/release.md` の手順を必ず遵守すること。
+
 **リリース手順（このリポジトリ直下で実行）:**
 
 ```bash
