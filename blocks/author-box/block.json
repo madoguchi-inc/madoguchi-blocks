@@ -5,7 +5,7 @@
 	"title": "著者情報",
 	"category": "design",
 	"icon": "admin-users",
-	"description": "記事の著者情報（名前・肩書き・プロフィール・アイコン・CTA）を文中に挿入できます。",
+	"description": "記事の著者情報（名前・肩書き・プロフィール・アイコン・CTA）を文中に挿入できます。schema.org/Person の構造化データ（JSON-LD）を同梱します。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",

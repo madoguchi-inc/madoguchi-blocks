@@ -4,6 +4,7 @@
  *
  * 名前・アバターは未入力なら「この記事の著者」を既定として使う。
  * アバター画像も無ければデフォルトのイラストを表示する。
+ * 併せて schema.org/Person を JSON-LD で同梱する。
  *
  * @var array    $attributes ブロック属性。
  * @var string   $content    内部コンテンツ（未使用）。
@@ -32,6 +33,36 @@ if ( $post ) {
 // 名前もプロフィールも無ければ描画しない
 if ( '' === $name && '' === trim( wp_strip_all_tags( $bio ) ) ) {
 	return '';
+}
+
+// JSON-LD（schema.org/Person）を構築する。
+// 表示と同じフォールバック後の値を使い、名前がある場合のみ出力する。
+$json = '';
+if ( '' !== $name ) {
+	$ld = array(
+		'@context' => 'https://schema.org',
+		'@type'    => 'Person',
+		'name'     => $name,
+	);
+
+	$role_plain = trim( wp_strip_all_tags( (string) $role ) );
+	if ( '' !== $role_plain ) {
+		$ld['jobTitle'] = $role_plain;
+	}
+
+	// プロフィール文をプレーンテキスト化（<br> は改行に変換）
+	$bio_plain = str_replace( array( '<br>', '<br/>', '<br />' ), "\n", (string) $bio );
+	$bio_plain = trim( wp_strip_all_tags( $bio_plain ) );
+	if ( '' !== $bio_plain ) {
+		$ld['description'] = $bio_plain;
+	}
+
+	if ( $avatar ) {
+		$ld['image'] = esc_url_raw( $avatar );
+	}
+
+	// スラッシュはエスケープしたまま（</script> の混入を防ぐ）。日本語は可読性のため非エスケープ。
+	$json = wp_json_encode( $ld, JSON_UNESCAPED_UNICODE );
 }
 
 // デフォルトアバター（画像もこの記事の著者画像も無い場合）
@@ -77,4 +108,7 @@ $wrapper               = get_block_wrapper_attributes( $wrapper_args );
 			<div class="author-box__inner"><?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
 		<?php endif; ?>
 	</div>
+	<?php if ( '' !== $json ) : ?>
+		<script type="application/ld+json"><?php echo $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></script>
+	<?php endif; ?>
 </div>
