@@ -18,7 +18,7 @@ PHP (WordPress プラグイン / block.json 登録) / JS (`@wordpress/scripts` =
 ```bash
 npm ci                # 依存インストール（初回・CI）
 npm run start         # エディタJSのウォッチ開発
-bash build.sh         # 一括ビルド（JS → CSS → view.js。この順序が必須）
+bash build.sh         # 一括ビルド（JS → CSS → REST用CSS → view.js。この順序が必須）
 npm run lint:js       # ESLint (wp-scripts)
 ```
 
@@ -30,6 +30,9 @@ npm run lint:js       # ESLint (wp-scripts)
 
 - エントリ: `src/index.js`（各ブロックの edit/save）→ `build/index.js`
 - スタイル: `scss/style.scss`（明示 import のみ）→ dart-sass で `build/style.css`
+- REST配信用CSS: `tools/build-rest-css.js` が `build/style.css` から `build/style-rest.css` を生成
+  （rem→px 固定・全宣言 `!important` 化・スコープ付き `all: revert` リセットで配信先テーマCSSの影響を遮断。
+  インライン style と衝突する CTAボタン系・カスタムプロパティは `!important` 化から除外）
 - フロントJS: `src/view.js` を `build/view.js` へコピー
 - `build/` は成果物を**コミット済み**（drop-in で動く）。`node_modules/` `dist-zip/` は gitignore
 - CSS は node-sass ではなく **dart-sass** を使用（Node 21 でのネイティブビルド回避。`overrides` で chokidar を v3 に固定）

@@ -5,10 +5,11 @@
 	"title": "条件カード",
 	"category": "design",
 	"icon": "id",
-	"description": "条件別おすすめ記事へのカード型内部リンク（1枚）。",
+	"description": "条件別おすすめ記事へのカード型内部リンク（1枚）。リンクにはCTAボタンブロックを使用します。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
+	"viewScript": "madoguchi-blocks-view",
 	"parent": [ "madoguchi/condition-cards" ],
 	"supports": {
 		"html": false,
@@ -20,14 +21,6 @@
 			"default": ""
 		},
 		"description": {
-			"type": "string",
-			"default": ""
-		},
-		"linkLabel": {
-			"type": "string",
-			"default": ""
-		},
-		"linkUrl": {
 			"type": "string",
 			"default": ""
 		},

@@ -1,0 +1,52 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/recommend-card",
+	"title": "おすすめリンクカード",
+	"category": "design",
+	"icon": "admin-links",
+	"description": "おすすめ記事へ誘導するリンクカード。①ボタン強調（CTAボタンブロックを内包） ②チェックリスト風（カード全体がリンク） の2パターンを切り替えられます。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"viewScript": "madoguchi-blocks-view",
+	"render": "file:./render.php",
+	"supports": {
+		"html": false,
+		"anchor": true
+	},
+	"attributes": {
+		"pattern": {
+			"type": "string",
+			"default": "button"
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		},
+		"description": {
+			"type": "string",
+			"default": ""
+		},
+		"iconKey": {
+			"type": "string",
+			"default": "search"
+		},
+		"imageUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"linkUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"accentColor": {
+			"type": "string",
+			"default": ""
+		}
+	}
+}

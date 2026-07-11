@@ -1,8 +1,10 @@
 /**
- * 条件カードで使う内蔵アイコン。
+ * 条件カード・おすすめリンクカードで使う内蔵アイコン。
  * カテゴリが増えても iconKey の差し替えだけで展開できるよう、
  * edit.js（エディタ）と save.js（保存マークアップ）の両方から共通利用する。
  * 全て stroke ベース（fill なし）で、色は currentColor に追従する。
+ * ※ おすすめリンクカードはサーバー描画のため、blocks/recommend-card/render.php にも
+ *   同じ図形を持つ。アイコンを追加・変更したら両方を同期すること。
  */
 
 // キー → 表示ラベル（サイドバーの選択肢用）
@@ -13,7 +15,9 @@ export const ICON_OPTIONS = [
 	{ label: 'エアコンクリーニング', value: 'aircon' },
 	{ label: '家具・粗大ごみ', value: 'furniture' },
 	{ label: '遺品整理', value: 'memorial' },
-	{ label: '買取', value: 'buy' }
+	{ label: '買取', value: 'buy' },
+	{ label: '検索（虫めがね）', value: 'search' },
+	{ label: 'チェックリスト', value: 'checklist' }
 ];
 
 // キー → SVG の path/shape 要素
@@ -63,25 +67,41 @@ const PATHS = {
 			<path d="M4 4h7l9 9-7 7-9-9z" />
 			<circle cx="8" cy="8" r="1.4" />
 		</>
+	),
+	search: (
+		<>
+			<circle cx="11" cy="11" r="6.5" />
+			<path d="M15.8 15.8L20.5 20.5" />
+		</>
+	),
+	checklist: (
+		<>
+			<rect x="5" y="5" width="14" height="16" rx="2" />
+			<path d="M9 5V4a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4v1" />
+			<path d="M8.5 11.5l2 2 4.5-4.5" />
+			<path d="M8.5 17h7" />
+		</>
 	)
 };
 
 /**
- * 条件カードのアイコンを描画するコンポーネント。
+ * カードのアイコンを描画するコンポーネント。
  *
  * @param {Object} props
- * @param {string} props.iconKey アイコンキー。
+ * @param {string} props.iconKey     アイコンキー。
+ * @param {string} [props.className] SVG のクラス名（既定は条件カード用）。
+ * @param {number} [props.size]      表示サイズ px（既定は条件カード用の28）。
  * @return {JSX.Element} SVG 要素。
  */
-export default function CardIcon( { iconKey }) {
+export default function CardIcon( { iconKey, className = 'condition-card__icon-svg', size = 28 }) {
 	const shape = PATHS[ iconKey ] || PATHS.box;
 
 	return (
 		<svg
-			className="condition-card__icon-svg"
+			className={ className }
 			viewBox="0 0 24 24"
-			width="28"
-			height="28"
+			width={ size }
+			height={ size }
 			fill="none"
 			stroke="currentColor"
 			strokeWidth="1.7"

@@ -1,0 +1,63 @@
+# 配布 zip を生成して GitHub リリースを作成する（plugin-update-checker の更新元）。
+#
+# 手動トリガー（workflow_dispatch）専用。main 上で実行すること。
+# タグ名は madoguchi-blocks.php の Version: ヘッダーから取得する
+# （リリースのタグ名 = Version: が自動更新の判定条件のため、手入力させない）。
+#
+# ローカルに gh CLI がある場合は従来どおり `bash package.sh --release` でも可。
+
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 依存インストール
+        run: npm ci
+
+      - name: 一括ビルド（JS → CSS → REST用CSS → view.js）
+        run: bash build.sh
+
+      - name: Version ヘッダー取得
+        id: ver
+        run: |
+          VERSION="$(grep -E '^\s*\*\s*Version:' madoguchi-blocks.php | head -1 | sed -E 's/.*Version:[[:space:]]*//; s/[[:space:]]+$//')"
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: Version をヘッダーから取得できません" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: 既存タグとの衝突チェック
+        run: |
+          if git ls-remote --tags origin "refs/tags/${{ steps.ver.outputs.version }}" | grep -q .; then
+            echo "ERROR: タグ ${{ steps.ver.outputs.version }} は既に存在します。Version: を上げてください" >&2
+            exit 1
+          fi
+
+      - name: 配布 zip 生成
+        run: bash package.sh
+
+      - name: GitHub リリース作成・zip 添付
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          gh release create "$VERSION" "dist-zip/madoguchi-blocks-${VERSION}.zip" \
+            --repo "${{ github.repository }}" \
+            --title "v${VERSION}" \
+            --target "${{ github.sha }}" \
+            --generate-notes

@@ -1,5 +1,7 @@
 /**
  * 条件カード（子） — エディタ表示
+ * リンクは CTAボタンブロック（madoguchi/cta-button）を内包する。
+ * 文言・URL・色などはボタン側のサイドバーで設定する。
  * ①アイコンのみ ②イラスト入り の2バリエーションに対応。
  */
 
@@ -7,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	RichText,
+	InnerBlocks,
 	InspectorControls,
 	MediaUpload,
 	MediaUploadCheck,
@@ -14,14 +17,29 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	TextControl,
 	SelectControl,
 	Button
 } from '@wordpress/components';
 import CardIcon, { ICON_OPTIONS } from './icons';
 
+// リンク部分に置けるブロック（CTAボタンのみ）
+const ALLOWED_BLOCKS = [ 'madoguchi/cta-button' ];
+
+// カード内に収まるコンパクトなボタンを既定にする
+const TEMPLATE = [
+	[
+		'madoguchi/cta-button',
+		{
+			align: 'left',
+			fontSize: 15,
+			borderRadius: 8,
+			padding: { top: '10px', right: '24px', bottom: '10px', left: '24px' }
+		}
+	]
+];
+
 export default function Edit( { attributes, setAttributes }) {
-	const { title, description, linkLabel, linkUrl, variation, iconKey, imageUrl, accentColor } = attributes;
+	const { title, description, variation, iconKey, imageUrl, accentColor } = attributes;
 	const blockProps = useBlockProps({
 		className: `condition-card condition-card--edit condition-card--${ variation }`,
 		style: accentColor ? { '--md-brand': accentColor } : undefined
@@ -67,14 +85,6 @@ export default function Edit( { attributes, setAttributes }) {
 						</MediaUploadCheck>
 					) }
 				</PanelBody>
-				<PanelBody title={ __( 'リンク設定', 'madoguchi-blocks' ) }>
-					<TextControl
-						label={ __( 'リンク先URL', 'madoguchi-blocks' ) }
-						value={ linkUrl }
-						onChange={ ( value ) => setAttributes({ linkUrl: value }) }
-						help={ __( '例: /column/minato-gomiyashiki/ など', 'madoguchi-blocks' ) }
-					/>
-				</PanelBody>
 				<PanelColorSettings
 					title={ __( 'カラー設定', 'madoguchi-blocks' ) }
 					colorSettings={ [ {
@@ -109,17 +119,12 @@ export default function Edit( { attributes, setAttributes }) {
 						onChange={ ( value ) => setAttributes({ description: value }) }
 						placeholder={ __( '説明文（例：大量の不用品や部屋全体の片付けを依頼したい方へ）', 'madoguchi-blocks' ) }
 					/>
-					<span className="condition-card__link">
-						<RichText
-							tagName="span"
-							className="condition-card__link-label"
-							value={ linkLabel }
-							onChange={ ( value ) => setAttributes({ linkLabel: value }) }
-							placeholder={ __( 'リンク文言（例：港区のおすすめゴミ屋敷清掃業者8選を見る）', 'madoguchi-blocks' ) }
-							allowedFormats={ [] }
+					<div className="condition-card__action">
+						<InnerBlocks
+							allowedBlocks={ ALLOWED_BLOCKS }
+							template={ TEMPLATE }
 						/>
-						<span className="condition-card__link-arrow" aria-hidden="true"></span>
-					</span>
+					</div>
 				</div>
 			</div>
 		</>

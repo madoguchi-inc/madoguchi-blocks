@@ -218,9 +218,13 @@ $cta_btn_bottom  : #f56f00;
 		}
 	}
 
-	// CTAボタン
+	// CTAボタン（madoguchi/cta-button を内包）
 	&__action {
 		margin: 0 !important;
+
+		.cta-button-wrap {
+			margin: 0;
+		}
 	}
 
 	&__button {

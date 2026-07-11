@@ -30,6 +30,8 @@ class Madoguchi_Blocks_Style_Inliner {
 		'madoguchi/author-box',
 		'madoguchi/review-section',
 		'madoguchi/comparison-table',
+		'madoguchi/cta-button',
+		'madoguchi/recommend-card',
 	);
 
 	/**
@@ -85,15 +87,20 @@ class Madoguchi_Blocks_Style_Inliner {
 	/**
 	 * インライン用の <style> 文字列を生成する。
 	 *
-	 * build/style.css を読み込み、相対画像パスを絶対URLへ書き換え、
-	 * 先頭にブランドカラーのカスタムプロパティを付与する。
+	 * REST配信用に変換済みの build/style-rest.css（rem→px・!important化・
+	 * スコープ付きリセット入り。配信先サイトのテーマCSSの影響を受けない）を優先し、
+	 * 無ければ build/style.css にフォールバックする。
+	 * 相対画像パスを絶対URLへ書き換え、先頭にブランドカラーのカスタムプロパティを付与する。
 	 *
 	 * @return string
 	 */
 	private function build_style_tag() {
 		if ( null === $this->style_cache ) {
-			$css_file = MADOGUCHI_BLOCKS_DIR . 'build/style.css';
-			$css      = file_exists( $css_file ) ? file_get_contents( $css_file ) : '';
+			$css_file = MADOGUCHI_BLOCKS_DIR . 'build/style-rest.css';
+			if ( ! file_exists( $css_file ) ) {
+				$css_file = MADOGUCHI_BLOCKS_DIR . 'build/style.css';
+			}
+			$css = file_exists( $css_file ) ? file_get_contents( $css_file ) : '';
 			// インライン化するとページURL基準になるため、画像の相対パスを絶対URLへ変換する。
 			$this->style_cache = str_replace( '../assets/img/', MADOGUCHI_BLOCKS_URL . 'assets/img/', $css );
 		}

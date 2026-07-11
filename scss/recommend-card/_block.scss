@@ -1,0 +1,202 @@
+/*--------------------------------------------------------------
+# おすすめリンクカード
+# ①ボタン強調（--button） ②チェックリスト風（--checklist）の2パターン。
+# 主要色はメディア別ブランドカラー（--md-brand）を使用。
+# 薄い背景色は color-mix で導出（非対応ブラウザは直前のフォールバック値）。
+--------------------------------------------------------------*/
+
+.recommend-card {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	margin: 1.5em 0;
+	padding: 18px 22px;
+	// .entry-content a の color / underline を打ち消す
+	color: $font_color !important;
+	text-decoration: none !important;
+	border-radius: 14px;
+	transition: $transition_duration;
+
+	@include mq-max(md) {
+		gap: 3.5vw;
+		padding: 4vw;
+	}
+
+	// ---- メディア（アイコン / イラスト）----
+	&__media {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: 0 0 auto;
+	}
+
+	&__icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 72px;
+		height: 72px;
+		color: var(--md-brand, $color_orange);
+		background: #fff;
+		border-radius: 50%;
+		box-shadow: 0 2px 8px rgba(#000, 0.06);
+
+		@include mq-max(md) {
+			width: 15vw;
+			height: 15vw;
+		}
+	}
+
+	&__image {
+		width: 72px;
+		height: 72px;
+		object-fit: contain;
+
+		@include mq-max(md) {
+			width: 16vw;
+			height: 16vw;
+		}
+	}
+
+	// ---- コンテンツ ----
+	&__content {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
+	// ピル型ラベル（空欄なら出力されない）
+	&__label {
+		display: inline-block;
+		margin: 0 0 0.5em !important;
+		padding: 3px 12px;
+		color: var(--md-brand, $color_orange);
+		font-weight: bold;
+		font-size: 1.2rem;
+		line-height: 1.5;
+		background: #fef4ec;
+		background: color-mix(in srgb, var(--md-brand, #{$color_orange}) 10%, #fff);
+		border-radius: 999px;
+
+		@include mq-max(md) {
+			font-size: 3vw;
+		}
+	}
+
+	&__title {
+		// .entry-content p の margin / line-height を打ち消す
+		margin: 0 !important;
+		font-weight: bold;
+		font-size: 1.8rem;
+		line-height: $line_height_narrow !important;
+
+		@include mq-max(md) {
+			font-size: 4.2vw;
+		}
+	}
+
+	&__desc {
+		margin: 0.5em 0 0 !important;
+		color: $font_color_light;
+		font-size: 1.4rem;
+		line-height: $line_height !important;
+
+		@include mq-max(md) {
+			font-size: 3.7vw;
+		}
+	}
+
+	// ---- ①ボタン強調タイプ ----
+	&--button {
+		background: #fef4ec;
+		background: color-mix(in srgb, var(--md-brand, #{$color_orange}) 7%, #fff);
+		border: 1px solid #fbe1cc;
+		border: 1px solid color-mix(in srgb, var(--md-brand, #{$color_orange}) 22%, #fff);
+
+		// アイコンと本文の間の点線区切り
+		.recommend-card__media {
+			padding-right: 16px;
+			border-right: 2px dotted #f6c9a3;
+			border-right: 2px dotted color-mix(in srgb, var(--md-brand, #{$color_orange}) 35%, #fff);
+
+			@include mq-max(md) {
+				padding-right: 3.5vw;
+			}
+		}
+
+		// 内包するCTAボタン（コンテンツ幅いっぱいに表示）
+		.recommend-card__action {
+			margin-top: 0.7em;
+
+			.cta-button-wrap {
+				margin: 0;
+			}
+
+			.cta-button {
+				// テーマの box-sizing に依存せず padding 込みで幅いっぱいに収める
+				box-sizing: border-box;
+				width: 100%;
+			}
+		}
+
+		// view.js がCTAボタン入りカードに付与（カード全体クリックでボタンへ遷移）
+		&.has-link {
+			cursor: pointer;
+
+			&:hover {
+				border-color: var(--md-brand, $color_orange);
+				box-shadow: 0 6px 16px rgba(#000, 0.08);
+			}
+		}
+	}
+
+	// ---- ②チェックリスト風タイプ ----
+	&--checklist {
+		background: #fff;
+		border: 1px solid #edf0f4;
+		box-shadow: 0 6px 18px rgba(#000, 0.06);
+
+		&:hover {
+			transform: translateY(-3px);
+			border-color: var(--md-brand, $color_orange);
+			box-shadow: 0 10px 24px rgba(#000, 0.1);
+		}
+
+		.recommend-card__icon {
+			background: #fef4ec;
+			background: color-mix(in srgb, var(--md-brand, #{$color_orange}) 9%, #fff);
+			box-shadow: none;
+		}
+	}
+
+	// 右端の丸囲みシェブロン（チェックリスト風）
+	&__chevron {
+		position: relative;
+		flex: 0 0 auto;
+		width: 40px;
+		height: 40px;
+		border: 2px solid var(--md-brand, $color_orange);
+		border-radius: 50%;
+
+		&::before {
+			position: absolute;
+			inset: 0;
+			width: 14px;
+			height: 14px;
+			margin: auto;
+			background-color: var(--md-brand, $color_orange);
+			mask: url($img_path + "iconamoon_arrow-up-2.svg") no-repeat center / contain;
+			-webkit-mask: url($img_path + "iconamoon_arrow-up-2.svg") no-repeat center / contain;
+			transition: $transition_duration;
+			content: "";
+		}
+
+		@include mq-max(md) {
+			width: 9vw;
+			height: 9vw;
+		}
+	}
+
+	&--checklist:hover &__chevron::before {
+		transform: translateX(2px);
+	}
+}

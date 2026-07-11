@@ -14,6 +14,9 @@ npx wp-scripts build src/index.js --output-path build
 echo "==> CSS (dart-sass)"
 npx sass scss/style.scss build/style.css --style=compressed --no-source-map
 
+echo "==> REST配信用CSS（rem→px・!important化・スコープ付きリセット）"
+node tools/build-rest-css.js
+
 echo "==> view.js コピー"
 cp src/view.js build/view.js
 
