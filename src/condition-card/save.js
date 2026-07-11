@@ -9,10 +9,15 @@ import { useBlockProps, RichText, InnerBlocks } from '@wordpress/block-editor';
 import CardIcon from './icons';
 
 export default function save({ attributes }) {
-	const { title, description, variation, iconKey, imageUrl, accentColor } = attributes;
+	const { title, description, variation, iconKey, imageUrl, accentColor, backgroundColor } = attributes;
+	// 両方未設定なら style 属性自体を出さない（既存投稿のマークアップを変えないため）
+	const style = {
+		...( accentColor ? { '--md-brand': accentColor } : {} ),
+		...( backgroundColor ? { background: backgroundColor } : {} )
+	};
 	const blockProps = useBlockProps.save({
 		className: `condition-card condition-card--${ variation }`,
-		style: accentColor ? { '--md-brand': accentColor } : undefined
+		style: Object.keys( style ).length ? style : undefined
 	});
 
 	return (

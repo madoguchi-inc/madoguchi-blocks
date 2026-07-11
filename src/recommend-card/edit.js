@@ -33,13 +33,16 @@ const TEMPLATE = [ [ 'madoguchi/cta-button', { fontSize: 16 } ] ];
 const PATTERNS = [ 'button', 'checklist', 'simple', 'infobox' ];
 
 export default function Edit( { attributes, setAttributes }) {
-	const { pattern, label, title, description, iconKey, imageUrl, linkUrl, accentColor } = attributes;
+	const { pattern, label, title, description, iconKey, imageUrl, linkUrl, accentColor, backgroundColor } = attributes;
 	const current = PATTERNS.includes( pattern ) ? pattern : 'button';
 	const isLink = current !== 'button'; // button 以外はカード全体がリンク
 	const isInfobox = current === 'infobox';
 	const blockProps = useBlockProps({
 		className: `recommend-card recommend-card--edit recommend-card--${ current }`,
-		style: accentColor ? { '--md-brand': accentColor } : undefined
+		style: {
+			...( accentColor ? { '--md-brand': accentColor } : {} ),
+			...( backgroundColor ? { background: backgroundColor } : {} )
+		}
 	});
 
 	// ラベル（情報ボックスは左帯の中、それ以外はピル型で本文の上）
@@ -109,11 +112,18 @@ export default function Edit( { attributes, setAttributes }) {
 				) }
 				<PanelColorSettings
 					title={ __( 'カラー設定', 'madoguchi-blocks' ) }
-					colorSettings={ [ {
-						value: accentColor,
-						onChange: ( color ) => setAttributes({ accentColor: color || '' }),
-						label: __( 'アクセントカラー', 'madoguchi-blocks' )
-					} ] }
+					colorSettings={ [
+						{
+							value: accentColor,
+							onChange: ( color ) => setAttributes({ accentColor: color || '' }),
+							label: __( 'アクセントカラー', 'madoguchi-blocks' )
+						},
+						{
+							value: backgroundColor,
+							onChange: ( color ) => setAttributes({ backgroundColor: color || '' }),
+							label: __( 'カード背景色（未設定はパターン既定）', 'madoguchi-blocks' )
+						}
+					] }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>

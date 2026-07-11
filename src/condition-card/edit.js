@@ -39,10 +39,13 @@ const TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes }) {
-	const { title, description, variation, iconKey, imageUrl, accentColor } = attributes;
+	const { title, description, variation, iconKey, imageUrl, accentColor, backgroundColor } = attributes;
 	const blockProps = useBlockProps({
 		className: `condition-card condition-card--edit condition-card--${ variation }`,
-		style: accentColor ? { '--md-brand': accentColor } : undefined
+		style: {
+			...( accentColor ? { '--md-brand': accentColor } : {} ),
+			...( backgroundColor ? { background: backgroundColor } : {} )
+		}
 	});
 
 	return (
@@ -87,11 +90,18 @@ export default function Edit( { attributes, setAttributes }) {
 				</PanelBody>
 				<PanelColorSettings
 					title={ __( 'カラー設定', 'madoguchi-blocks' ) }
-					colorSettings={ [ {
-						value: accentColor,
-						onChange: ( color ) => setAttributes({ accentColor: color || '' }),
-						label: __( 'アクセントカラー', 'madoguchi-blocks' )
-					} ] }
+					colorSettings={ [
+						{
+							value: accentColor,
+							onChange: ( color ) => setAttributes({ accentColor: color || '' }),
+							label: __( 'アクセントカラー', 'madoguchi-blocks' )
+						},
+						{
+							value: backgroundColor,
+							onChange: ( color ) => setAttributes({ backgroundColor: color || '' }),
+							label: __( 'カード背景色（未設定は白）', 'madoguchi-blocks' )
+						}
+					] }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>

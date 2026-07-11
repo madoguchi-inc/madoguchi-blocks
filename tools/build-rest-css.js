@@ -47,11 +47,23 @@ const ROOTS = [
 ];
 
 // !important を付与しない（インライン style を優先させる）セレクタ×プロパティ
-// sel はセレクタの部分一致。props が null ならそのセレクタの全宣言を除外する。
+// sel はセレクタの部分一致、selEnds はカンマ区切りセレクタのいずれかが末尾一致。
+// props が null ならマッチしたセレクタの全宣言を除外する。
 const INLINE_GUARDS = [
 	{ sel: '.cta-button', props: null },
 	{ sel: '__stars-fill', props: [ 'width' ] },
-	{ sel: '.comparison-table__grid', props: [ 'grid-template-columns' ] }
+	{ sel: '.comparison-table__grid', props: [ 'grid-template-columns' ] },
+	// カード背景色（ルート要素のインライン style）を優先させる
+	{
+		selEnds: [
+			'.recommend-card--button',
+			'.recommend-card--checklist',
+			'.recommend-card--simple',
+			'.recommend-card--infobox',
+			'.condition-card'
+		],
+		props: [ 'background', 'background-color' ]
+	}
 ];
 
 // ルートクラスを3連結して特異性を上げる（class="checklist-cta" に .a.a.a はマッチする）
@@ -59,8 +71,14 @@ const triple = ( root ) => root.repeat( 3 );
 
 function isGuarded( selector, prop ) {
 	return INLINE_GUARDS.some( ( g ) => {
-		if ( ! selector.includes( g.sel ) ) {
+		if ( g.sel && ! selector.includes( g.sel ) ) {
 			return false;
+		}
+		if ( g.selEnds ) {
+			const parts = selector.split( ',' ).map( ( s ) => s.trim() );
+			if ( ! parts.some( ( s ) => g.selEnds.some( ( end ) => s.endsWith( end ) ) ) ) {
+				return false;
+			}
 		}
 		return null === g.props || g.props.includes( prop );
 	});
