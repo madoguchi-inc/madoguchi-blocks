@@ -168,6 +168,129 @@
 		}
 	}
 
+	// ---- ③ シンプル・ミニマルタイプ ----
+	&--simple {
+		background: #fff;
+		border: 1px solid #e9edf2;
+
+		&:hover {
+			transform: translateY(-2px);
+			border-color: var(--md-brand, $color_orange);
+			box-shadow: 0 6px 16px rgba(#000, 0.08);
+		}
+
+		// 円背景なしの素のアイコン
+		.recommend-card__icon {
+			width: 48px;
+			height: 48px;
+			background: none;
+			box-shadow: none;
+
+			@include mq-max(md) {
+				width: 11vw;
+				height: 11vw;
+			}
+		}
+
+		// 丸囲みなしの小さめシェブロン
+		.recommend-card__chevron {
+			width: 20px;
+			height: 20px;
+			border: none;
+
+			&::before {
+				width: 18px;
+				height: 18px;
+			}
+
+			@include mq-max(md) {
+				width: 5vw;
+				height: 5vw;
+			}
+		}
+	}
+
+	// ---- ④ 情報ボックスタイプ ----
+	&--infobox {
+		gap: 0;
+		padding: 0;
+		overflow: hidden;
+		background: #f7f9fb;
+		border: 1px solid #e9edf2;
+
+		&:hover {
+			border-color: var(--md-brand, $color_orange);
+			box-shadow: 0 6px 16px rgba(#000, 0.08);
+		}
+
+		// 左の帯（アイコン＋ラベル）
+		.recommend-card__media {
+			flex-direction: column;
+			gap: 6px;
+			align-self: stretch;
+			min-width: 92px;
+			padding: 16px 12px;
+			background: var(--md-brand, $color_orange);
+
+			@include mq-max(md) {
+				min-width: 19vw;
+				padding: 3.5vw 2.5vw;
+			}
+		}
+
+		.recommend-card__icon {
+			width: auto;
+			height: auto;
+			color: #fff;
+			background: none;
+			border-radius: 0;
+			box-shadow: none;
+		}
+
+		// 帯内ラベル（ピルではなく白文字）
+		.recommend-card__label {
+			margin: 0 !important;
+			padding: 0;
+			color: #fff;
+			font-size: 1.2rem;
+			line-height: 1.4;
+			text-align: center;
+			background: none;
+			border-radius: 0;
+
+			@include mq-max(md) {
+				font-size: 2.9vw;
+			}
+		}
+
+		.recommend-card__content {
+			padding: 14px 18px;
+
+			@include mq-max(md) {
+				padding: 3.5vw 4vw;
+			}
+		}
+
+		// 丸囲みなしの小さめシェブロン
+		.recommend-card__chevron {
+			width: 20px;
+			height: 20px;
+			margin-right: 16px;
+			border: none;
+
+			&::before {
+				width: 18px;
+				height: 18px;
+			}
+
+			@include mq-max(md) {
+				width: 5vw;
+				height: 5vw;
+				margin-right: 3.5vw;
+			}
+		}
+	}
+
 	// 右端の丸囲みシェブロン（チェックリスト風）
 	&__chevron {
 		position: relative;

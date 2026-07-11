@@ -3,6 +3,8 @@
  *
  * ①ボタン強調（button）… CTAボタンブロックを内包。カード全体クリックはフロントでボタンへ委譲。
  * ②チェックリスト風（checklist）… カード全体がリンク。右端に丸囲みシェブロンを表示。
+ * ③シンプル・ミニマル（simple）… 白カード＋細枠＋素のアイコン。カード全体がリンク。
+ * ④情報ボックス（infobox）… 左にブランドカラーの帯（アイコン＋ラベル）。カード全体がリンク。
  * 本体は render.php が描画する動的ブロック。
  */
 
@@ -28,13 +30,31 @@ import CardIcon, { ICON_OPTIONS } from '../condition-card/icons';
 const ALLOWED_BLOCKS = [ 'madoguchi/cta-button' ];
 const TEMPLATE = [ [ 'madoguchi/cta-button', { fontSize: 16 } ] ];
 
+const PATTERNS = [ 'button', 'checklist', 'simple', 'infobox' ];
+
 export default function Edit( { attributes, setAttributes }) {
 	const { pattern, label, title, description, iconKey, imageUrl, linkUrl, accentColor } = attributes;
-	const isChecklist = pattern === 'checklist';
+	const current = PATTERNS.includes( pattern ) ? pattern : 'button';
+	const isLink = current !== 'button'; // button 以外はカード全体がリンク
+	const isInfobox = current === 'infobox';
 	const blockProps = useBlockProps({
-		className: `recommend-card recommend-card--edit recommend-card--${ isChecklist ? 'checklist' : 'button' }`,
+		className: `recommend-card recommend-card--edit recommend-card--${ current }`,
 		style: accentColor ? { '--md-brand': accentColor } : undefined
 	});
+
+	// ラベル（情報ボックスは左帯の中、それ以外はピル型で本文の上）
+	const labelField = (
+		<RichText
+			tagName="p"
+			className="recommend-card__label"
+			value={ label }
+			onChange={ ( value ) => setAttributes({ label: value }) }
+			placeholder={ isInfobox
+				? __( 'ラベル（例：関連記事）', 'madoguchi-blocks' )
+				: __( 'ラベル（例：不用品回収を検討中の方へ）※空欄で非表示', 'madoguchi-blocks' ) }
+			allowedFormats={ [] }
+		/>
+	);
 
 	return (
 		<>
@@ -42,13 +62,15 @@ export default function Edit( { attributes, setAttributes }) {
 				<PanelBody title={ __( '表示スタイル', 'madoguchi-blocks' ) }>
 					<SelectControl
 						label={ __( 'パターン', 'madoguchi-blocks' ) }
-						value={ isChecklist ? 'checklist' : 'button' }
+						value={ current }
 						options={ [
 							{ label: __( 'ボタン強調（CTAボタンを内包）', 'madoguchi-blocks' ), value: 'button' },
-							{ label: __( 'チェックリスト風（カード全体がリンク）', 'madoguchi-blocks' ), value: 'checklist' }
+							{ label: __( 'チェックリスト風（カード全体がリンク）', 'madoguchi-blocks' ), value: 'checklist' },
+							{ label: __( 'シンプル・ミニマル（カード全体がリンク）', 'madoguchi-blocks' ), value: 'simple' },
+							{ label: __( '情報ボックス（カード全体がリンク）', 'madoguchi-blocks' ), value: 'infobox' }
 						] }
 						onChange={ ( value ) => setAttributes({ pattern: value }) }
-						help={ isChecklist
+						help={ isLink
 							? __( 'リンク先は下の「リンク設定」で指定します。', 'madoguchi-blocks' )
 							: __( 'リンク先・ボタン文言はカード内のCTAボタン側で設定します。', 'madoguchi-blocks' ) }
 					/>
@@ -75,7 +97,7 @@ export default function Edit( { attributes, setAttributes }) {
 						) }
 					</MediaUploadCheck>
 				</PanelBody>
-				{ isChecklist && (
+				{ isLink && (
 					<PanelBody title={ __( 'リンク設定', 'madoguchi-blocks' ) }>
 						<TextControl
 							label={ __( 'リンク先URL', 'madoguchi-blocks' ) }
@@ -95,7 +117,7 @@ export default function Edit( { attributes, setAttributes }) {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				<div className="recommend-card__media" aria-hidden="true">
+				<div className="recommend-card__media">
 					{ imageUrl ? (
 						<img className="recommend-card__image" src={ imageUrl } alt="" />
 					) : (
@@ -103,16 +125,10 @@ export default function Edit( { attributes, setAttributes }) {
 							<CardIcon iconKey={ iconKey } className="recommend-card__icon-svg" size={ 40 } />
 						</span>
 					) }
+					{ isInfobox && labelField }
 				</div>
 				<div className="recommend-card__content">
-					<RichText
-						tagName="p"
-						className="recommend-card__label"
-						value={ label }
-						onChange={ ( value ) => setAttributes({ label: value }) }
-						placeholder={ __( 'ラベル（例：不用品回収を検討中の方へ）※空欄で非表示', 'madoguchi-blocks' ) }
-						allowedFormats={ [] }
-					/>
+					{ ! isInfobox && labelField }
 					<RichText
 						tagName="p"
 						className="recommend-card__title"
@@ -127,7 +143,7 @@ export default function Edit( { attributes, setAttributes }) {
 						onChange={ ( value ) => setAttributes({ description: value }) }
 						placeholder={ __( '説明文（例：対応できる業者を比較・紹介しています。）', 'madoguchi-blocks' ) }
 					/>
-					{ ! isChecklist && (
+					{ ! isLink && (
 						<div className="recommend-card__action">
 							<InnerBlocks
 								allowedBlocks={ ALLOWED_BLOCKS }
@@ -136,7 +152,7 @@ export default function Edit( { attributes, setAttributes }) {
 						</div>
 					) }
 				</div>
-				{ isChecklist && (
+				{ isLink && (
 					<span className="recommend-card__chevron" aria-hidden="true"></span>
 				) }
 			</div>

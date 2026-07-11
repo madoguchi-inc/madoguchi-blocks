@@ -17,7 +17,8 @@ export const ICON_OPTIONS = [
 	{ label: '遺品整理', value: 'memorial' },
 	{ label: '買取', value: 'buy' },
 	{ label: '検索（虫めがね）', value: 'search' },
-	{ label: 'チェックリスト', value: 'checklist' }
+	{ label: 'チェックリスト', value: 'checklist' },
+	{ label: 'インフォメーション', value: 'info' }
 ];
 
 // キー → SVG の path/shape 要素
@@ -80,6 +81,13 @@ const PATHS = {
 			<path d="M9 5V4a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4v1" />
 			<path d="M8.5 11.5l2 2 4.5-4.5" />
 			<path d="M8.5 17h7" />
+		</>
+	),
+	info: (
+		<>
+			<circle cx="12" cy="12" r="9" />
+			<path d="M12 11v5" />
+			<path d="M12 7.5v.01" />
 		</>
 	)
 };
