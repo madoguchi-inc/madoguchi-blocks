@@ -27,10 +27,19 @@ git commit -am "..."
 - `build/` は成果物としてコミット済みなので、ビルド差分も一緒にコミットする
 
 ### 4. 配布 zip 生成 + GitHub リリース作成・添付
+
+**方法A（ローカルに gh CLI がある場合）:**
 ```bash
 bash package.sh --release
 ```
 - 内部で `gh release create <Version> <zip> --repo madoguchi-inc/madoguchi-blocks --title v<Version> --generate-notes` が走る
+
+**方法B（gh CLI が無い環境。Claude Code リモート等）:**
+- `Version:` を上げた変更を PR で **main にマージするだけ**でよい。`.github/workflows/release.yml` が
+  main への push で起動し、`Version:` に対応するタグが未作成なら CI 上でビルド→zip→リリース作成まで自動実行する
+  （タグ作成済みならスキップされる。`Version:` を上げ忘れるとリリースされない）
+- ワークフローの完走と、リリース（タグ・zip 添付）の存在を必ず確認すること
+
 - 配布 zip は実行時ファイルのみ（`madoguchi-blocks.php` / `inc/` / `blocks/` / `build/` / `assets/` / `lib/` / `README.md`）。`src/` `scss/` `*.sh` `node_modules/` は含めない
 - zip だけ作って確認したい場合は `bash package.sh`（`--release` なし）
 

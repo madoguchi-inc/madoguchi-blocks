@@ -125,6 +125,10 @@ cp madoguchi-blocks/src/view.js madoguchi-blocks/build/view.js
    ```
    `dist-zip/madoguchi-blocks-<version>.zip` を生成し、専用リポジトリに **タグ = バージョン**（例 `1.1.2`）で
    GitHub リリースを作成・zip添付します（`--release` を付けなければ zip 生成のみ）。
+
+   > gh CLI が無い環境では、`Version:` を上げた変更を **main にマージするだけ**でも
+   > リリースされます（`.github/workflows/release.yml` が main への push で起動し、
+   > 未リリースのバージョンなら CI がビルド→zip→リリース作成まで自動実行）。
 5. リリース本文に変更点を書いておくと、各サイトの更新画面「詳細を表示」で読めます。
 
 > ⚠️ **タグ名は必ず `Version:` ヘッダーと一致させること**。plugin-update-checker はリリースのタグ名を

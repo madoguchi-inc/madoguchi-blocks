@@ -1,10 +1,12 @@
 # 配布 zip を生成して GitHub リリースを作成する（plugin-update-checker の更新元）。
 #
-# トリガーは2通り:
+# トリガーは3通り:
+#   - main への push（PR マージ含む）
+#     → madoguchi-blocks.php の Version: に対応するタグが未作成の場合だけリリースを作成。
+#       作成済みならスキップ（= Version: を上げてマージすると自動でリリースされる）
 #   - バージョン番号のタグ（例 1.2.0）を push
-#     → タグ名 = madoguchi-blocks.php の Version: ヘッダーであることを検証してからリリース
+#     → タグ名 = Version: ヘッダーであることを検証してからリリース
 #   - Actions 画面からの手動実行（workflow_dispatch。main 上で実行すること）
-#     → タグは Version: ヘッダーの値で自動作成する
 #
 # タグ名 = Version: が自動更新の判定条件のため、不一致はここで失敗させる。
 # ローカルに gh CLI がある場合は従来どおり `bash package.sh --release` でも可。
@@ -14,6 +16,8 @@ name: Release
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - "[0-9]*"
 
@@ -26,18 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: 依存インストール
-        run: npm ci
-
-      - name: 一括ビルド（JS → CSS → REST用CSS → view.js）
-        run: bash build.sh
-
-      - name: Version ヘッダー取得
+      - name: Version ヘッダー取得・リリース要否判定
         id: ver
         run: |
           VERSION="$(grep -E '^\s*\*\s*Version:' madoguchi-blocks.php | head -1 | sed -E 's/.*Version:[[:space:]]*//; s/[[:space:]]+$//')"
@@ -47,26 +40,44 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: タグ名と Version の一致チェック（タグ push 時）
-        if: github.event_name == 'push'
-        run: |
-          if [ "$GITHUB_REF_NAME" != "${{ steps.ver.outputs.version }}" ]; then
-            echo "ERROR: タグ名 ($GITHUB_REF_NAME) と Version: (${{ steps.ver.outputs.version }}) が一致しません" >&2
-            exit 1
+          # タグ push なら、タグ名と Version: の一致を検証してリリースする
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            if [ "${GITHUB_REF_NAME}" != "$VERSION" ]; then
+              echo "ERROR: タグ名 (${GITHUB_REF_NAME}) と Version: ($VERSION) が一致しません" >&2
+              exit 1
+            fi
+            echo "go=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: 既存タグとの衝突チェック（手動実行時）
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          if git ls-remote --tags origin "refs/tags/${{ steps.ver.outputs.version }}" | grep -q .; then
-            echo "ERROR: タグ ${{ steps.ver.outputs.version }} は既に存在します。Version: を上げてください" >&2
-            exit 1
+          # main への push / 手動実行なら、Version のタグが未作成の場合だけリリースする
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "タグ $VERSION は作成済みのためリリースをスキップします"
+            echo "go=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - uses: actions/setup-node@v4
+        if: steps.ver.outputs.go == 'true'
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 依存インストール
+        if: steps.ver.outputs.go == 'true'
+        run: npm ci
+
+      - name: 一括ビルド（JS → CSS → REST用CSS → view.js）
+        if: steps.ver.outputs.go == 'true'
+        run: bash build.sh
 
       - name: 配布 zip 生成
+        if: steps.ver.outputs.go == 'true'
         run: bash package.sh
 
       - name: GitHub リリース作成・zip 添付
+        if: steps.ver.outputs.go == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -74,4 +85,5 @@ jobs:
           gh release create "$VERSION" "dist-zip/madoguchi-blocks-${VERSION}.zip" \
             --repo "${{ github.repository }}" \
             --title "v${VERSION}" \
+            --target "${GITHUB_SHA}" \
             --generate-notes
