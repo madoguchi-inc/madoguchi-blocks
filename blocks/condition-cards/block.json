@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/condition-cards",
 	"title": "条件別カードリンク",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "grid-view",
 	"description": "条件別おすすめ記事へのカード型内部リンク集。見出しとカードを記事ごとに編集できます。",
 	"textdomain": "madoguchi-blocks",

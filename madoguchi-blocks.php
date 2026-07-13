@@ -12,7 +12,7 @@
  * 使い方:
  *   1. この「madoguchi-blocks」フォルダごと wp-content/plugins/ に置く
  *   2. 管理画面 > プラグイン で「Madoguchi Blocks」を有効化
- *   3. 投稿/固定ページの編集画面、カテゴリ「デザイン」に各ブロックが追加される
+ *   3. 投稿/固定ページの編集画面、ブロック挿入メニューのカテゴリー「Madoguchi Blocks」に各ブロックが追加される
  *   4. 管理画面 > 設定 > Madoguchi Blocks でメディア別のブランドカラーを設定できる
  *
  * 備考: ブロックの名前空間は madoguchi/* です（旧 fuyouhin/* から変更）。
@@ -58,6 +58,30 @@ function madoguchi_blocks_boot_update_checker() {
 	}
 }
 madoguchi_blocks_boot_update_checker();
+
+/**
+ * ブロック挿入メニューに専用カテゴリー「Madoguchi Blocks」を追加する。
+ *
+ * 各ブロックの block.json は "category": "madoguchi" を指定しているため、
+ * このカテゴリーを登録しておくと全ブロックが1か所にまとまって表示される。
+ * 先頭に差し込み、挿入メニューで見つけやすくする。
+ *
+ * @param array $categories 既存のカテゴリー配列。
+ * @return array
+ */
+function madoguchi_blocks_register_category( $categories ) {
+	array_unshift(
+		$categories,
+		array(
+			'slug'  => 'madoguchi',
+			'title' => __( 'Madoguchi Blocks', 'madoguchi-blocks' ),
+			'icon'  => null,
+		)
+	);
+
+	return $categories;
+}
+add_filter( 'block_categories_all', 'madoguchi_blocks_register_category' );
 
 /**
  * 共有スクリプト/スタイルを登録し、各ブロックを block.json から登録する。

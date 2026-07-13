@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/comparison-row",
 	"title": "比較テーブルの行",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "editor-justify",
 	"description": "買取業者比較テーブルの1行（1業者）。店名・評価・各列の値と、CTA列に置くブロックを持ちます。",
 	"textdomain": "madoguchi-blocks",

@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/comparison-table",
 	"title": "買取業者比較テーブル",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "editor-table",
 	"description": "買取業者を一覧で比較できるテーブル。列を自由に増やせ、各行のCTA列にはCTAボタン等のブロックを入れられます。スマホでは横スクロール（店名列は固定）。",
 	"textdomain": "madoguchi-blocks",
