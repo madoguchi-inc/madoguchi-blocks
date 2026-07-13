@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/cta-button",
 	"title": "CTAボタン",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "button",
 	"description": "記事内に自在に置けるCTAボタン。背景色・文字色・角丸・整列・余白を設定でき、ボタン内テキストの一部をバッジ風に表示できます。",
 	"textdomain": "madoguchi-blocks",

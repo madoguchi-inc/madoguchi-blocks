@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Madoguchi Blocks（記事内コンテンツブロック集）
  * Description:        記事内に設置できるカスタムブロック集。チェックリスト型CTA・条件別カードリンク・買取業者比較テーブル・著者情報・口コミ。テーマ非依存で動作し、REST API 経由でもCSSを同梱して同一デザインを再現します。
- * Version:           1.2.0
+ * Version:           1.3.0
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Madoguchi Inc.
@@ -12,7 +12,7 @@
  * 使い方:
  *   1. この「madoguchi-blocks」フォルダごと wp-content/plugins/ に置く
  *   2. 管理画面 > プラグイン で「Madoguchi Blocks」を有効化
- *   3. 投稿/固定ページの編集画面、カテゴリ「デザイン」に各ブロックが追加される
+ *   3. 投稿/固定ページの編集画面、ブロック挿入メニューのカテゴリー「Madoguchi Blocks」に各ブロックが追加される
  *   4. 管理画面 > 設定 > Madoguchi Blocks でメディア別のブランドカラーを設定できる
  *
  * 備考: ブロックの名前空間は madoguchi/* です（旧 fuyouhin/* から変更）。
@@ -60,6 +60,30 @@ function madoguchi_blocks_boot_update_checker() {
 madoguchi_blocks_boot_update_checker();
 
 /**
+ * ブロック挿入メニューに専用カテゴリー「Madoguchi Blocks」を追加する。
+ *
+ * 各ブロックの block.json は "category": "madoguchi" を指定しているため、
+ * このカテゴリーを登録しておくと全ブロックが1か所にまとまって表示される。
+ * 先頭に差し込み、挿入メニューで見つけやすくする。
+ *
+ * @param array $categories 既存のカテゴリー配列。
+ * @return array
+ */
+function madoguchi_blocks_register_category( $categories ) {
+	array_unshift(
+		$categories,
+		array(
+			'slug'  => 'madoguchi',
+			'title' => __( 'Madoguchi Blocks', 'madoguchi-blocks' ),
+			'icon'  => null,
+		)
+	);
+
+	return $categories;
+}
+add_filter( 'block_categories_all', 'madoguchi_blocks_register_category' );
+
+/**
  * 共有スクリプト/スタイルを登録し、各ブロックを block.json から登録する。
  */
 function madoguchi_blocks_register() {
@@ -77,6 +101,17 @@ function madoguchi_blocks_register() {
 		$asset['version'],
 		true
 	);
+
+	// 著者テンプレートをエディタへ供給する（著者情報ブロックのテンプレート選択用）。
+	if ( function_exists( 'madoguchi_blocks_author_templates' ) ) {
+		wp_localize_script(
+			'madoguchi-blocks-editor',
+			'madoguchiBlocksData',
+			array(
+				'authorTemplates' => array_values( madoguchi_blocks_author_templates() ),
+			)
+		);
+	}
 
 	// フロント＋エディタ共通スタイル
 	// CSSのみ変更したときもキャッシュが切れるよう、style.css のファイル更新時刻をバージョンに使う

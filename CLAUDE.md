@@ -1,7 +1,7 @@
 # madoguchi-blocks
 
 記事内に設置できるカスタム Gutenberg ブロック集の WordPress プラグイン（テーマ非依存）。
-チェックリスト型CTA・条件別カードリンク・買取業者比較テーブル・著者情報・口コミ・CTAボタン。
+チェックリスト型CTA・条件別カードリンク・比較テーブル・著者情報・口コミ・CTAボタン・おすすめリンクカード。
 
 - 旧: `fuyouhin.support` モノレポ内 (`madoguchi-blocks/`) で開発 → **独立リポジトリに分離済み**
 - 配布・自動更新も本リポジトリで完結する
@@ -36,6 +36,17 @@ npm run lint:js       # ESLint (wp-scripts)
 - フロントJS: `src/view.js` を `build/view.js` へコピー
 - `build/` は成果物を**コミット済み**（drop-in で動く）。`node_modules/` `dist-zip/` は gitignore
 - CSS は node-sass ではなく **dart-sass** を使用（Node 21 でのネイティブビルド回避。`overrides` で chokidar を v3 に固定）
+
+## 開発ルール（`.claude/rules/`）
+
+ブロックの追加・改修時は以下のルールを**必ず遵守する**:
+
+- **REST 表示の厳格化**: `.claude/rules/rest-isolation.md` — REST 配信時に配信先テーマCSSの影響を受けないよう、
+  新ブロックの style-inliner 登録・`build-rest-css.js` の `ROOTS`/`INLINE_GUARDS` 更新・再ビルド・敵対的CSS下の確認を行う。
+- **ブロック設計（色・フォント・アイコン・テキスト）**: `.claude/rules/block-design.md` — 色（`--md-brand`＋背景色）・
+  文字サイズ・アイコン（内蔵選択＋画像差し替え）は基本的に編集画面から変更可能にし、表示テキストはキャンバス上の
+  `RichText` で直接編集・インライン書式を許容する。
+- **リリース**: `.claude/rules/release.md`（下記）。
 
 ## 配布・自動更新
 

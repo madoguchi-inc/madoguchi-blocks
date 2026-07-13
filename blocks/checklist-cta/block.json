@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/checklist-cta",
 	"title": "チェックリスト型CTA",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "yes-alt",
 	"description": "囲み枠つきのチェックリスト型CTA。見出し・チェック項目を記事ごとに編集でき、ボタンにはCTAボタンブロックを使用します。",
 	"textdomain": "madoguchi-blocks",

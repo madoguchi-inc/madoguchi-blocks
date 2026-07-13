@@ -3,9 +3,9 @@
 	"apiVersion": 3,
 	"name": "madoguchi/recommend-card",
 	"title": "おすすめリンクカード",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "admin-links",
-	"description": "おすすめ記事へ誘導するリンクカード。①ボタン強調（CTAボタンブロックを内包） ②チェックリスト風（カード全体がリンク） の2パターンを切り替えられます。",
+	"description": "おすすめ記事へ誘導するリンクカード。①ボタン強調（CTAボタンブロックを内包） ②チェックリスト風 ③シンプル・ミニマル ④情報ボックス の4パターンを切り替えられます（②〜④はカード全体がリンク）。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
@@ -45,6 +45,10 @@
 			"default": ""
 		},
 		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"backgroundColor": {
 			"type": "string",
 			"default": ""
 		}

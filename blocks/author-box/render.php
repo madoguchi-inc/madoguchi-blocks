@@ -16,6 +16,20 @@ $role   = isset( $attributes['role'] ) ? $attributes['role'] : '';
 $bio    = isset( $attributes['bio'] ) ? $attributes['bio'] : '';
 $avatar = isset( $attributes['avatarUrl'] ) ? $attributes['avatarUrl'] : '';
 
+// 著者テンプレートが選択されていれば、その内容で上書きする（参照方式）。
+// 設定画面で編集すると、そのテンプレートを使う全記事に反映される。
+// テンプレートが削除済みの場合は、この記事の手入力値（上の値）にフォールバックする。
+$template_id = isset( $attributes['templateId'] ) ? $attributes['templateId'] : '';
+if ( '' !== (string) $template_id && function_exists( 'madoguchi_blocks_get_author_template' ) ) {
+	$template = madoguchi_blocks_get_author_template( $template_id );
+	if ( $template ) {
+		$name   = trim( wp_strip_all_tags( isset( $template['name'] ) ? $template['name'] : '' ) );
+		$role   = isset( $template['role'] ) ? $template['role'] : '';
+		$bio    = isset( $template['bio'] ) ? $template['bio'] : '';
+		$avatar = isset( $template['avatarUrl'] ) ? $template['avatarUrl'] : '';
+	}
+}
+
 // 名前・アバターの既定値をこの記事の著者から補完する
 $post = get_post();
 if ( $post ) {

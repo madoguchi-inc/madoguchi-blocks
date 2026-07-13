@@ -24,6 +24,7 @@ const TEMPLATE = [ [ 'madoguchi/cta-button', {
 export default function Edit( { attributes, setAttributes, context }) {
 	const { name, rating, values } = attributes;
 	const columns = ( context && context['madoguchi/comparisonColumns'] ) || [];
+	const nameLabel = ( context && context['madoguchi/comparisonNameLabel'] ) || '';
 
 	const blockProps = useBlockProps({ className: 'comparison-row-edit' });
 	const innerProps = useInnerBlocksProps(
@@ -54,13 +55,13 @@ export default function Edit( { attributes, setAttributes, context }) {
 
 			<div { ...blockProps }>
 				<div className="comparison-row-edit__field">
-					<span className="comparison-row-edit__lbl">{ __( '業者名', 'madoguchi-blocks' ) }</span>
+					<span className="comparison-row-edit__lbl">{ nameLabel || __( '名称', 'madoguchi-blocks' ) }</span>
 					<RichText
 						tagName="span"
 						className="comparison-row-edit__name"
 						value={ name }
 						onChange={ ( v ) => setAttributes({ name: v }) }
-						placeholder={ __( '店舗名', 'madoguchi-blocks' ) }
+						placeholder={ nameLabel || __( '名称（例：業者・商品名）', 'madoguchi-blocks' ) }
 						allowedFormats={ [] }
 					/>
 					{ rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }

@@ -2,17 +2,21 @@
 /**
  * おすすめリンクカードブロック（動的レンダリング）
  *
- * おすすめ記事へ誘導するリンクカード。2パターンを切り替えられる。
+ * おすすめ記事へ誘導するリンクカード。4パターンを切り替えられる。
  *   - button    … ボタン強調タイプ。CTAボタンブロック（$content）を内包し、
  *                 カード全体のクリックは view.js がボタンへ委譲する。
  *   - checklist … チェックリスト風。カード全体が <a> リンクで、右端に丸囲みシェブロンを表示する。
+ *   - simple    … シンプル・ミニマル。白カード＋細枠＋素のアイコン＋右シェブロン。カード全体が <a>。
+ *   - infobox   … 情報ボックス。左にブランドカラーの帯（アイコン＋ラベル）。カード全体が <a>。
  *
  * @var array    $attributes ブロック属性。
  * @var string   $content    内部コンテンツ（button パターンのCTAボタン）。
  * @var WP_Block $block      ブロックインスタンス。
  */
 
-$pattern     = ( isset( $attributes['pattern'] ) && 'checklist' === $attributes['pattern'] ) ? 'checklist' : 'button';
+$patterns    = array( 'button', 'checklist', 'simple', 'infobox' );
+$pattern     = ( isset( $attributes['pattern'] ) && in_array( $attributes['pattern'], $patterns, true ) ) ? $attributes['pattern'] : 'button';
+$is_link     = 'button' !== $pattern;
 $label       = isset( $attributes['label'] ) ? wp_strip_all_tags( $attributes['label'] ) : '';
 $title       = wp_kses( isset( $attributes['title'] ) ? $attributes['title'] : '', array( 'br' => array() ) );
 $description = wp_kses( isset( $attributes['description'] ) ? $attributes['description'] : '', array( 'br' => array() ) );
@@ -39,30 +43,44 @@ $icon_paths = array(
 	'buy'       => '<path d="M4 4h7l9 9-7 7-9-9z"/><circle cx="8" cy="8" r="1.4"/>',
 	'search'    => '<circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L20.5 20.5"/>',
 	'checklist' => '<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V4a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4v1"/><path d="M8.5 11.5l2 2 4.5-4.5"/><path d="M8.5 17h7"/>',
+	'info'      => '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5v.01"/>',
 );
 $icon_shape = isset( $icon_paths[ $icon_key ] ) ? $icon_paths[ $icon_key ] : $icon_paths['search'];
 $icon_svg   = '<svg class="recommend-card__icon-svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $icon_shape . '</svg>';
 
-// ラッパー（パターン別クラス + アクセントカラー）
+// ラッパー（パターン別クラス + アクセントカラー + カード背景色）
 $wrapper_args = array( 'class' => 'recommend-card recommend-card--' . $pattern );
+$styles       = array();
 $accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
 if ( $accent ) {
-	$wrapper_args['style'] = '--md-brand:' . $accent . ';';
+	$styles[] = '--md-brand:' . $accent;
+}
+// カード背景色はインライン style で出力（パターン既定の背景より優先される）
+$card_bg = isset( $attributes['backgroundColor'] ) ? sanitize_hex_color( $attributes['backgroundColor'] ) : '';
+if ( $card_bg ) {
+	$styles[] = 'background:' . $card_bg;
+}
+if ( $styles ) {
+	$wrapper_args['style'] = implode( ';', $styles ) . ';';
 }
 $wrapper = get_block_wrapper_attributes( $wrapper_args );
 
 // メディア（画像 or 内蔵アイコン）
 ob_start();
 ?>
-<div class="recommend-card__media" aria-hidden="true">
+<?php $media_has_label = ( 'infobox' === $pattern && '' !== $label ); // ラベル入りの帯は読み上げ対象にする ?>
+<div class="recommend-card__media"<?php echo $media_has_label ? '' : ' aria-hidden="true"'; ?>>
 	<?php if ( $image_url ) : ?>
 		<img class="recommend-card__image" src="<?php echo esc_url( $image_url ); ?>" alt="" loading="lazy" />
 	<?php else : ?>
 		<span class="recommend-card__icon"><?php echo $icon_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 	<?php endif; ?>
+	<?php if ( 'infobox' === $pattern && '' !== $label ) : // 情報ボックスはラベルを左帯の中に表示する ?>
+		<p class="recommend-card__label"><?php echo esc_html( $label ); ?></p>
+	<?php endif; ?>
 </div>
 <div class="recommend-card__content">
-	<?php if ( '' !== $label ) : ?>
+	<?php if ( 'infobox' !== $pattern && '' !== $label ) : ?>
 		<p class="recommend-card__label"><?php echo esc_html( $label ); ?></p>
 	<?php endif; ?>
 	<?php if ( '' !== trim( wp_strip_all_tags( $title ) ) ) : ?>
@@ -78,8 +96,8 @@ ob_start();
 <?php
 $inner = ob_get_clean();
 
-// checklist はカード全体を <a>、button は <div>（<a> の入れ子を避け、クリックは view.js が委譲）
-if ( 'checklist' === $pattern ) :
+// button 以外はカード全体を <a>、button は <div>（<a> の入れ子を避け、クリックは view.js が委譲）
+if ( $is_link ) :
 	?>
 	<a <?php echo $wrapper; ?> href="<?php echo esc_url( $link_url ? $link_url : '#' ); ?>">
 		<?php echo $inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

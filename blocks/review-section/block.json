@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/review-section",
 	"title": "口コミ・レビュー",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "format-status",
 	"description": "利用者の口コミ・レビューセクション。schema.org の構造化データ（JSON-LD）を同梱し、検索エンジンやAIに口コミとして認識されやすくします。",
 	"textdomain": "madoguchi-blocks",

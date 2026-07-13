@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "madoguchi/condition-card",
 	"title": "条件カード",
-	"category": "design",
+	"category": "madoguchi",
 	"icon": "id",
 	"description": "条件別おすすめ記事へのカード型内部リンク（1枚）。リンクにはCTAボタンブロックを使用します。",
 	"textdomain": "madoguchi-blocks",
@@ -37,6 +37,10 @@
 			"default": ""
 		},
 		"accentColor": {
+			"type": "string",
+			"default": ""
+		},
+		"backgroundColor": {
 			"type": "string",
 			"default": ""
 		}
