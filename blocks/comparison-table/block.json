@@ -2,17 +2,18 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "madoguchi/comparison-table",
-	"title": "買取業者比較テーブル",
+	"title": "比較テーブル",
 	"category": "madoguchi",
 	"icon": "editor-table",
-	"description": "買取業者を一覧で比較できるテーブル。列を自由に増やせ、各行のCTA列にはCTAボタン等のブロックを入れられます。スマホでは横スクロール（店名列は固定）。",
+	"description": "項目を一覧で比較できるテーブル。1列目の見出しと列を自由に設定でき、各行のCTA列にはCTAボタン等のブロックを入れられます。スマホでは横スクロール（1列目は固定）。買取業者・サービス・商品などの比較に使えます。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
 	"viewScript": "madoguchi-blocks-view",
 	"render": "file:./render.php",
 	"providesContext": {
-		"madoguchi/comparisonColumns": "columns"
+		"madoguchi/comparisonColumns": "columns",
+		"madoguchi/comparisonNameLabel": "nameLabel"
 	},
 	"supports": {
 		"html": false,
@@ -20,6 +21,10 @@
 	},
 	"attributes": {
 		"caption": {
+			"type": "string",
+			"default": ""
+		},
+		"nameLabel": {
 			"type": "string",
 			"default": ""
 		},
@@ -38,8 +43,8 @@
 		"columns": {
 			"type": "array",
 			"default": [
-				{ "label": "買取方法" },
-				{ "label": "対応エリア" }
+				{ "label": "料金" },
+				{ "label": "特徴" }
 			]
 		}
 	}

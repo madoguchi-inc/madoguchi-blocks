@@ -1,6 +1,6 @@
 /**
- * 買取業者比較テーブル（親） — エディタ表示
- * 列（列名）はエディタ内で追加/編集/削除。行は comparison-row 子ブロックとして追加する。
+ * 比較テーブル（親） — エディタ表示
+ * 1列目の見出し・各列名はエディタ内で編集。行は comparison-row 子ブロックとして追加する。
  */
 
 import { __ } from '@wordpress/i18n';
@@ -18,7 +18,7 @@ const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
 const TEMPLATE = [ [ 'madoguchi/comparison-row' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId }) {
-	const { caption, articleId, columns, accentColor, fontSize } = attributes;
+	const { caption, articleId, columns, accentColor, fontSize, nameLabel } = attributes;
 
 	const blockProps = useBlockProps({
 		className: 'comparison-table comparison-table--edit',
@@ -92,13 +92,23 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 					className="comparison-table__caption"
 					value={ caption }
 					onChange={ ( value ) => setAttributes({ caption: value }) }
-					placeholder={ __( '見出し（例：おすすめ買取業者を比較）', 'madoguchi-blocks' ) }
+					placeholder={ __( '見出し（例：おすすめサービスを比較）', 'madoguchi-blocks' ) }
 					allowedFormats={ [] }
 				/>
 
 				<div className="comparison-table__columns-edit">
 					<span className="comparison-table__columns-edit-label">{ __( '列：', 'madoguchi-blocks' ) }</span>
-					<span className="comparison-table__columns-edit-fixed">{ __( '業者（固定）', 'madoguchi-blocks' ) }</span>
+					<span className="comparison-table__col-chip comparison-table__col-chip--name">
+						<RichText
+							tagName="span"
+							className="comparison-table__col-label"
+							value={ nameLabel || '' }
+							onChange={ ( value ) => setAttributes({ nameLabel: value }) }
+							placeholder={ __( '1列目の見出し（例：業者・商品名）', 'madoguchi-blocks' ) }
+							allowedFormats={ [] }
+						/>
+						<span className="comparison-table__col-fixed-mark">{ __( '（固定）', 'madoguchi-blocks' ) }</span>
+					</span>
 					{ columns.map( ( col, index ) => (
 						<span className="comparison-table__col-chip" key={ index }>
 							<RichText

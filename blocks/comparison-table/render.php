@@ -1,9 +1,10 @@
 <?php
 /**
- * 買取業者比較テーブル（親・動的レンダリング）
+ * 比較テーブル（親・動的レンダリング）
  *
  * CSSグリッドでヘッダ＋各行（子ブロック）を整列させる。
  * 行は madoguchi/comparison-row 子ブロック（$content）として差し込まれる。
+ * 1列目の見出しは nameLabel（未設定時は「項目」）。
  *
  * @var array    $attributes ブロック属性。
  * @var string   $content    子ブロック（行）のレンダリング結果。
@@ -12,6 +13,12 @@
 
 $caption = isset( $attributes['caption'] ) ? wp_strip_all_tags( $attributes['caption'] ) : '';
 $columns = ( isset( $attributes['columns'] ) && is_array( $attributes['columns'] ) ) ? $attributes['columns'] : array();
+
+// 1列目（行名）の見出し。未設定なら汎用の既定値にフォールバックする。
+$name_label = isset( $attributes['nameLabel'] ) ? trim( wp_strip_all_tags( $attributes['nameLabel'] ) ) : '';
+if ( '' === $name_label ) {
+	$name_label = __( '項目', 'madoguchi-blocks' );
+}
 
 // 行が無ければ描画しない
 if ( '' === trim( (string) $content ) ) {
@@ -54,7 +61,7 @@ $wrapper = get_block_wrapper_attributes( $wrapper_args );
 
 	<div class="comparison-table__scroll" data-article="<?php echo esc_attr( $article ); ?>">
 		<div class="comparison-table__grid" style="grid-template-columns:<?php echo esc_attr( $template ); ?>;">
-			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--name"><?php esc_html_e( '業者', 'madoguchi-blocks' ); ?></div>
+			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--name"><?php echo esc_html( $name_label ); ?></div>
 			<?php foreach ( $columns as $col ) : ?>
 				<div class="comparison-table__gcell comparison-table__gcell--head"><?php echo esc_html( isset( $col['label'] ) ? wp_strip_all_tags( $col['label'] ) : '' ); ?></div>
 			<?php endforeach; ?>

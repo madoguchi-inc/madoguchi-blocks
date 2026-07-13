@@ -5,13 +5,13 @@
 	"title": "比較テーブルの行",
 	"category": "madoguchi",
 	"icon": "editor-justify",
-	"description": "買取業者比較テーブルの1行（1業者）。店名・評価・各列の値と、CTA列に置くブロックを持ちます。",
+	"description": "比較テーブルの1行。1列目の名称・評価・各列の値と、CTA列に置くブロックを持ちます。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
 	"render": "file:./render.php",
 	"parent": [ "madoguchi/comparison-table" ],
-	"usesContext": [ "madoguchi/comparisonColumns" ],
+	"usesContext": [ "madoguchi/comparisonColumns", "madoguchi/comparisonNameLabel" ],
 	"supports": {
 		"html": false,
 		"reusable": false
