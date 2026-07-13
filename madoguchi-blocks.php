@@ -102,6 +102,17 @@ function madoguchi_blocks_register() {
 		true
 	);
 
+	// 著者テンプレートをエディタへ供給する（著者情報ブロックのテンプレート選択用）。
+	if ( function_exists( 'madoguchi_blocks_author_templates' ) ) {
+		wp_localize_script(
+			'madoguchi-blocks-editor',
+			'madoguchiBlocksData',
+			array(
+				'authorTemplates' => array_values( madoguchi_blocks_author_templates() ),
+			)
+		);
+	}
+
 	// フロント＋エディタ共通スタイル
 	// CSSのみ変更したときもキャッシュが切れるよう、style.css のファイル更新時刻をバージョンに使う
 	$style_file = MADOGUCHI_BLOCKS_DIR . 'build/style.css';
