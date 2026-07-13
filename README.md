@@ -28,13 +28,17 @@ REST 用には**配信先サイトのテーマCSSの影響を受けない専用C
 ブロックの**外側**（記事の通常の段落など）には一切影響しません。
 なお配信先が `!important` 付きで指定したスタイルまでは打ち消せません（CSSの仕様上の限界）。
 
-### ブランドカラー（メディア別）
+### ブランドカラー（メディア別）／カード背景色
 
 管理画面 > **設定 > Madoguchi Blocks** で、メディアごとのブランドカラー（既定色）を設定できます。
 各ブロックの主要色（CTAボタン・リンク・強調）は CSS カスタムプロパティ `--md-brand` を参照します。
 
-さらに、各ブロックの編集画面サイドバー **「カラー設定 > アクセントカラー」** のカラーピッカーで、
-ブロック単位に色を上書きできます（未設定のブロックは上記の全体設定＝既定色にフォールバック）。
+さらに、各ブロックの編集画面サイドバー **「カラー設定」** のカラーピッカーで、ブロック単位に色を上書きできます:
+
+- **アクセントカラー** … ボタン・リンク・アイコン・帯・枠線などのテーマカラー（未設定は上記の全体設定＝既定色にフォールバック）
+- **カード背景色** … おすすめリンクカード・条件カードのカード背景だけを個別指定（未設定はパターン既定の tint / 白）
+
+カード背景色はブロックのインライン style で出力するため、通常フロント・REST 配信のどちらでも確実に反映されます。
 
 ## インストール（ぶちこめば動く）
 
@@ -61,18 +65,20 @@ REST 用には**配信先サイトのテーマCSSの影響を受けない専用C
 madoguchi-blocks/
   madoguchi-blocks.php     … プラグイン本体（ブロック登録・アセット読み込み・自動更新）
   inc/                    … 設定画面・スタイルインライナ・レビューアバター
-  blocks/                 … 各ブロックの block.json（サーバー登録用）
-  build/                  … 配布用ビルド成果物（JS / CSS / view.js）★これが実行に必要
+  blocks/                 … 各ブロックの block.json / render.php（サーバー登録・動的描画用）
+  build/                  … 配布用ビルド成果物（index.js / style.css / style-rest.css / view.js）★これが実行に必要
   assets/img/             … アイコンSVG（CSSが参照）
   lib/                    … plugin-update-checker（GitHubリリース自動更新ライブラリ）
   src/                    … エディタJS（edit/save）ソース ※再ビルド用
   scss/                   … スタイルのソース ※再ビルド用
+  tools/                  … REST配信用CSS生成スクリプト（build-rest-css.js）※再ビルド用
   build.sh                … 一括ビルド ※開発用
   package.sh              … 配布zip生成・リリース ※開発用
+  .github/workflows/      … main への push で自動リリースする GitHub Actions ※開発用
 ```
 
 実行時に必要なのは `madoguchi-blocks.php` / `inc/` / `blocks/` / `build/` / `assets/` / `lib/` です。
-`src/` `scss/` `*.sh` は開発用で、配布だけなら無くても動きます（`package.sh` はこの区別で zip を作ります）。
+`src/` `scss/` `tools/` `*.sh` は開発用で、配布だけなら無くても動きます（`package.sh` はこの区別で zip を作ります）。
 
 ## 注意
 
@@ -82,25 +88,28 @@ madoguchi-blocks/
 
 ## 再ビルド（ソースを変更した場合のみ）
 
-このリポジトリ（fuyouhin.support）の `node_modules` を使う前提。一括ビルドスクリプトを用意しています:
+このリポジトリ直下で `npm ci`（初回のみ）→ 一括ビルドスクリプトを実行します:
 
 ```bash
-bash madoguchi-blocks/build.sh
+npm ci          # 初回のみ（依存インストール）
+bash build.sh   # JS → CSS → REST用CSS → view.js を順に生成
 ```
 
 > ⚠️ **重要**: `wp-scripts build` は `--output-path`（`build/`）を**クリーンしてから**出力します。
-> そのため JS だけをビルドすると `build/style.css` と `build/view.js` が消えます。
-> 必ず「JS → CSS → view.js コピー」をセットで実行してください（`build.sh` はこの順序を守ります）。
+> そのため JS だけをビルドすると `build/style.css` `build/style-rest.css` `build/view.js` が消えます。
+> 必ず「JS → CSS → REST用CSS → view.js コピー」をセットで実行してください（`build.sh` はこの順序を守ります）。
 
 手動で行う場合:
 
 ```bash
 # JS（@wordpress/scripts）※build/ をクリーンする
-npx wp-scripts build madoguchi-blocks/src/index.js --output-path madoguchi-blocks/build
-# CSS（node-sass）
-npx node-sass madoguchi-blocks/scss/style.scss madoguchi-blocks/build/style.css --output-style compressed
+npx wp-scripts build src/index.js --output-path build
+# CSS（dart-sass）
+npx sass scss/style.scss build/style.css --style=compressed --no-source-map
+# REST配信用CSS（rem→px・!important化・スコープ付きリセット）
+node tools/build-rest-css.js
 # フロント用スクリプト
-cp madoguchi-blocks/src/view.js madoguchi-blocks/build/view.js
+cp src/view.js build/view.js
 ```
 
 ## 更新（自動アップデート）
@@ -116,20 +125,29 @@ cp madoguchi-blocks/src/view.js madoguchi-blocks/build/view.js
 
 ### リリース手順（新バージョンを配る側）
 
-1. ソースを修正し、`bash madoguchi-blocks/build.sh` で `build/` を最新化する
-2. `madoguchi-blocks.php` の `Version:` を上げる（例 `1.1.1` → `1.1.2`）
-3. 変更をコミットする
-4. 配布zipを作ってリリースする:
-   ```bash
-   bash madoguchi-blocks/package.sh --release
-   ```
-   `dist-zip/madoguchi-blocks-<version>.zip` を生成し、専用リポジトリに **タグ = バージョン**（例 `1.1.2`）で
-   GitHub リリースを作成・zip添付します（`--release` を付けなければ zip 生成のみ）。
+共通の準備:
 
-   > gh CLI が無い環境では、`Version:` を上げた変更を **main にマージするだけ**でも
-   > リリースされます（`.github/workflows/release.yml` が main への push で起動し、
-   > 未リリースのバージョンなら CI がビルド→zip→リリース作成まで自動実行）。
-5. リリース本文に変更点を書いておくと、各サイトの更新画面「詳細を表示」で読めます。
+1. ソースを修正し、`bash build.sh` で `build/` を最新化する
+2. `madoguchi-blocks.php` の `Version:` を上げる（例 `1.2.0` → `1.3.0`。機能追加=minor / バグ修正=patch）
+3. build 差分を含めて変更をコミットする
+
+そのうえで、いずれかの方法でリリースします。
+
+**方法A（推奨・gh CLI 不要）: main にマージするだけ**
+
+`Version:` を上げた変更を **main にマージ**すれば、`.github/workflows/release.yml` が
+main への push で起動し、`Version:` に対応するタグが未作成なら CI 上でビルド→zip→リリース作成まで自動実行します
+（作成済みのバージョンならスキップ）。マージ後に Actions の完走とリリースの作成を確認してください。
+
+**方法B: ローカルに gh CLI がある場合**
+
+```bash
+bash package.sh --release
+```
+
+`dist-zip/madoguchi-blocks-<version>.zip` を生成し、専用リポジトリに **タグ = バージョン**（例 `1.3.0`）で
+GitHub リリースを作成・zip添付します（`--release` を付けなければ zip 生成のみ）。
 
 > ⚠️ **タグ名は必ず `Version:` ヘッダーと一致させること**。plugin-update-checker はリリースのタグ名を
-> 新バージョンとして扱うため、ずれると更新判定が正しく動きません。
+> 新バージョンとして扱うため、ずれると更新判定が正しく動きません（ワークフローもこの一致を検証します）。
+> リリース本文（自動生成の変更点）は各サイトの更新画面「詳細を表示」で読めます。
