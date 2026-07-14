@@ -64,14 +64,14 @@
 		border-bottom: 1px solid #ececec;
 	}
 
-	// 店名列（固定）
+	// 店名列（固定・背景色は --md-name-bg で上書き可能）
 	&__gcell--name {
 		position: sticky;
 		left: 0;
 		z-index: 1;
 		align-items: flex-start;
 		text-align: left;
-		background: #fff;
+		background: var(--md-name-bg, #fff);
 		box-shadow: 4px 0 6px rgba(#000, 0.04);
 	}
 
@@ -84,6 +84,17 @@
 		font-weight: bold;
 		font-size: 1.07em;
 		word-break: break-word;
+	}
+
+	// 店名 → CTAボタンと同じリンク（文字色は各行の --md-… ではなくインラインstyleで個別上書き）
+	&__shop-link {
+		color: inherit;
+		text-decoration: none;
+
+		&:hover,
+		&:focus {
+			text-decoration: underline;
+		}
 	}
 
 	&__rating {

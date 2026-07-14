@@ -31,14 +31,19 @@ $article = ( isset( $attributes['articleId'] ) && '' !== $attributes['articleId'
 
 $col_count = count( $columns );
 
-// グリッドの列定義: 店名 + 各列 + CTA
-$template = '160px';
+// 名称列の幅（px）。未設定・不正値は既定の160pxにフォールバック。
+$name_col_width = isset( $attributes['nameColWidth'] ) ? (int) $attributes['nameColWidth'] : 160;
+if ( $name_col_width <= 0 ) {
+	$name_col_width = 160;
+}
+
+// グリッドの列定義: 店名 + CTA（2列目固定） + 各列
+$template = $name_col_width . 'px minmax(130px, auto)';
 for ( $i = 0; $i < $col_count; $i++ ) {
 	$template .= ' minmax(90px, 1fr)';
 }
-$template .= ' minmax(130px, auto)';
 
-// ラッパー（アクセントカラー・文字サイズ）
+// ラッパー（アクセントカラー・文字サイズ・名称列の背景色）
 $wrapper_args = array( 'class' => 'comparison-table' );
 $styles       = array();
 $accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
@@ -48,6 +53,10 @@ if ( $accent ) {
 $font_size = isset( $attributes['fontSize'] ) ? (int) $attributes['fontSize'] : 0;
 if ( $font_size > 0 ) {
 	$styles[] = '--md-table-size:' . $font_size . 'px';
+}
+$name_bg = isset( $attributes['nameColBgColor'] ) ? sanitize_hex_color( $attributes['nameColBgColor'] ) : '';
+if ( $name_bg ) {
+	$styles[] = '--md-name-bg:' . $name_bg;
 }
 if ( $styles ) {
 	$wrapper_args['style'] = implode( ';', $styles ) . ';';
@@ -62,10 +71,10 @@ $wrapper = get_block_wrapper_attributes( $wrapper_args );
 	<div class="comparison-table__scroll" data-article="<?php echo esc_attr( $article ); ?>">
 		<div class="comparison-table__grid" style="grid-template-columns:<?php echo esc_attr( $template ); ?>;">
 			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--name"><?php echo esc_html( $name_label ); ?></div>
+			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--cta"></div>
 			<?php foreach ( $columns as $col ) : ?>
 				<div class="comparison-table__gcell comparison-table__gcell--head"><?php echo esc_html( isset( $col['label'] ) ? wp_strip_all_tags( $col['label'] ) : '' ); ?></div>
 			<?php endforeach; ?>
-			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--cta"></div>
 			<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 各行(子ブロック) ?>
 		</div>
 	</div>

@@ -28,6 +28,10 @@
 		"values": {
 			"type": "array",
 			"default": []
+		},
+		"nameColor": {
+			"type": "string",
+			"default": ""
 		}
 	}
 }

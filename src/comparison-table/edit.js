@@ -18,13 +18,14 @@ const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
 const TEMPLATE = [ [ 'madoguchi/comparison-row' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId }) {
-	const { caption, articleId, columns, accentColor, fontSize, nameLabel } = attributes;
+	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor } = attributes;
 
 	const blockProps = useBlockProps({
 		className: 'comparison-table comparison-table--edit',
 		style: {
 			...( accentColor ? { '--md-brand': accentColor } : {} ),
-			...( fontSize ? { '--md-table-size': fontSize + 'px' } : {} )
+			...( fontSize ? { '--md-table-size': fontSize + 'px' } : {} ),
+			...( nameColBgColor ? { '--md-name-bg': nameColBgColor } : {} )
 		}
 	});
 	const innerProps = useInnerBlocksProps(
@@ -75,6 +76,14 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						onChange={ ( value ) => setAttributes({ articleId: value }) }
 						help={ __( '未入力の場合は現在の記事IDを使用します。', 'madoguchi-blocks' ) }
 					/>
+					<RangeControl
+						label={ __( '名称列の幅（px）', 'madoguchi-blocks' ) }
+						value={ nameColWidth }
+						onChange={ ( value ) => setAttributes({ nameColWidth: value }) }
+						min={ 100 }
+						max={ 280 }
+						step={ 10 }
+					/>
 				</PanelBody>
 				<PanelColorSettings
 					title={ __( 'カラー設定', 'madoguchi-blocks' ) }
@@ -82,6 +91,10 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						value: accentColor,
 						onChange: ( color ) => setAttributes({ accentColor: color || '' }),
 						label: __( 'アクセントカラー', 'madoguchi-blocks' )
+					}, {
+						value: nameColBgColor,
+						onChange: ( color ) => setAttributes({ nameColBgColor: color || '' }),
+						label: __( '名称列の背景色', 'madoguchi-blocks' )
 					} ] }
 				/>
 			</InspectorControls>
