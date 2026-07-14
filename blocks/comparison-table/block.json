@@ -40,6 +40,14 @@
 			"type": "number",
 			"default": 14
 		},
+		"nameColWidth": {
+			"type": "number",
+			"default": 160
+		},
+		"nameColBgColor": {
+			"type": "string",
+			"default": ""
+		},
 		"columns": {
 			"type": "array",
 			"default": [
