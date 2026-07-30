@@ -11,7 +11,7 @@ import {
 	InspectorControls,
 	PanelColorSettings
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import { PanelBody, RangeControl, SelectControl } from '@wordpress/components';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/cta-button' ];
 // セル内では既定でコンパクトなCTAボタンにする
@@ -23,11 +23,10 @@ const TEMPLATE = [ [ 'madoguchi/cta-button', {
 } ] ];
 
 export default function Edit( { attributes, setAttributes, context }) {
-	const { name, rating, values, nameColor, ctaNote } = attributes;
+	const { name, rating, values, nameColor, ctaNote, ratingDisplay } = attributes;
 	const columns = ( context && context['madoguchi/comparisonColumns'] ) || [];
 	const nameLabel = ( context && context['madoguchi/comparisonNameLabel'] ) || '';
 	const showCta = ! context || context['madoguchi/comparisonShowCta'] !== false;
-	const ratingDisplay = ( context && context['madoguchi/comparisonRatingDisplay'] ) || 'star';
 
 	const blockProps = useBlockProps({ className: 'comparison-row-edit' });
 	// CTAボタンは削除できないよう固定（挿入・削除・並べ替えを禁止。属性の編集は可能）
@@ -46,14 +45,25 @@ export default function Edit( { attributes, setAttributes, context }) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( '評価', 'madoguchi-blocks' ) }>
-					<RangeControl
-						label={ __( '評価（星）', 'madoguchi-blocks' ) }
-						value={ rating || 0 }
-						onChange={ ( v ) => setAttributes({ rating: v }) }
-						min={ 0 }
-						max={ 5 }
-						step={ 0.1 }
+					<SelectControl
+						label={ __( '表示方式', 'madoguchi-blocks' ) }
+						value={ ratingDisplay || 'star' }
+						options={ [
+							{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'star' },
+							{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' }
+						] }
+						onChange={ ( value ) => setAttributes({ ratingDisplay: value }) }
 					/>
+					{ 'star' === ( ratingDisplay || 'star' ) && (
+						<RangeControl
+							label={ __( '評価（星）', 'madoguchi-blocks' ) }
+							value={ rating || 0 }
+							onChange={ ( v ) => setAttributes({ rating: v }) }
+							min={ 0 }
+							max={ 5 }
+							step={ 0.1 }
+						/>
+					) }
 				</PanelBody>
 				<PanelColorSettings
 					title={ __( 'カラー設定', 'madoguchi-blocks' ) }

@@ -14,8 +14,7 @@
 	"providesContext": {
 		"madoguchi/comparisonColumns": "columns",
 		"madoguchi/comparisonNameLabel": "nameLabel",
-		"madoguchi/comparisonShowCta": "showCta",
-		"madoguchi/comparisonRatingDisplay": "ratingDisplay"
+		"madoguchi/comparisonShowCta": "showCta"
 	},
 	"supports": {
 		"html": false,
@@ -57,10 +56,6 @@
 		"ctaLabel": {
 			"type": "string",
 			"default": ""
-		},
-		"ratingDisplay": {
-			"type": "string",
-			"default": "star"
 		},
 		"columns": {
 			"type": "array",

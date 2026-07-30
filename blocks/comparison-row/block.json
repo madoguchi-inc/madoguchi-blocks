@@ -11,7 +11,7 @@
 	"style": "madoguchi-blocks-style",
 	"render": "file:./render.php",
 	"parent": [ "madoguchi/comparison-table" ],
-	"usesContext": [ "madoguchi/comparisonColumns", "madoguchi/comparisonNameLabel", "madoguchi/comparisonShowCta", "madoguchi/comparisonRatingDisplay" ],
+	"usesContext": [ "madoguchi/comparisonColumns", "madoguchi/comparisonNameLabel", "madoguchi/comparisonShowCta" ],
 	"supports": {
 		"html": false,
 		"reusable": false
@@ -36,6 +36,10 @@
 		"ctaNote": {
 			"type": "string",
 			"default": ""
+		},
+		"ratingDisplay": {
+			"type": "string",
+			"default": "star"
 		}
 	}
 }

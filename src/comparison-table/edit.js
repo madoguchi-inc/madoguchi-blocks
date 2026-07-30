@@ -12,14 +12,14 @@ import {
 	InspectorControls,
 	PanelColorSettings
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, RangeControl, Button, ToggleControl, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl, RangeControl, Button, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
 const TEMPLATE = [ [ 'madoguchi/comparison-row' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId }) {
-	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel, ratingDisplay } = attributes;
+	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel } = attributes;
 	const [ dragIndex, setDragIndex ] = useState( null );
 
 	const blockProps = useBlockProps({
@@ -124,15 +124,6 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						checked={ showCta }
 						onChange={ ( value ) => setAttributes({ showCta: value }) }
 						help={ __( 'オフにすると各行のCTAボタン列を非表示にします。', 'madoguchi-blocks' ) }
-					/>
-					<SelectControl
-						label={ __( '評価表示', 'madoguchi-blocks' ) }
-						value={ ratingDisplay }
-						options={ [
-							{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'star' },
-							{ label: __( 'PR表記', 'madoguchi-blocks' ), value: 'pr' }
-						] }
-						onChange={ ( value ) => setAttributes({ ratingDisplay: value }) }
 					/>
 				</PanelBody>
 				<PanelColorSettings

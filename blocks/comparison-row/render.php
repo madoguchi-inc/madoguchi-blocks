@@ -17,13 +17,13 @@ $values     = ( isset( $attributes['values'] ) && is_array( $attributes['values'
 $name_color = isset( $attributes['nameColor'] ) ? sanitize_hex_color( $attributes['nameColor'] ) : '';
 $cta_note   = isset( $attributes['ctaNote'] ) ? wp_kses( $attributes['ctaNote'], array( 'br' => array(), 'strong' => array(), 'em' => array() ) ) : '';
 
-// 親から列定義・CTA表示可否・評価表示方式を受け取る
+// 親から列定義・CTA表示可否を受け取る（評価表示方式は行ごとの自属性）
 $columns        = isset( $block->context['madoguchi/comparisonColumns'] ) && is_array( $block->context['madoguchi/comparisonColumns'] )
 	? $block->context['madoguchi/comparisonColumns']
 	: array();
 $col_count      = count( $columns );
 $show_cta       = ! isset( $block->context['madoguchi/comparisonShowCta'] ) || (bool) $block->context['madoguchi/comparisonShowCta'];
-$rating_display = isset( $block->context['madoguchi/comparisonRatingDisplay'] ) ? $block->context['madoguchi/comparisonRatingDisplay'] : 'star';
+$rating_display = isset( $attributes['ratingDisplay'] ) ? $attributes['ratingDisplay'] : 'star';
 $width          = max( 0, min( 100, ( $rating / 5 ) * 100 ) );
 
 // CTA列（子ブロック）のURLを取得し、店名も同じリンクにする
