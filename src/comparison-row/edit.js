@@ -23,9 +23,11 @@ const TEMPLATE = [ [ 'madoguchi/cta-button', {
 } ] ];
 
 export default function Edit( { attributes, setAttributes, context }) {
-	const { name, rating, values, nameColor } = attributes;
+	const { name, rating, values, nameColor, ctaNote } = attributes;
 	const columns = ( context && context['madoguchi/comparisonColumns'] ) || [];
 	const nameLabel = ( context && context['madoguchi/comparisonNameLabel'] ) || '';
+	const showCta = ! context || context['madoguchi/comparisonShowCta'] !== false;
+	const ratingDisplay = ( context && context['madoguchi/comparisonRatingDisplay'] ) || 'star';
 
 	const blockProps = useBlockProps({ className: 'comparison-row-edit' });
 	// CTAボタンは削除できないよう固定（挿入・削除・並べ替えを禁止。属性の編集は可能）
@@ -75,12 +77,24 @@ export default function Edit( { attributes, setAttributes, context }) {
 						placeholder={ nameLabel || __( '名称（例：業者・商品名）', 'madoguchi-blocks' ) }
 						allowedFormats={ [] }
 					/>
-					{ rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }
+					{ 'pr' === ratingDisplay && <span className="comparison-row-edit__rating">{ __( 'PR', 'madoguchi-blocks' ) }</span> }
+					{ 'pr' !== ratingDisplay && rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }
 				</div>
-				<div className="comparison-row-edit__field comparison-row-edit__field--cta">
-					<span className="comparison-row-edit__lbl">{ __( 'CTA', 'madoguchi-blocks' ) }</span>
-					<div { ...innerProps } />
-				</div>
+				{ showCta && (
+					<div className="comparison-row-edit__field comparison-row-edit__field--cta">
+						<span className="comparison-row-edit__lbl">{ __( 'CTA', 'madoguchi-blocks' ) }</span>
+						<div>
+							<div { ...innerProps } />
+							<RichText
+								tagName="p"
+								className="comparison-row-edit__cta-note"
+								value={ ctaNote }
+								onChange={ ( value ) => setAttributes({ ctaNote: value }) }
+								placeholder={ __( 'CTA下の補足文（任意・例：初回限定）', 'madoguchi-blocks' ) }
+							/>
+						</div>
+					</div>
+				) }
 				{ columns.map( ( col, i ) => (
 					<div className="comparison-row-edit__field" key={ i }>
 						<span className="comparison-row-edit__lbl">{ col.label || ( __( '列', 'madoguchi-blocks' ) + ' ' + ( i + 1 ) ) }</span>

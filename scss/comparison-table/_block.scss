@@ -136,6 +136,19 @@
 		color: #f5820b;
 	}
 
+	// 評価表示を「PR」表記にした場合のバッジ
+	&__pr-badge {
+		display: inline-block;
+		margin-top: 4px;
+		padding: 1px 8px;
+		color: #999;
+		font-size: 0.8em;
+		font-weight: bold;
+		line-height: 1.6;
+		background: #f0f0f0;
+		border-radius: 4px;
+	}
+
 	// CTA列に置かれたブロック（CTAボタン等）をセル幅になじませる
 	// ※padding/font-size はブロック側のインライン指定が優先されるため、
 	//   コンパクトな既定値は行テンプレート側で与える。
@@ -154,6 +167,15 @@
 			box-sizing: border-box;
 			width: 100%;
 		}
+	}
+
+	// CTAボタン下の補足文
+	&__cta-note {
+		margin: 6px 0 0 !important;
+		color: $font_color_light;
+		font-size: 0.8em;
+		line-height: $line_height_narrow !important;
+		text-align: center;
 	}
 
 	// スクロール可能ヒント（実際に横スクロールが発生するときだけ表示）
@@ -206,11 +228,23 @@
 	background: #fff;
 	border: 1px solid #ddd;
 	border-radius: 6px;
+	transition: opacity 0.15s;
 
 	.comparison-table__col-label {
 		min-width: 3em;
 		outline: none;
 	}
+
+	&.is-dragging {
+		opacity: 0.4;
+	}
+}
+
+.comparison-table__col-drag {
+	color: #b0b0b0;
+	font-size: 13px;
+	line-height: 1;
+	cursor: grab;
 }
 
 // 1列目（固定）の見出しチップ。編集可能だが固定列であることを示す
@@ -288,5 +322,12 @@
 		margin-left: 8px;
 		color: #f5820b;
 		font-size: 12px;
+	}
+
+	&__cta-note {
+		margin: 4px 0 0;
+		color: #757575;
+		font-size: 12px;
+		outline: none;
 	}
 }

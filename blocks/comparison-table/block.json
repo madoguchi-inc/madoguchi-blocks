@@ -13,7 +13,9 @@
 	"render": "file:./render.php",
 	"providesContext": {
 		"madoguchi/comparisonColumns": "columns",
-		"madoguchi/comparisonNameLabel": "nameLabel"
+		"madoguchi/comparisonNameLabel": "nameLabel",
+		"madoguchi/comparisonShowCta": "showCta",
+		"madoguchi/comparisonRatingDisplay": "ratingDisplay"
 	},
 	"supports": {
 		"html": false,
@@ -47,6 +49,18 @@
 		"nameColBgColor": {
 			"type": "string",
 			"default": ""
+		},
+		"showCta": {
+			"type": "boolean",
+			"default": true
+		},
+		"ctaLabel": {
+			"type": "string",
+			"default": ""
+		},
+		"ratingDisplay": {
+			"type": "string",
+			"default": "star"
 		},
 		"columns": {
 			"type": "array",

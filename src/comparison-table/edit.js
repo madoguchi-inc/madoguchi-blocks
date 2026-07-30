@@ -4,6 +4,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -11,14 +12,15 @@ import {
 	InspectorControls,
 	PanelColorSettings
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, RangeControl, Button } from '@wordpress/components';
+import { PanelBody, TextControl, RangeControl, Button, ToggleControl, SelectControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
 const TEMPLATE = [ [ 'madoguchi/comparison-row' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId }) {
-	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor } = attributes;
+	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel, ratingDisplay } = attributes;
+	const [ dragIndex, setDragIndex ] = useState( null );
 
 	const blockProps = useBlockProps({
 		className: 'comparison-table comparison-table--edit',
@@ -59,6 +61,39 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 		setAttributes({ columns: columns.filter( ( _, i ) => i !== index ) });
 	};
 
+	// 配列の要素を fromIndex → toIndex へ移動する
+	const reorder = ( arr, fromIndex, toIndex ) => {
+		const next = arr.slice();
+		const [ moved ] = next.splice( fromIndex, 1 );
+		next.splice( toIndex, 0, moved );
+		return next;
+	};
+
+	// 列の並べ替え時は全行の values も同じ順序に揃える
+	const moveColumn = ( fromIndex, toIndex ) => {
+		if ( fromIndex === toIndex || fromIndex < 0 || toIndex < 0 ) {
+			return;
+		}
+		childRows.forEach( ( row ) => {
+			const values = Array.isArray( row.attributes.values ) ? row.attributes.values.slice() : [];
+			while ( values.length < columns.length ) {
+				values.push( '' );
+			}
+			updateBlockAttributes( row.clientId, { values: reorder( values, fromIndex, toIndex ) });
+		});
+		setAttributes({ columns: reorder( columns, fromIndex, toIndex ) });
+	};
+
+	const handleDragStart = ( index ) => () => setDragIndex( index );
+	const handleDragOver = ( event ) => event.preventDefault();
+	const handleDrop = ( index ) => ( event ) => {
+		event.preventDefault();
+		if ( null !== dragIndex ) {
+			moveColumn( dragIndex, index );
+		}
+		setDragIndex( null );
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -83,6 +118,21 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						min={ 100 }
 						max={ 280 }
 						step={ 10 }
+					/>
+					<ToggleControl
+						label={ __( 'CTA列を表示', 'madoguchi-blocks' ) }
+						checked={ showCta }
+						onChange={ ( value ) => setAttributes({ showCta: value }) }
+						help={ __( 'オフにすると各行のCTAボタン列を非表示にします。', 'madoguchi-blocks' ) }
+					/>
+					<SelectControl
+						label={ __( '評価表示', 'madoguchi-blocks' ) }
+						value={ ratingDisplay }
+						options={ [
+							{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'star' },
+							{ label: __( 'PR表記', 'madoguchi-blocks' ), value: 'pr' }
+						] }
+						onChange={ ( value ) => setAttributes({ ratingDisplay: value }) }
 					/>
 				</PanelBody>
 				<PanelColorSettings
@@ -110,7 +160,7 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 				/>
 
 				<div className="comparison-table__columns-edit">
-					<span className="comparison-table__columns-edit-label">{ __( '列：', 'madoguchi-blocks' ) }</span>
+					<span className="comparison-table__columns-edit-label">{ __( '列（ドラッグで並べ替え）：', 'madoguchi-blocks' ) }</span>
 					<span className="comparison-table__col-chip comparison-table__col-chip--name">
 						<RichText
 							tagName="span"
@@ -123,7 +173,16 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						<span className="comparison-table__col-fixed-mark">{ __( '（固定）', 'madoguchi-blocks' ) }</span>
 					</span>
 					{ columns.map( ( col, index ) => (
-						<span className="comparison-table__col-chip" key={ index }>
+						<span
+							className={ 'comparison-table__col-chip' + ( dragIndex === index ? ' is-dragging' : '' ) }
+							key={ index }
+							draggable
+							onDragStart={ handleDragStart( index ) }
+							onDragOver={ handleDragOver }
+							onDrop={ handleDrop( index ) }
+							onDragEnd={ () => setDragIndex( null ) }
+						>
+							<span className="comparison-table__col-drag" aria-hidden="true">⠿</span>
 							<RichText
 								tagName="span"
 								className="comparison-table__col-label"
@@ -140,7 +199,19 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 							>×</button>
 						</span>
 					) ) }
-					<span className="comparison-table__col-chip comparison-table__col-chip--cta">{ __( 'CTA（固定）', 'madoguchi-blocks' ) }</span>
+					{ showCta && (
+						<span className="comparison-table__col-chip comparison-table__col-chip--cta">
+							<RichText
+								tagName="span"
+								className="comparison-table__col-label"
+								value={ ctaLabel || '' }
+								onChange={ ( value ) => setAttributes({ ctaLabel: value }) }
+								placeholder={ __( 'CTA見出し（例：詳細へ）', 'madoguchi-blocks' ) }
+								allowedFormats={ [] }
+							/>
+							<span className="comparison-table__col-fixed-mark">{ __( '（固定）', 'madoguchi-blocks' ) }</span>
+						</span>
+					) }
 					<Button variant="secondary" size="small" icon="plus" onClick={ addColumn }>
 						{ __( '列を追加', 'madoguchi-blocks' ) }
 					</Button>

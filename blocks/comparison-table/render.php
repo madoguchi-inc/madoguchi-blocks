@@ -31,14 +31,21 @@ $article = ( isset( $attributes['articleId'] ) && '' !== $attributes['articleId'
 
 $col_count = count( $columns );
 
+// CTA列の表示可否・ヘッダー文言（未設定時は空のまま＝従来どおり）
+$show_cta  = ! isset( $attributes['showCta'] ) || (bool) $attributes['showCta'];
+$cta_label = isset( $attributes['ctaLabel'] ) ? trim( wp_strip_all_tags( $attributes['ctaLabel'] ) ) : '';
+
 // 名称列の幅（px）。未設定・不正値は既定の160pxにフォールバック。
 $name_col_width = isset( $attributes['nameColWidth'] ) ? (int) $attributes['nameColWidth'] : 160;
 if ( $name_col_width <= 0 ) {
 	$name_col_width = 160;
 }
 
-// グリッドの列定義: 店名 + CTA（2列目固定） + 各列
-$template = $name_col_width . 'px minmax(130px, auto)';
+// グリッドの列定義: 店名 + CTA（表示時は2列目固定） + 各列
+$template = $name_col_width . 'px';
+if ( $show_cta ) {
+	$template .= ' minmax(130px, auto)';
+}
 for ( $i = 0; $i < $col_count; $i++ ) {
 	$template .= ' minmax(90px, 1fr)';
 }
@@ -71,7 +78,9 @@ $wrapper = get_block_wrapper_attributes( $wrapper_args );
 	<div class="comparison-table__scroll" data-article="<?php echo esc_attr( $article ); ?>">
 		<div class="comparison-table__grid" style="grid-template-columns:<?php echo esc_attr( $template ); ?>;">
 			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--name"><?php echo esc_html( $name_label ); ?></div>
-			<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--cta"></div>
+			<?php if ( $show_cta ) : ?>
+				<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--cta"><?php echo esc_html( $cta_label ); ?></div>
+			<?php endif; ?>
 			<?php foreach ( $columns as $col ) : ?>
 				<div class="comparison-table__gcell comparison-table__gcell--head"><?php echo esc_html( isset( $col['label'] ) ? wp_strip_all_tags( $col['label'] ) : '' ); ?></div>
 			<?php endforeach; ?>
