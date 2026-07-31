@@ -35,6 +35,10 @@
 			"type": "number",
 			"default": 11
 		},
+		"badgeTextColor": {
+			"type": "string",
+			"default": ""
+		},
 		"url": {
 			"type": "string",
 			"default": ""

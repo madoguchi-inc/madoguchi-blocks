@@ -34,7 +34,7 @@ function boxToStyle( box, prop ) {
 }
 
 export default function Edit( { attributes, setAttributes }) {
-	const { text, badgeText, badgePosition, badgeGap, badgeFontSize, url, backgroundColor, bgType, gradientFrom, gradientTo, gradientAngle, textColor, borderRadius, fontSize, align, margin, padding } = attributes;
+	const { text, badgeText, badgePosition, badgeGap, badgeFontSize, badgeTextColor, url, backgroundColor, bgType, gradientFrom, gradientTo, gradientAngle, textColor, borderRadius, fontSize, align, margin, padding } = attributes;
 	const showBadge = badgePosition !== 'none';
 	const isGradient = bgType === 'gradient';
 
@@ -47,16 +47,21 @@ export default function Edit( { attributes, setAttributes }) {
 	}
 
 	// 背景タイプに応じた色設定
-	const colorSettings = isGradient
-		? [
-			{ value: gradientFrom, onChange: ( c ) => setAttributes({ gradientFrom: c || '' }), label: __( 'グラデーション開始色', 'madoguchi-blocks' ) },
-			{ value: gradientTo, onChange: ( c ) => setAttributes({ gradientTo: c || '' }), label: __( 'グラデーション終了色', 'madoguchi-blocks' ) },
-			{ value: textColor, onChange: ( c ) => setAttributes({ textColor: c || '' }), label: __( '文字色', 'madoguchi-blocks' ) }
-		]
-		: [
-			{ value: backgroundColor, onChange: ( c ) => setAttributes({ backgroundColor: c || '' }), label: __( '背景色', 'madoguchi-blocks' ) },
-			{ value: textColor, onChange: ( c ) => setAttributes({ textColor: c || '' }), label: __( '文字色', 'madoguchi-blocks' ) }
-		];
+	const colorSettings = [
+		...( isGradient
+			? [
+				{ value: gradientFrom, onChange: ( c ) => setAttributes({ gradientFrom: c || '' }), label: __( 'グラデーション開始色', 'madoguchi-blocks' ) },
+				{ value: gradientTo, onChange: ( c ) => setAttributes({ gradientTo: c || '' }), label: __( 'グラデーション終了色', 'madoguchi-blocks' ) },
+				{ value: textColor, onChange: ( c ) => setAttributes({ textColor: c || '' }), label: __( '文字色', 'madoguchi-blocks' ) }
+			]
+			: [
+				{ value: backgroundColor, onChange: ( c ) => setAttributes({ backgroundColor: c || '' }), label: __( '背景色', 'madoguchi-blocks' ) },
+				{ value: textColor, onChange: ( c ) => setAttributes({ textColor: c || '' }), label: __( '文字色', 'madoguchi-blocks' ) }
+			] ),
+		...( showBadge
+			? [ { value: badgeTextColor, onChange: ( c ) => setAttributes({ badgeTextColor: c || '' }), label: __( 'バッジの文字色', 'madoguchi-blocks' ) } ]
+			: [] )
+	];
 
 	const blockProps = useBlockProps({
 		className: 'cta-button-wrap',
@@ -77,7 +82,10 @@ export default function Edit( { attributes, setAttributes }) {
 		<RichText
 			tagName="span"
 			className="cta-button__badge"
-			style={ badgeFontSize ? { fontSize: badgeFontSize + 'px' } : undefined }
+			style={ {
+				...( badgeFontSize ? { fontSize: badgeFontSize + 'px' } : {} ),
+				...( badgeTextColor ? { color: badgeTextColor } : {} )
+			} }
 			value={ badgeText }
 			onChange={ ( value ) => setAttributes({ badgeText: value }) }
 			placeholder={ __( 'バッジ', 'madoguchi-blocks' ) }

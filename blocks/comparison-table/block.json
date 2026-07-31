@@ -13,7 +13,8 @@
 	"render": "file:./render.php",
 	"providesContext": {
 		"madoguchi/comparisonColumns": "columns",
-		"madoguchi/comparisonNameLabel": "nameLabel"
+		"madoguchi/comparisonNameLabel": "nameLabel",
+		"madoguchi/comparisonShowCta": "showCta"
 	},
 	"supports": {
 		"html": false,
@@ -45,6 +46,14 @@
 			"default": 160
 		},
 		"nameColBgColor": {
+			"type": "string",
+			"default": ""
+		},
+		"showCta": {
+			"type": "boolean",
+			"default": true
+		},
+		"ctaLabel": {
 			"type": "string",
 			"default": ""
 		},

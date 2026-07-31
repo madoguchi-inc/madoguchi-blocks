@@ -15,13 +15,16 @@ $name       = isset( $attributes['name'] ) ? wp_strip_all_tags( $attributes['nam
 $rating     = isset( $attributes['rating'] ) ? floatval( $attributes['rating'] ) : 0;
 $values     = ( isset( $attributes['values'] ) && is_array( $attributes['values'] ) ) ? $attributes['values'] : array();
 $name_color = isset( $attributes['nameColor'] ) ? sanitize_hex_color( $attributes['nameColor'] ) : '';
+$cta_note   = isset( $attributes['ctaNote'] ) ? wp_kses( $attributes['ctaNote'], array( 'br' => array(), 'strong' => array(), 'em' => array() ) ) : '';
 
-// 親から列定義を受け取る
-$columns   = isset( $block->context['madoguchi/comparisonColumns'] ) && is_array( $block->context['madoguchi/comparisonColumns'] )
+// 親から列定義・CTA表示可否を受け取る（評価表示方式は行ごとの自属性）
+$columns        = isset( $block->context['madoguchi/comparisonColumns'] ) && is_array( $block->context['madoguchi/comparisonColumns'] )
 	? $block->context['madoguchi/comparisonColumns']
 	: array();
-$col_count = count( $columns );
-$width     = max( 0, min( 100, ( $rating / 5 ) * 100 ) );
+$col_count      = count( $columns );
+$show_cta       = ! isset( $block->context['madoguchi/comparisonShowCta'] ) || (bool) $block->context['madoguchi/comparisonShowCta'];
+$rating_display = isset( $attributes['ratingDisplay'] ) ? $attributes['ratingDisplay'] : 'star';
+$width          = max( 0, min( 100, ( $rating / 5 ) * 100 ) );
 
 // CTA列（子ブロック）のURLを取得し、店名も同じリンクにする
 $cta_url = '';
@@ -47,14 +50,23 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		<?php else : ?>
 			<span class="comparison-table__shop"<?php echo $name_style; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>><?php echo esc_html( $name ); ?></span>
 		<?php endif; ?>
-		<?php if ( $rating > 0 ) : ?>
+		<?php if ( 'pr' === $rating_display ) : ?>
+			<span class="comparison-table__pr-badge"><?php esc_html_e( 'PR', 'madoguchi-blocks' ); ?></span>
+		<?php elseif ( $rating > 0 ) : ?>
 			<span class="comparison-table__rating">
 				<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $width ); ?>%"></span></span>
 				<span class="comparison-table__score"><?php echo esc_html( number_format( $rating, 1 ) ); ?></span>
 			</span>
 		<?php endif; ?>
 	</div>
-	<div class="comparison-table__gcell comparison-table__gcell--cta"><?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped CTA列の子ブロック ?></div>
+	<?php if ( $show_cta ) : ?>
+		<div class="comparison-table__gcell comparison-table__gcell--cta">
+			<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped CTA列の子ブロック ?>
+			<?php if ( '' !== trim( wp_strip_all_tags( $cta_note ) ) ) : ?>
+				<p class="comparison-table__cta-note"><?php echo $cta_note; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にwp_kses済み ?></p>
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
 	<?php for ( $i = 0; $i < $col_count; $i++ ) : ?>
 		<div class="comparison-table__gcell"><?php echo esc_html( isset( $values[ $i ] ) ? wp_strip_all_tags( $values[ $i ] ) : '' ); ?></div>
 	<?php endfor; ?>

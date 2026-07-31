@@ -82,8 +82,16 @@ $btn_style .= $box_css( isset( $attributes['padding'] ) ? $attributes['padding']
 // 各値は sanitize_hex_color / (int) / 長さバリデーション済みのため、esc_attr で出力する
 // （safecss_filter_attr は linear-gradient を除去する場合があるため使用しない）
 
-$badge_fs    = isset( $attributes['badgeFontSize'] ) ? (int) $attributes['badgeFontSize'] : 0;
-$badge_style = $badge_fs > 0 ? ' style="font-size:' . $badge_fs . 'px"' : '';
+$badge_fs     = isset( $attributes['badgeFontSize'] ) ? (int) $attributes['badgeFontSize'] : 0;
+$badge_color  = isset( $attributes['badgeTextColor'] ) ? sanitize_hex_color( $attributes['badgeTextColor'] ) : '';
+$badge_styles = array();
+if ( $badge_fs > 0 ) {
+	$badge_styles[] = 'font-size:' . $badge_fs . 'px';
+}
+if ( $badge_color ) {
+	$badge_styles[] = 'color:' . $badge_color;
+}
+$badge_style = $badge_styles ? ' style="' . esc_attr( implode( ';', $badge_styles ) ) . '"' : '';
 $badge_html  = $show_badge ? '<span class="cta-button__badge"' . $badge_style . '>' . esc_html( wp_strip_all_tags( $badge ) ) . '</span>' : '';
 $label_html = '<span class="cta-button__label">' . esc_html( wp_strip_all_tags( $text ) ) . '</span>';
 ?>
