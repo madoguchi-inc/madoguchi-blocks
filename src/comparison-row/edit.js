@@ -23,7 +23,7 @@ const TEMPLATE = [ [ 'madoguchi/cta-button', {
 } ] ];
 
 export default function Edit( { attributes, setAttributes, context }) {
-	const { name, rating, values, nameColor, ctaNote, ratingDisplay } = attributes;
+	const { name, rating, values, nameColor, ctaNote, ratingDisplay, ctaNoteFontSize, ctaNoteColor } = attributes;
 	const columns = ( context && context['madoguchi/comparisonColumns'] ) || [];
 	const nameLabel = ( context && context['madoguchi/comparisonNameLabel'] ) || '';
 	const showCta = ! context || context['madoguchi/comparisonShowCta'] !== false;
@@ -71,8 +71,24 @@ export default function Edit( { attributes, setAttributes, context }) {
 						value: nameColor,
 						onChange: ( color ) => setAttributes({ nameColor: color || '' }),
 						label: __( '名称の文字色', 'madoguchi-blocks' )
-					} ] }
+					}, ...( showCta ? [ {
+						value: ctaNoteColor,
+						onChange: ( color ) => setAttributes({ ctaNoteColor: color || '' }),
+						label: __( 'CTA下の補足文の文字色（この行のみ上書き）', 'madoguchi-blocks' )
+					} ] : [] ) ] }
 				/>
+				{ showCta && (
+					<PanelBody title={ __( 'CTA補足文', 'madoguchi-blocks' ) } initialOpen={ false }>
+						<RangeControl
+							label={ __( '文字サイズ（px・この行のみ上書き）', 'madoguchi-blocks' ) }
+							value={ ctaNoteFontSize || 0 }
+							onChange={ ( value ) => setAttributes({ ctaNoteFontSize: value }) }
+							min={ 0 }
+							max={ 20 }
+							help={ __( '0はテーブル側の既定値を使用します。', 'madoguchi-blocks' ) }
+						/>
+					</PanelBody>
+				) }
 			</InspectorControls>
 
 			<div { ...blockProps }>
@@ -98,6 +114,10 @@ export default function Edit( { attributes, setAttributes, context }) {
 							<RichText
 								tagName="p"
 								className="comparison-row-edit__cta-note"
+								style={ {
+									...( ctaNoteFontSize ? { '--md-cta-note-size': ctaNoteFontSize + 'px' } : {} ),
+									...( ctaNoteColor ? { '--md-cta-note-color': ctaNoteColor } : {} )
+								} }
 								value={ ctaNote }
 								onChange={ ( value ) => setAttributes({ ctaNote: value }) }
 								placeholder={ __( 'CTA下の補足文（任意・例：初回限定）', 'madoguchi-blocks' ) }
@@ -111,6 +131,10 @@ export default function Edit( { attributes, setAttributes, context }) {
 						<RichText
 							tagName="span"
 							className="comparison-row-edit__val"
+							style={ {
+								...( col.fontSize ? { fontSize: col.fontSize + 'px' } : {} ),
+								...( col.color ? { color: col.color } : {} )
+							} }
 							value={ ( values && values[ i ] ) || '' }
 							onChange={ ( v ) => updateValue( i, v ) }
 							placeholder={ __( '○ / - / 内容', 'madoguchi-blocks' ) }

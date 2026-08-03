@@ -37,6 +37,14 @@
 			"type": "string",
 			"default": ""
 		},
+		"ctaNoteFontSize": {
+			"type": "number",
+			"default": 0
+		},
+		"ctaNoteColor": {
+			"type": "string",
+			"default": ""
+		},
 		"ratingDisplay": {
 			"type": "string",
 			"default": "star"

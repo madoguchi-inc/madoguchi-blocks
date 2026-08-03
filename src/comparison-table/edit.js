@@ -4,7 +4,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -12,22 +12,28 @@ import {
 	InspectorControls,
 	PanelColorSettings
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, RangeControl, Button, ToggleControl } from '@wordpress/components';
+import { PanelBody, TextControl, RangeControl, Button, ToggleControl, Dropdown, ColorPalette } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
 const TEMPLATE = [ [ 'madoguchi/comparison-row' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId }) {
-	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel } = attributes;
+	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel, ctaNoteFontSize, ctaNoteColor } = attributes;
 	const [ dragIndex, setDragIndex ] = useState( null );
+	// ドラッグはハンドル（⠿）でmousedownした列だけ有効にする。
+	// チップ全体を draggable にすると内部の RichText（contenteditable）が
+	// mousedown を先取りしてしまい、ドラッグそのものが始まらないため。
+	const [ armedIndex, setArmedIndex ] = useState( null );
 
 	const blockProps = useBlockProps({
 		className: 'comparison-table comparison-table--edit',
 		style: {
 			...( accentColor ? { '--md-brand': accentColor } : {} ),
 			...( fontSize ? { '--md-table-size': fontSize + 'px' } : {} ),
-			...( nameColBgColor ? { '--md-name-bg': nameColBgColor } : {} )
+			...( nameColBgColor ? { '--md-name-bg': nameColBgColor } : {} ),
+			...( ctaNoteFontSize ? { '--md-cta-note-size': ctaNoteFontSize + 'px' } : {} ),
+			...( ctaNoteColor ? { '--md-cta-note-color': ctaNoteColor } : {} )
 		}
 	});
 	const innerProps = useInnerBlocksProps(
@@ -44,6 +50,12 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 
 	const updateColumnLabel = ( index, value ) => {
 		const next = columns.map( ( c, i ) => ( i === index ? { ...c, label: value } : c ) );
+		setAttributes({ columns: next });
+	};
+
+	// 列単位の文字サイズ・色（ヘッダー・値セルの両方に適用）を更新する
+	const updateColumnSetting = ( index, key, value ) => {
+		const next = columns.map( ( c, i ) => ( i === index ? { ...c, [ key ]: value } : c ) );
 		setAttributes({ columns: next });
 	};
 
@@ -84,15 +96,44 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 		setAttributes({ columns: reorder( columns, fromIndex, toIndex ) });
 	};
 
-	const handleDragStart = ( index ) => () => setDragIndex( index );
-	const handleDragOver = ( event ) => event.preventDefault();
+	const armColumn = ( index ) => () => setArmedIndex( index );
+	const disarmColumn = () => setArmedIndex( null );
+
+	const handleDragStart = ( index ) => ( event ) => {
+		setDragIndex( index );
+		event.stopPropagation();
+		// Firefox は dataTransfer.setData() が呼ばれないとドラッグを開始しない。
+		event.dataTransfer.effectAllowed = 'move';
+		event.dataTransfer.setData( 'text/plain', String( index ) );
+	};
+	const handleDragOver = ( event ) => {
+		event.preventDefault();
+		event.stopPropagation();
+		event.dataTransfer.dropEffect = 'move';
+	};
 	const handleDrop = ( index ) => ( event ) => {
 		event.preventDefault();
+		event.stopPropagation();
 		if ( null !== dragIndex ) {
 			moveColumn( dragIndex, index );
 		}
 		setDragIndex( null );
 	};
+	const handleDragEnd = ( event ) => {
+		event.stopPropagation();
+		setDragIndex( null );
+		setArmedIndex( null );
+	};
+
+	// ハンドルで mousedown した後、チップ外でマウスを離した場合も確実に解除する
+	useEffect( () => {
+		if ( null === armedIndex ) {
+			return;
+		}
+		const onMouseUp = () => setArmedIndex( null );
+		window.addEventListener( 'mouseup', onMouseUp );
+		return () => window.removeEventListener( 'mouseup', onMouseUp );
+	}, [ armedIndex ] );
 
 	return (
 		<>
@@ -125,6 +166,16 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						onChange={ ( value ) => setAttributes({ showCta: value }) }
 						help={ __( 'オフにすると各行のCTAボタン列を非表示にします。', 'madoguchi-blocks' ) }
 					/>
+					{ showCta && (
+						<RangeControl
+							label={ __( 'CTA下の補足文の文字サイズ（既定・px）', 'madoguchi-blocks' ) }
+							value={ ctaNoteFontSize || 0 }
+							onChange={ ( value ) => setAttributes({ ctaNoteFontSize: value }) }
+							min={ 0 }
+							max={ 20 }
+							help={ __( '0は既定サイズ。各行の設定で個別に上書きできます。', 'madoguchi-blocks' ) }
+						/>
+					) }
 				</PanelBody>
 				<PanelColorSettings
 					title={ __( 'カラー設定', 'madoguchi-blocks' ) }
@@ -136,7 +187,11 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						value: nameColBgColor,
 						onChange: ( color ) => setAttributes({ nameColBgColor: color || '' }),
 						label: __( '名称列の背景色', 'madoguchi-blocks' )
-					} ] }
+					}, ...( showCta ? [ {
+						value: ctaNoteColor,
+						onChange: ( color ) => setAttributes({ ctaNoteColor: color || '' }),
+						label: __( 'CTA下の補足文の文字色（既定）', 'madoguchi-blocks' )
+					} ] : [] ) ] }
 				/>
 			</InspectorControls>
 
@@ -167,20 +222,74 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						<span
 							className={ 'comparison-table__col-chip' + ( dragIndex === index ? ' is-dragging' : '' ) }
 							key={ index }
-							draggable
+							draggable={ armedIndex === index }
 							onDragStart={ handleDragStart( index ) }
 							onDragOver={ handleDragOver }
 							onDrop={ handleDrop( index ) }
-							onDragEnd={ () => setDragIndex( null ) }
+							onDragEnd={ handleDragEnd }
 						>
-							<span className="comparison-table__col-drag" aria-hidden="true">⠿</span>
+							<span
+								className="comparison-table__col-drag"
+								aria-hidden="true"
+								onMouseDown={ armColumn( index ) }
+								onMouseUp={ disarmColumn }
+							>⠿</span>
+							<button
+								type="button"
+								className="comparison-table__col-move"
+								onClick={ () => moveColumn( index, index - 1 ) }
+								disabled={ 0 === index }
+								aria-label={ __( '左へ移動', 'madoguchi-blocks' ) }
+							>←</button>
+							<button
+								type="button"
+								className="comparison-table__col-move"
+								onClick={ () => moveColumn( index, index + 1 ) }
+								disabled={ index === columns.length - 1 }
+								aria-label={ __( '右へ移動', 'madoguchi-blocks' ) }
+							>→</button>
 							<RichText
 								tagName="span"
 								className="comparison-table__col-label"
+								style={ {
+									...( col.fontSize ? { fontSize: col.fontSize + 'px' } : {} ),
+									...( col.color ? { color: col.color } : {} )
+								} }
 								value={ col.label || '' }
 								onChange={ ( value ) => updateColumnLabel( index, value ) }
 								placeholder={ __( '列名', 'madoguchi-blocks' ) }
 								allowedFormats={ [] }
+							/>
+							<Dropdown
+								className="comparison-table__col-settings"
+								contentClassName="comparison-table__col-settings-popover"
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<button
+										type="button"
+										className="comparison-table__col-gear"
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+										aria-label={ __( 'この列の文字サイズ・色', 'madoguchi-blocks' ) }
+									>⚙</button>
+								) }
+								renderContent={ () => (
+									<div className="comparison-table__col-settings-panel">
+										<RangeControl
+											label={ __( '文字サイズ（px・0で既定値）', 'madoguchi-blocks' ) }
+											value={ col.fontSize || 0 }
+											onChange={ ( value ) => updateColumnSetting( index, 'fontSize', value ) }
+											min={ 0 }
+											max={ 28 }
+										/>
+										<p className="comparison-table__col-settings-label">{ __( '文字色', 'madoguchi-blocks' ) }</p>
+										<ColorPalette
+											value={ col.color }
+											onChange={ ( value ) => updateColumnSetting( index, 'color', value || '' ) }
+											enableAlpha={ false }
+											clearable
+										/>
+									</div>
+								) }
 							/>
 							<button
 								type="button"
