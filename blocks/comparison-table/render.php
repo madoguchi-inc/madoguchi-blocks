@@ -65,6 +65,15 @@ $name_bg = isset( $attributes['nameColBgColor'] ) ? sanitize_hex_color( $attribu
 if ( $name_bg ) {
 	$styles[] = '--md-name-bg:' . $name_bg;
 }
+// CTA下の補足文の既定の文字サイズ・色（各行は自身の属性で上書き可能）
+$cta_note_size = isset( $attributes['ctaNoteFontSize'] ) ? (int) $attributes['ctaNoteFontSize'] : 0;
+if ( $cta_note_size > 0 ) {
+	$styles[] = '--md-cta-note-size:' . $cta_note_size . 'px';
+}
+$cta_note_color = isset( $attributes['ctaNoteColor'] ) ? sanitize_hex_color( $attributes['ctaNoteColor'] ) : '';
+if ( $cta_note_color ) {
+	$styles[] = '--md-cta-note-color:' . $cta_note_color;
+}
 if ( $styles ) {
 	$wrapper_args['style'] = implode( ';', $styles ) . ';';
 }
@@ -82,7 +91,20 @@ $wrapper = get_block_wrapper_attributes( $wrapper_args );
 				<div class="comparison-table__gcell comparison-table__gcell--head comparison-table__gcell--cta"><?php echo esc_html( $cta_label ); ?></div>
 			<?php endif; ?>
 			<?php foreach ( $columns as $col ) : ?>
-				<div class="comparison-table__gcell comparison-table__gcell--head"><?php echo esc_html( isset( $col['label'] ) ? wp_strip_all_tags( $col['label'] ) : '' ); ?></div>
+				<?php
+				// 列単位の文字サイズ・色（ヘッダー・値セルの両方に同じ値を適用する）
+				$col_styles = array();
+				$col_size   = isset( $col['fontSize'] ) ? (int) $col['fontSize'] : 0;
+				if ( $col_size > 0 ) {
+					$col_styles[] = '--md-col-size:' . $col_size . 'px';
+				}
+				$col_color = isset( $col['color'] ) ? sanitize_hex_color( $col['color'] ) : '';
+				if ( $col_color ) {
+					$col_styles[] = '--md-col-color:' . $col_color;
+				}
+				$col_style_attr = $col_styles ? ' style="' . esc_attr( implode( ';', $col_styles ) ) . '"' : '';
+				?>
+				<div class="comparison-table__gcell comparison-table__gcell--head"<?php echo $col_style_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>><?php echo esc_html( isset( $col['label'] ) ? wp_strip_all_tags( $col['label'] ) : '' ); ?></div>
 			<?php endforeach; ?>
 			<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 各行(子ブロック) ?>
 		</div>

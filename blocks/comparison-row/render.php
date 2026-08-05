@@ -17,6 +17,18 @@ $values     = ( isset( $attributes['values'] ) && is_array( $attributes['values'
 $name_color = isset( $attributes['nameColor'] ) ? sanitize_hex_color( $attributes['nameColor'] ) : '';
 $cta_note   = isset( $attributes['ctaNote'] ) ? wp_kses( $attributes['ctaNote'], array( 'br' => array(), 'strong' => array(), 'em' => array() ) ) : '';
 
+// CTA下の補足文の文字サイズ・色（未設定ならテーブル側の既定値をCSS継承で使う）
+$cta_note_styles = array();
+$cta_note_size   = isset( $attributes['ctaNoteFontSize'] ) ? (int) $attributes['ctaNoteFontSize'] : 0;
+if ( $cta_note_size > 0 ) {
+	$cta_note_styles[] = '--md-cta-note-size:' . $cta_note_size . 'px';
+}
+$cta_note_color = isset( $attributes['ctaNoteColor'] ) ? sanitize_hex_color( $attributes['ctaNoteColor'] ) : '';
+if ( $cta_note_color ) {
+	$cta_note_styles[] = '--md-cta-note-color:' . $cta_note_color;
+}
+$cta_note_style_attr = $cta_note_styles ? ' style="' . esc_attr( implode( ';', $cta_note_styles ) ) . '"' : '';
+
 // 親から列定義・CTA表示可否を受け取る（評価表示方式は行ごとの自属性）
 $columns        = isset( $block->context['madoguchi/comparisonColumns'] ) && is_array( $block->context['madoguchi/comparisonColumns'] )
 	? $block->context['madoguchi/comparisonColumns']
@@ -63,11 +75,25 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		<div class="comparison-table__gcell comparison-table__gcell--cta">
 			<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped CTA列の子ブロック ?>
 			<?php if ( '' !== trim( wp_strip_all_tags( $cta_note ) ) ) : ?>
-				<p class="comparison-table__cta-note"><?php echo $cta_note; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にwp_kses済み ?></p>
+				<p class="comparison-table__cta-note"<?php echo $cta_note_style_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>><?php echo $cta_note; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にwp_kses済み ?></p>
 			<?php endif; ?>
 		</div>
 	<?php endif; ?>
 	<?php for ( $i = 0; $i < $col_count; $i++ ) : ?>
-		<div class="comparison-table__gcell"><?php echo esc_html( isset( $values[ $i ] ) ? wp_strip_all_tags( $values[ $i ] ) : '' ); ?></div>
+		<?php
+		// 列単位の文字サイズ・色（親のヘッダーセルと同じ値を値セルにも適用する）
+		$col        = isset( $columns[ $i ] ) && is_array( $columns[ $i ] ) ? $columns[ $i ] : array();
+		$col_styles = array();
+		$col_size   = isset( $col['fontSize'] ) ? (int) $col['fontSize'] : 0;
+		if ( $col_size > 0 ) {
+			$col_styles[] = '--md-col-size:' . $col_size . 'px';
+		}
+		$col_color = isset( $col['color'] ) ? sanitize_hex_color( $col['color'] ) : '';
+		if ( $col_color ) {
+			$col_styles[] = '--md-col-color:' . $col_color;
+		}
+		$col_style_attr = $col_styles ? ' style="' . esc_attr( implode( ';', $col_styles ) ) . '"' : '';
+		?>
+		<div class="comparison-table__gcell"<?php echo $col_style_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>><?php echo esc_html( isset( $values[ $i ] ) ? wp_strip_all_tags( $values[ $i ] ) : '' ); ?></div>
 	<?php endfor; ?>
 </div>
