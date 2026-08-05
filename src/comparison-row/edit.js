@@ -41,6 +41,12 @@ export default function Edit( { attributes, setAttributes, context }) {
 		setAttributes({ values: nv });
 	};
 
+	// チェック列・口コミ列は値をオブジェクトで持つため、既存キーを保ったまま1項目だけ更新する
+	const updateValueField = ( i, key, v, fallback ) => {
+		const current = ( values && values[ i ] && 'object' === typeof values[ i ] ) ? values[ i ] : fallback;
+		updateValue( i, { ...current, [ key ]: v } );
+	};
+
 	return (
 		<>
 			<InspectorControls>
@@ -125,23 +131,82 @@ export default function Edit( { attributes, setAttributes, context }) {
 						</div>
 					</div>
 				) }
-				{ columns.map( ( col, i ) => (
-					<div className="comparison-row-edit__field" key={ i }>
-						<span className="comparison-row-edit__lbl">{ col.label || ( __( '列', 'madoguchi-blocks' ) + ' ' + ( i + 1 ) ) }</span>
-						<RichText
-							tagName="span"
-							className="comparison-row-edit__val"
-							style={ {
-								...( col.fontSize ? { fontSize: col.fontSize + 'px' } : {} ),
-								...( col.color ? { color: col.color } : {} )
-							} }
-							value={ ( values && values[ i ] ) || '' }
-							onChange={ ( v ) => updateValue( i, v ) }
-							placeholder={ __( '○ / - / 内容', 'madoguchi-blocks' ) }
-							allowedFormats={ [] }
-						/>
-					</div>
-				) ) }
+				{ columns.map( ( col, i ) => {
+					const colType = col.type || 'text';
+					const cellValue = values && values[ i ];
+					const cellStyle = {
+						...( col.fontSize ? { fontSize: col.fontSize + 'px' } : {} ),
+						...( col.color ? { color: col.color } : {} )
+					};
+					return (
+						<div className="comparison-row-edit__field" key={ i }>
+							<span className="comparison-row-edit__lbl">{ col.label || ( __( '列', 'madoguchi-blocks' ) + ' ' + ( i + 1 ) ) }</span>
+							{ 'text' === colType && (
+								<RichText
+									tagName="span"
+									className="comparison-row-edit__val"
+									style={ cellStyle }
+									value={ ( 'string' === typeof cellValue && cellValue ) || '' }
+									onChange={ ( v ) => updateValue( i, v ) }
+									placeholder={ __( '○ / - / 内容', 'madoguchi-blocks' ) }
+									allowedFormats={ [] }
+								/>
+							) }
+							{ 'check' === colType && (
+								<span className="comparison-row-edit__check">
+									<SelectControl
+										value={ ( cellValue && cellValue.mark ) || 'none' }
+										options={ [
+											{ label: __( 'なし', 'madoguchi-blocks' ), value: 'none' },
+											{ label: __( '✓（あり）', 'madoguchi-blocks' ), value: 'check' },
+											{ label: __( '✕（なし）', 'madoguchi-blocks' ), value: 'cross' }
+										] }
+										onChange={ ( v ) => updateValueField( i, 'mark', v, { mark: 'none', text: '' } ) }
+									/>
+									<RichText
+										tagName="span"
+										className="comparison-row-edit__val"
+										style={ cellStyle }
+										value={ ( cellValue && cellValue.text ) || '' }
+										onChange={ ( v ) => updateValueField( i, 'text', v, { mark: 'none', text: '' } ) }
+										placeholder={ __( '補足テキスト（任意）', 'madoguchi-blocks' ) }
+										allowedFormats={ [] }
+									/>
+								</span>
+							) }
+							{ 'review' === colType && (
+								<span className="comparison-row-edit__review">
+									<SelectControl
+										value={ ( cellValue && cellValue.mode ) || 'stars' }
+										options={ [
+											{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'stars' },
+											{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' }
+										] }
+										onChange={ ( v ) => updateValueField( i, 'mode', v, { mode: 'stars', rating: 0 } ) }
+									/>
+									{ 'pr' !== ( ( cellValue && cellValue.mode ) || 'stars' ) && (
+										<RangeControl
+											value={ ( cellValue && cellValue.rating ) || 0 }
+											onChange={ ( v ) => updateValueField( i, 'rating', v, { mode: 'stars', rating: 0 } ) }
+											min={ 0 }
+											max={ 5 }
+											step={ 0.5 }
+										/>
+									) }
+								</span>
+							) }
+							{ 'score' === colType && (
+								<RangeControl
+									value={ ( 'number' === typeof cellValue && cellValue ) || 0 }
+									onChange={ ( v ) => updateValue( i, v ) }
+									min={ 0 }
+									max={ 5 }
+									step={ 0.5 }
+								/>
+							) }
+						</div>
+					);
+				} ) }
 			</div>
 		</>
 	);

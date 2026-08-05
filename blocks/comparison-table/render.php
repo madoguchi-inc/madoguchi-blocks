@@ -47,11 +47,14 @@ if ( $show_cta ) {
 	$template .= ' minmax(130px, auto)';
 }
 for ( $i = 0; $i < $col_count; $i++ ) {
-	$template .= ' minmax(90px, 1fr)';
+	// 列の横幅（px）が設定されていればそれを固定トラック幅にし、未設定は既存どおり可変（minmax）にする。
+	$col_width = isset( $columns[ $i ]['width'] ) ? (int) $columns[ $i ]['width'] : 0;
+	$template .= $col_width > 0 ? ' ' . $col_width . 'px' : ' minmax(90px, 1fr)';
 }
 
 // ラッパー（アクセントカラー・文字サイズ・名称列の背景色）
-$wrapper_args = array( 'class' => 'comparison-table' );
+$cell_align   = ( isset( $attributes['cellAlign'] ) && 'left' === $attributes['cellAlign'] ) ? 'left' : 'center';
+$wrapper_args = array( 'class' => 'comparison-table' . ( 'left' === $cell_align ? ' comparison-table--align-left' : '' ) );
 $styles       = array();
 $accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
 if ( $accent ) {
@@ -64,6 +67,15 @@ if ( $font_size > 0 ) {
 $name_bg = isset( $attributes['nameColBgColor'] ) ? sanitize_hex_color( $attributes['nameColBgColor'] ) : '';
 if ( $name_bg ) {
 	$styles[] = '--md-name-bg:' . $name_bg;
+}
+// ヘッダー行の背景色・文字色（未設定は既存の既定色のまま）
+$header_bg = isset( $attributes['headerBgColor'] ) ? sanitize_hex_color( $attributes['headerBgColor'] ) : '';
+if ( $header_bg ) {
+	$styles[] = '--md-header-bg:' . $header_bg;
+}
+$header_text = isset( $attributes['headerTextColor'] ) ? sanitize_hex_color( $attributes['headerTextColor'] ) : '';
+if ( $header_text ) {
+	$styles[] = '--md-header-text:' . $header_text;
 }
 // CTA下の補足文の既定の文字サイズ・色（各行は自身の属性で上書き可能）
 $cta_note_size = isset( $attributes['ctaNoteFontSize'] ) ? (int) $attributes['ctaNoteFontSize'] : 0;

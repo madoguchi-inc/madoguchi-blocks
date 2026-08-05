@@ -49,6 +49,18 @@
 			"type": "string",
 			"default": ""
 		},
+		"headerBgColor": {
+			"type": "string",
+			"default": ""
+		},
+		"headerTextColor": {
+			"type": "string",
+			"default": ""
+		},
+		"cellAlign": {
+			"type": "string",
+			"default": "center"
+		},
 		"showCta": {
 			"type": "boolean",
 			"default": true
