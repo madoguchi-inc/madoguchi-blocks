@@ -56,7 +56,8 @@ export default function Edit( { attributes, setAttributes, context }) {
 						value={ ratingDisplay || 'star' }
 						options={ [
 							{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'star' },
-							{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' }
+							{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' },
+							{ label: __( 'なし（表示しない）', 'madoguchi-blocks' ), value: 'none' }
 						] }
 						onChange={ ( value ) => setAttributes({ ratingDisplay: value }) }
 					/>
@@ -110,7 +111,7 @@ export default function Edit( { attributes, setAttributes, context }) {
 						allowedFormats={ [] }
 					/>
 					{ 'pr' === ratingDisplay && <span className="comparison-row-edit__rating">{ __( 'PR', 'madoguchi-blocks' ) }</span> }
-					{ 'pr' !== ratingDisplay && rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }
+					{ 'star' === ( ratingDisplay || 'star' ) && rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }
 				</div>
 				{ showCta && (
 					<div className="comparison-row-edit__field comparison-row-edit__field--cta">

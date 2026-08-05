@@ -64,7 +64,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		<?php endif; ?>
 		<?php if ( 'pr' === $rating_display ) : ?>
 			<span class="comparison-table__pr-badge"><?php esc_html_e( 'PR', 'madoguchi-blocks' ); ?></span>
-		<?php elseif ( $rating > 0 ) : ?>
+		<?php elseif ( 'star' === $rating_display && $rating > 0 ) : ?>
 			<span class="comparison-table__rating">
 				<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $width ); ?>%"></span></span>
 				<span class="comparison-table__score"><?php echo esc_html( number_format( $rating, 1 ) ); ?></span>
