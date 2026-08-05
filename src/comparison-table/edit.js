@@ -12,14 +12,14 @@ import {
 	InspectorControls,
 	PanelColorSettings
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, RangeControl, Button, ToggleControl, Dropdown, ColorPalette } from '@wordpress/components';
+import { PanelBody, TextControl, RangeControl, Button, ToggleControl, Dropdown, ColorPalette, SelectControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
 const TEMPLATE = [ [ 'madoguchi/comparison-row' ] ];
 
 export default function Edit( { attributes, setAttributes, clientId }) {
-	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel, ctaNoteFontSize, ctaNoteColor } = attributes;
+	const { caption, articleId, columns, accentColor, fontSize, nameLabel, nameColWidth, nameColBgColor, showCta, ctaLabel, ctaNoteFontSize, ctaNoteColor, headerBgColor, headerTextColor, cellAlign } = attributes;
 	const [ dragIndex, setDragIndex ] = useState( null );
 	// ドラッグはハンドル（⠿）でmousedownした列だけ有効にする。
 	// チップ全体を draggable にすると内部の RichText（contenteditable）が
@@ -27,13 +27,15 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 	const [ armedIndex, setArmedIndex ] = useState( null );
 
 	const blockProps = useBlockProps({
-		className: 'comparison-table comparison-table--edit',
+		className: 'comparison-table comparison-table--edit' + ( 'left' === cellAlign ? ' comparison-table--align-left' : '' ),
 		style: {
 			...( accentColor ? { '--md-brand': accentColor } : {} ),
 			...( fontSize ? { '--md-table-size': fontSize + 'px' } : {} ),
 			...( nameColBgColor ? { '--md-name-bg': nameColBgColor } : {} ),
 			...( ctaNoteFontSize ? { '--md-cta-note-size': ctaNoteFontSize + 'px' } : {} ),
-			...( ctaNoteColor ? { '--md-cta-note-color': ctaNoteColor } : {} )
+			...( ctaNoteColor ? { '--md-cta-note-color': ctaNoteColor } : {} ),
+			...( headerBgColor ? { '--md-header-bg': headerBgColor } : {} ),
+			...( headerTextColor ? { '--md-header-text': headerTextColor } : {} )
 		}
 	});
 	const innerProps = useInnerBlocksProps(
@@ -166,6 +168,12 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						onChange={ ( value ) => setAttributes({ showCta: value }) }
 						help={ __( 'オフにすると各行のCTAボタン列を非表示にします。', 'madoguchi-blocks' ) }
 					/>
+					<ToggleControl
+						label={ __( 'セル内の文字を左揃えにする', 'madoguchi-blocks' ) }
+						checked={ 'left' === cellAlign }
+						onChange={ ( value ) => setAttributes({ cellAlign: value ? 'left' : 'center' }) }
+						help={ __( 'オフ（既定）は中央揃え。CTA列は対象外です。', 'madoguchi-blocks' ) }
+					/>
 					{ showCta && (
 						<RangeControl
 							label={ __( 'CTA下の補足文の文字サイズ（既定・px）', 'madoguchi-blocks' ) }
@@ -187,6 +195,14 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						value: nameColBgColor,
 						onChange: ( color ) => setAttributes({ nameColBgColor: color || '' }),
 						label: __( '名称列の背景色', 'madoguchi-blocks' )
+					}, {
+						value: headerBgColor,
+						onChange: ( color ) => setAttributes({ headerBgColor: color || '' }),
+						label: __( 'ヘッダーの背景色', 'madoguchi-blocks' )
+					}, {
+						value: headerTextColor,
+						onChange: ( color ) => setAttributes({ headerTextColor: color || '' }),
+						label: __( 'ヘッダーの文字色', 'madoguchi-blocks' )
 					}, ...( showCta ? [ {
 						value: ctaNoteColor,
 						onChange: ( color ) => setAttributes({ ctaNoteColor: color || '' }),
@@ -274,6 +290,26 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 								) }
 								renderContent={ () => (
 									<div className="comparison-table__col-settings-panel">
+										<SelectControl
+											label={ __( '列の種別', 'madoguchi-blocks' ) }
+											value={ col.type || 'text' }
+											options={ [
+												{ label: __( 'テキスト', 'madoguchi-blocks' ), value: 'text' },
+												{ label: __( '✓／✕（チェック）', 'madoguchi-blocks' ), value: 'check' },
+												{ label: __( '口コミ（☆評価／PR）', 'madoguchi-blocks' ), value: 'review' },
+												{ label: __( '検証スコア（☆）', 'madoguchi-blocks' ), value: 'score' }
+											] }
+											onChange={ ( value ) => updateColumnSetting( index, 'type', value ) }
+											help={ __( '種別を変えると、各行のこの列の入力方法が切り替わります。', 'madoguchi-blocks' ) }
+										/>
+										<RangeControl
+											label={ __( '列の横幅（px・0で自動）', 'madoguchi-blocks' ) }
+											value={ col.width || 0 }
+											onChange={ ( value ) => updateColumnSetting( index, 'width', value ) }
+											min={ 0 }
+											max={ 400 }
+											step={ 10 }
+										/>
 										<RangeControl
 											label={ __( '文字サイズ（px・0で既定値）', 'madoguchi-blocks' ) }
 											value={ col.fontSize || 0 }

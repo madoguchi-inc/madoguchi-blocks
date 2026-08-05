@@ -83,6 +83,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		<?php
 		// 列単位の文字サイズ・色（親のヘッダーセルと同じ値を値セルにも適用する）
 		$col        = isset( $columns[ $i ] ) && is_array( $columns[ $i ] ) ? $columns[ $i ] : array();
+		$col_type   = isset( $col['type'] ) ? $col['type'] : 'text';
 		$col_styles = array();
 		$col_size   = isset( $col['fontSize'] ) ? (int) $col['fontSize'] : 0;
 		if ( $col_size > 0 ) {
@@ -93,7 +94,56 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 			$col_styles[] = '--md-col-color:' . $col_color;
 		}
 		$col_style_attr = $col_styles ? ' style="' . esc_attr( implode( ';', $col_styles ) ) . '"' : '';
+		$cell_value     = isset( $values[ $i ] ) ? $values[ $i ] : '';
+		$cell_class     = 'comparison-table__gcell';
+		if ( in_array( $col_type, array( 'check', 'review', 'score' ), true ) ) {
+			$cell_class .= ' comparison-table__gcell--' . $col_type;
+		}
 		?>
-		<div class="comparison-table__gcell"<?php echo $col_style_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>><?php echo esc_html( isset( $values[ $i ] ) ? wp_strip_all_tags( $values[ $i ] ) : '' ); ?></div>
+		<div class="<?php echo esc_attr( $cell_class ); ?>"<?php echo $col_style_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>>
+			<?php if ( 'check' === $col_type ) : ?>
+				<?php
+				// チェック列: { mark: 'check'|'cross'|'none', text: string } の想定（旧データ・型不一致時はテキストのみ扱いにフォールバック）。
+				$mark = ( is_array( $cell_value ) && isset( $cell_value['mark'] ) ) ? $cell_value['mark'] : '';
+				$text = ( is_array( $cell_value ) && isset( $cell_value['text'] ) )
+					? wp_kses( $cell_value['text'], array( 'br' => array(), 'strong' => array(), 'em' => array() ) )
+					: ( is_array( $cell_value ) ? '' : wp_strip_all_tags( (string) $cell_value ) );
+				?>
+				<span class="comparison-table__check">
+					<?php if ( 'check' === $mark ) : ?>
+						<span class="comparison-table__check-icon comparison-table__check-icon--check" aria-hidden="true">✓</span>
+					<?php elseif ( 'cross' === $mark ) : ?>
+						<span class="comparison-table__check-icon comparison-table__check-icon--cross" aria-hidden="true">✕</span>
+					<?php endif; ?>
+					<?php if ( '' !== trim( wp_strip_all_tags( $text ) ) ) : ?>
+						<span class="comparison-table__check-text"><?php echo $text; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にwp_kses済み ?></span>
+					<?php endif; ?>
+				</span>
+			<?php elseif ( 'review' === $col_type ) : ?>
+				<?php
+				// 口コミ列: { mode: 'stars'|'pr', rating: number }。旧データ・数値のみの場合は星評価として扱う。
+				$mode   = ( is_array( $cell_value ) && isset( $cell_value['mode'] ) ) ? $cell_value['mode'] : 'stars';
+				$rating = ( is_array( $cell_value ) && isset( $cell_value['rating'] ) ) ? floatval( $cell_value['rating'] ) : ( is_numeric( $cell_value ) ? floatval( $cell_value ) : 0 );
+				$rwidth = max( 0, min( 100, ( $rating / 5 ) * 100 ) );
+				?>
+				<?php if ( 'pr' === $mode ) : ?>
+					<span class="comparison-table__pr-badge"><?php esc_html_e( 'PR', 'madoguchi-blocks' ); ?></span>
+				<?php else : ?>
+					<span class="comparison-table__rating">
+						<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $rwidth ); ?>%"></span></span>
+						<span class="comparison-table__score"><?php echo esc_html( number_format( $rating, 1 ) ); ?></span>
+					</span>
+				<?php endif; ?>
+			<?php elseif ( 'score' === $col_type ) : ?>
+				<?php
+				// 検証スコア列: 数値（0〜5）を星の塗り幅で表す。
+				$score  = ( is_array( $cell_value ) && isset( $cell_value['rating'] ) ) ? floatval( $cell_value['rating'] ) : ( is_numeric( $cell_value ) ? floatval( $cell_value ) : 0 );
+				$swidth = max( 0, min( 100, ( $score / 5 ) * 100 ) );
+				?>
+				<span class="comparison-table__stars comparison-table__stars--score"><span class="comparison-table__stars-fill comparison-table__stars-fill--score" style="width:<?php echo esc_attr( $swidth ); ?>%"></span></span>
+			<?php else : ?>
+				<?php echo esc_html( is_array( $cell_value ) ? '' : wp_strip_all_tags( (string) $cell_value ) ); ?>
+			<?php endif; ?>
+		</div>
 	<?php endfor; ?>
 </div>

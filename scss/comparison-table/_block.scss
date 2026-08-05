@@ -50,8 +50,8 @@
 		text-align: center;
 		font-size: var(--md-col-size, inherit);
 		color: var(--md-col-color, inherit);
-		border-right: 1px solid #ededed;
-		border-bottom: 1px solid #f0f0f0;
+		border-right: 1px solid #dcdcdc;
+		border-bottom: 1px solid #d8d8d8;
 	}
 
 	// 最終列（CTA）は右罫線なし
@@ -63,8 +63,42 @@
 		font-weight: bold;
 		font-size: var(--md-col-size, 0.93em);
 		white-space: nowrap;
-		background: #f6f6f6;
-		border-bottom: 1px solid #ececec;
+		background: var(--md-header-bg, #f6f6f6);
+		color: var(--md-header-text, inherit);
+		border-bottom: 1px solid #d0d0d0;
+	}
+
+	// 「セル内の文字を左揃えにする」設定時（CTA列は対象外。既存記事は既定=中央揃えのまま変化なし）
+	&--align-left &__gcell:not(&__gcell--cta) {
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	// チェック列（✓／✕＋補足テキスト）は設定に関わらず常に左揃え
+	&__gcell--check {
+		align-items: flex-start;
+		text-align: left;
+	}
+
+	&__check {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	&__check-icon {
+		flex: 0 0 auto;
+		font-weight: bold;
+		font-size: 1.1em;
+		line-height: 1;
+
+		&--check {
+			color: #2e9e44;
+		}
+
+		&--cross {
+			color: #c33;
+		}
 	}
 
 	// 店名列（固定・背景色は --md-name-bg で上書き可能）
@@ -80,7 +114,7 @@
 
 	&__gcell--head#{&}__gcell--name {
 		z-index: 3;
-		background: #f6f6f6;
+		background: var(--md-header-bg, #f6f6f6);
 	}
 
 	&__shop {
@@ -137,6 +171,11 @@
 		font-weight: bold;
 		font-size: 0.95em;
 		color: #f5820b;
+	}
+
+	// 検証スコア列は口コミ列と塗り色を分け、見た目で区別できるようにする
+	&__stars-fill--score {
+		color: #3a8ee6;
 	}
 
 	// 評価表示を「PR」表記にした場合のバッジ
@@ -376,6 +415,14 @@
 
 	&__val {
 		outline: none;
+	}
+
+	&__check,
+	&__review {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
 	}
 
 	&__rating {
