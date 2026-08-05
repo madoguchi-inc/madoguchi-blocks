@@ -121,14 +121,14 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 				</span>
 			<?php elseif ( 'review' === $col_type ) : ?>
 				<?php
-				// 口コミ列: { mode: 'stars'|'pr', rating: number }。旧データ・数値のみの場合は星評価として扱う。
+				// 口コミ列: { mode: 'stars'|'pr'|'none', rating: number }。旧データ・数値のみの場合は星評価として扱う。
 				$mode   = ( is_array( $cell_value ) && isset( $cell_value['mode'] ) ) ? $cell_value['mode'] : 'stars';
 				$rating = ( is_array( $cell_value ) && isset( $cell_value['rating'] ) ) ? floatval( $cell_value['rating'] ) : ( is_numeric( $cell_value ) ? floatval( $cell_value ) : 0 );
 				$rwidth = max( 0, min( 100, ( $rating / 5 ) * 100 ) );
 				?>
 				<?php if ( 'pr' === $mode ) : ?>
 					<span class="comparison-table__pr-badge"><?php esc_html_e( 'PR', 'madoguchi-blocks' ); ?></span>
-				<?php else : ?>
+				<?php elseif ( 'none' !== $mode ) : ?>
 					<span class="comparison-table__rating">
 						<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $rwidth ); ?>%"></span></span>
 						<span class="comparison-table__score"><?php echo esc_html( number_format( $rating, 1 ) ); ?></span>

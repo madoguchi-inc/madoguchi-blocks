@@ -181,11 +181,12 @@ export default function Edit( { attributes, setAttributes, context }) {
 										value={ ( cellValue && cellValue.mode ) || 'stars' }
 										options={ [
 											{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'stars' },
-											{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' }
+											{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' },
+											{ label: __( 'なし（表示しない）', 'madoguchi-blocks' ), value: 'none' }
 										] }
 										onChange={ ( v ) => updateValueField( i, 'mode', v, { mode: 'stars', rating: 0 } ) }
 									/>
-									{ 'pr' !== ( ( cellValue && cellValue.mode ) || 'stars' ) && (
+									{ 'stars' === ( ( cellValue && cellValue.mode ) || 'stars' ) && (
 										<RangeControl
 											value={ ( cellValue && cellValue.rating ) || 0 }
 											onChange={ ( v ) => updateValueField( i, 'rating', v, { mode: 'stars', rating: 0 } ) }
