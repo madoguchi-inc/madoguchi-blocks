@@ -1,37 +1,54 @@
 /*--------------------------------------------------------------
-# 買取業者比較テーブル（親＋行ブロック / CSSグリッド）
+# 比較テーブル（親＋行ブロック / CSSグリッド）
+# デザイン: Figma「みんなの買取 > テーブルデザイン」（TSK-4158）
+#   罫線 #d4dde1 / ヘッダー #ededed（名称列 #dedede）/ グループ見出し #f3e3a0（配下は白と45%混色）
+#   本文 12px 左揃え・上揃え / 名称はリンク色 #3254cd / 記号・星は 15px・12px
 --------------------------------------------------------------*/
+
+// 配色（Figma 値）
+$ct-border      : #d4dde1;
+$ct-head-bg     : #ededed;
+$ct-head-name-bg: #dedede;
+$ct-group-bg    : #f3e3a0;
+$ct-caption-bg  : #c3cfd5;
+$ct-link        : #3254cd;
+$ct-brand       : #c4ab46; // ブランド色の既定（--md-brand 未設定時）
+$ct-mark-ok     : #46c446;
+$ct-mark-ng     : #c44646;
+$ct-mark-partial: #febf03;
+$ct-hint        : #546366;
 
 .comparison-table {
 	margin: 2em 0;
 
+	// テーブル直上の見出しバー
 	&__caption {
-		margin: 0 0 0.8em !important;
+		margin: 0 !important;
+		padding: 13px 12px;
+		color: #000;
 		font-weight: bold;
-		font-size: 2rem;
-		line-height: $line_height_narrow !important;
-
-		@include mq-max(md) {
-			font-size: 4.4vw;
-		}
+		font-size: 1.6rem;
+		line-height: 1.6 !important;
+		text-align: center;
+		background: $ct-caption-bg;
+		border-bottom: 1px solid #fff;
 	}
 
-	// 横スクロール領域
+	// 横スクロール領域（外枠の罫線はセル側で描く）
 	&__scroll {
 		position: relative;
 		overflow-x: auto;
 		-webkit-overflow-scrolling: touch;
-		border: 1px solid #eee;
-		border-radius: 12px;
 	}
 
 	// グリッド本体（grid-template-columns はインラインで指定）
 	// min-width は付けない。列の最小トラック幅の合計がコンテナを超えたときだけ
 	// スクロール領域内で横スクロールが発生する。
-	// 文字サイズは --md-table-size を基準にし、各セルは em で相対指定する。
+	// 文字サイズは --md-table-size（既定12px）を基準にし、各セルは em で相対指定する。
 	&__grid {
 		display: grid;
-		font-size: var(--md-table-size, 1.4rem);
+		font-size: var(--md-table-size, 1.2rem);
+		line-height: 1.3;
 	}
 
 	// 行ラッパーは display:contents で、セルを親グリッドの直接要素にする
@@ -39,114 +56,162 @@
 		display: contents;
 	}
 
+	// セル共通（既定は中央揃え。--align-left 指定時に左揃え）
 	// 列単位の文字サイズ・色（--md-col-* は列のヘッダー・値セルの両方に同じ値を出す）
 	&__gcell {
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		padding: 12px 14px;
+		justify-content: flex-start;
+		gap: 4px;
+		padding: 12px 8px;
 		text-align: center;
 		font-size: var(--md-col-size, inherit);
 		color: var(--md-col-color, inherit);
-		border-right: 1px solid #dcdcdc;
-		border-bottom: 1px solid #d8d8d8;
+		word-break: break-word;
+		background: #fff;
+		border-right: 1px solid $ct-border;
+		border-bottom: 1px solid $ct-border;
 	}
 
-	// 最終列（CTA）は右罫線なし
-	&__gcell--cta {
-		border-right: 0;
-	}
-
+	// ヘッダーセル（1段時は全列同じ。2段時は --span2 / --group / --sub で行位置を決める）
 	&__gcell--head {
+		justify-content: center;
+		padding: 13px 8px;
 		font-weight: bold;
-		font-size: var(--md-col-size, 0.93em);
-		white-space: nowrap;
-		background: var(--md-header-bg, #f6f6f6);
-		color: var(--md-header-text, inherit);
-		border-bottom: 1px solid #d0d0d0;
+		font-size: var(--md-col-size, 1em);
+		color: var(--md-header-text, #000);
+		background: var(--md-header-bg, #{$ct-head-bg});
+		border-top: 1px solid $ct-border;
+		border-right-color: #fff;
+		border-bottom: 0;
 	}
 
-	// 「セル内の文字を左揃えにする」設定時（CTA列は対象外。既存記事は既定=中央揃えのまま変化なし）
+	// 2段ヘッダー: 名称・CTA・グループ無しの列は1〜2段目を縦に結合
+	&__gcell--span2 {
+		grid-row: 1 / span 2;
+	}
+
+	// 2段ヘッダー: 上段（グループ見出し。横方向の結合は render.php のインライン grid-column）
+	&__gcell--group {
+		grid-row: 1;
+		padding: 4px 8px;
+		font-size: 0.92em;
+		background: var(--md-group-bg, #{$ct-group-bg});
+	}
+
+	// 2段ヘッダー: 下段（グループ配下の列見出し。グループ色を白と混ぜた淡色）
+	&__gcell--sub {
+		grid-row: 2;
+		padding: 7px 8px;
+		font-size: 0.92em;
+		background: color-mix(in srgb, var(--md-group-bg, #{$ct-group-bg}) 45%, #fff);
+		border-top: 0;
+	}
+
+	// 「セル内の文字を左揃えにする」設定時（既定オン。CTA列は対象外）
 	&--align-left &__gcell:not(&__gcell--cta) {
 		align-items: flex-start;
 		text-align: left;
 	}
 
-	// チェック列（✓／✕＋補足テキスト）は設定に関わらず常に左揃え
-	&__gcell--check {
-		align-items: flex-start;
-		text-align: left;
-	}
-
+	// 記号（◎✓△✕）＋補足テキストの縦並び
 	&__check {
-		display: inline-flex;
+		display: flex;
+		flex-direction: column;
 		align-items: center;
-		gap: 6px;
+		gap: 4px;
 	}
 
-	&__check-icon {
-		flex: 0 0 auto;
-		font-weight: bold;
-		font-size: 1.1em;
-		line-height: 1;
+	&--align-left &__check {
+		align-items: flex-start;
+	}
 
+	&__mark-icon {
+		display: block;
+		flex: 0 0 auto;
+		width: 15px;
+		height: 15px;
+
+		&--circle,
 		&--check {
-			color: #2e9e44;
+			color: $ct-mark-ok;
+		}
+
+		&--triangle {
+			color: $ct-mark-partial;
 		}
 
 		&--cross {
-			color: #c33;
+			color: $ct-mark-ng;
 		}
 	}
 
-	// 店名列（固定・背景色は --md-name-bg で上書き可能）
+	// 名称列（固定・背景色は --md-name-bg で上書き可能）。他列との境界は二重線
 	&__gcell--name {
 		position: sticky;
 		left: 0;
 		z-index: 1;
-		align-items: flex-start;
-		text-align: left;
+		justify-content: center;
 		background: var(--md-name-bg, #fff);
-		box-shadow: 4px 0 6px rgba(#000, 0.04);
+		border-left: 1px solid $ct-border;
+		border-right: 3px double $ct-border;
 	}
 
 	&__gcell--head#{&}__gcell--name {
 		z-index: 3;
-		background: var(--md-header-bg, #f6f6f6);
+		background: var(--md-header-bg, #{$ct-head-name-bg});
+		border-right-color: $ct-border;
 	}
 
 	&__shop {
 		font-weight: bold;
-		font-size: 1.07em;
+		font-size: 1.08em;
 		word-break: break-word;
 	}
 
-	// 店名 → CTAボタンと同じリンク（文字色は各行の --md-… ではなくインラインstyleで個別上書き）
+	// 店名 → CTAボタンと同じリンク（文字色は各行のインラインstyleで個別上書き可能）
 	&__shop-link {
-		color: inherit;
-		text-decoration: none;
+		color: $ct-link;
+		text-decoration: underline;
 
 		&:hover,
 		&:focus {
-			text-decoration: underline;
+			text-decoration: none;
 		}
 	}
 
+	// 評価（名称セル下は横並び、口コミ列は「数値→星」の縦並び）
 	&__rating {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 2px 6px;
 		align-items: center;
-		margin-top: 4px;
+	}
+
+	&__gcell--review,
+	&__gcell--score {
+		justify-content: center;
+	}
+
+	&__gcell--review &__rating {
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+	}
+
+	&--align-left &__gcell--review &__rating {
+		align-items: flex-start;
 	}
 
 	&__stars {
 		position: relative;
 		display: inline-block;
-		font-size: 0.95em;
+		font-size: 1em;
+		letter-spacing: 1px;
 		line-height: 1;
+		white-space: nowrap;
 		color: #ddd;
 
 		&::before {
@@ -160,7 +225,7 @@
 		left: 0;
 		overflow: hidden;
 		white-space: nowrap;
-		color: #f5b81b;
+		color: var(--md-brand, #{$ct-brand});
 
 		&::before {
 			content: "★★★★★";
@@ -169,8 +234,9 @@
 
 	&__score {
 		font-weight: bold;
-		font-size: 0.95em;
-		color: #f5820b;
+		font-size: 1.33em;
+		line-height: 1;
+		color: var(--md-brand, #{$ct-brand});
 	}
 
 	// 検証スコア列は口コミ列と塗り色を分け、見た目で区別できるようにする
@@ -181,7 +247,6 @@
 	// 評価表示を「PR」表記にした場合のバッジ
 	&__pr-badge {
 		display: inline-block;
-		margin-top: 4px;
 		padding: 1px 8px;
 		color: #999;
 		font-size: 0.8em;
@@ -191,12 +256,13 @@
 		border-radius: 4px;
 	}
 
-	// CTA列に置かれたブロック（CTAボタン等）をセル幅になじませる
-	// ※padding/font-size はブロック側のインライン指定が優先されるため、
+	// CTA列（2列目固定）。ボタンはセル中央
+	// ※padding/font-size/角丸はブロック側のインライン指定が優先されるため、
 	//   コンパクトな既定値は行テンプレート側で与える。
 	&__gcell--cta {
-		// ボタンの周囲に余白を確保
-		padding: 12px 16px;
+		align-items: center;
+		justify-content: center;
+		padding: 8px;
 
 		.cta-button-wrap {
 			box-sizing: border-box;
@@ -204,18 +270,24 @@
 			margin: 0;
 		}
 
-		// width:100% がセル幅を超えないよう border-box にする（はみ出し防止）
+		// width:100% がセル幅を超えないよう border-box にする（はみ出し防止）。影はデザインの 3px 落ち影
 		.cta-button {
 			box-sizing: border-box;
 			width: 100%;
+			box-shadow: 0 3px 0 rgba(#000, 0.25);
+
+			&:hover {
+				transform: translateY(2px);
+				box-shadow: 0 1px 0 rgba(#000, 0.25);
+			}
 		}
 	}
 
 	// CTAボタン下の補足文（テーブル既定値は --md-cta-note-* を親から継承、行ごとに上書き可能）
 	&__cta-note {
-		margin: 6px 0 0 !important;
+		margin: 2px 0 0 !important;
 		color: var(--md-cta-note-color, #{$font_color_light});
-		font-size: var(--md-cta-note-size, 0.8em);
+		font-size: var(--md-cta-note-size, 0.85em);
 		line-height: $line_height_narrow !important;
 		text-align: center;
 	}
@@ -223,14 +295,31 @@
 	// スクロール可能ヒント（実際に横スクロールが発生するときだけ表示）
 	&__hint {
 		display: none;
-		margin: 6px 0 0 !important;
-		color: $font_color_light;
-		font-size: 1.2rem;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin: 8px 0 0 !important;
+		color: $ct-hint;
+		font-size: 1.4rem;
+		line-height: $line_height_narrow !important;
 		text-align: center;
 	}
 
+	&__hint-arrow {
+		display: inline-flex;
+		flex: 0 0 auto;
+		width: 13px;
+		height: 13px;
+
+		svg {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	}
+
 	&.is-scrollable &__hint {
-		display: block;
+		display: flex;
 	}
 }
 
@@ -280,6 +369,16 @@
 	&.is-dragging {
 		opacity: 0.4;
 	}
+}
+
+// 列に設定したグループ見出し（2段ヘッダーの上段）をチップ内に小さく表示
+.comparison-table__col-group-tag {
+	padding: 1px 6px;
+	color: #333;
+	font-size: 10px;
+	line-height: 1.5;
+	white-space: nowrap;
+	border-radius: 3px;
 }
 
 .comparison-table__col-drag {
@@ -425,9 +524,27 @@
 		gap: 8px;
 	}
 
+	// 記号のプレビュー（選択中の ◎✓△✕）
+	&__check .comparison-table__mark-icon {
+		flex: 0 0 auto;
+
+		&--circle,
+		&--check {
+			color: $ct-mark-ok;
+		}
+
+		&--triangle {
+			color: $ct-mark-partial;
+		}
+
+		&--cross {
+			color: $ct-mark-ng;
+		}
+	}
+
 	&__rating {
 		margin-left: 8px;
-		color: #f5820b;
+		color: $ct-brand;
 		font-size: 12px;
 	}
 
