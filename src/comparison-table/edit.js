@@ -172,7 +172,7 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 						label={ __( 'セル内の文字を左揃えにする', 'madoguchi-blocks' ) }
 						checked={ 'left' === cellAlign }
 						onChange={ ( value ) => setAttributes({ cellAlign: value ? 'left' : 'center' }) }
-						help={ __( 'オフ（既定）は中央揃え。CTA列は対象外です。', 'madoguchi-blocks' ) }
+						help={ __( 'オン（既定）は左揃え。オフにすると中央揃え。CTA列は対象外です。', 'madoguchi-blocks' ) }
 					/>
 					{ showCta && (
 						<RangeControl
@@ -264,6 +264,13 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 								disabled={ index === columns.length - 1 }
 								aria-label={ __( '右へ移動', 'madoguchi-blocks' ) }
 							>→</button>
+							{ col.group && (
+								<span
+									className="comparison-table__col-group-tag"
+									style={ { background: col.groupColor || '#f3e3a0' } }
+									title={ __( 'グループ見出し（2段ヘッダーの上段）', 'madoguchi-blocks' ) }
+								>{ col.group }</span>
+							) }
 							<RichText
 								tagName="span"
 								className="comparison-table__col-label"
@@ -302,6 +309,24 @@ export default function Edit( { attributes, setAttributes, clientId }) {
 											onChange={ ( value ) => updateColumnSetting( index, 'type', value ) }
 											help={ __( '種別を変えると、各行のこの列の入力方法が切り替わります。', 'madoguchi-blocks' ) }
 										/>
+										<TextControl
+											label={ __( 'グループ見出し（2段ヘッダー）', 'madoguchi-blocks' ) }
+											value={ col.group || '' }
+											onChange={ ( value ) => updateColumnSetting( index, 'group', value ) }
+											placeholder={ __( '例：対応可能な買取方法', 'madoguchi-blocks' ) }
+											help={ __( '隣り合う列に同じ見出しを設定すると、まとめて上段の見出しになります。空欄なら1段のまま。', 'madoguchi-blocks' ) }
+										/>
+										{ col.group && (
+											<>
+												<p className="comparison-table__col-settings-label">{ __( 'グループ見出しの背景色（既定: #f3e3a0・グループ先頭列の設定を使用）', 'madoguchi-blocks' ) }</p>
+												<ColorPalette
+													value={ col.groupColor }
+													onChange={ ( value ) => updateColumnSetting( index, 'groupColor', value || '' ) }
+													enableAlpha={ false }
+													clearable
+												/>
+											</>
+										) }
 										<RangeControl
 											label={ __( '列の横幅（px・0で自動）', 'madoguchi-blocks' ) }
 											value={ col.width || 0 }

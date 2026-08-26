@@ -5,7 +5,7 @@
 	"title": "比較テーブル",
 	"category": "madoguchi",
 	"icon": "editor-table",
-	"description": "項目を一覧で比較できるテーブル。1列目の見出しと列を自由に設定でき、各行のCTA列にはCTAボタン等のブロックを入れられます。スマホでは横スクロール（1列目は固定）。買取業者・サービス・商品などの比較に使えます。",
+	"description": "項目を一覧で比較できるテーブル。1列目の見出しと列を自由に設定でき、列に「グループ見出し」を付けると2段ヘッダーになります。各行のCTA列にはCTAボタン等のブロックを入れられます。スマホでは横スクロール（1列目は固定）。買取業者・サービス・商品などの比較に使えます。",
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
@@ -39,7 +39,7 @@
 		},
 		"fontSize": {
 			"type": "number",
-			"default": 14
+			"default": 12
 		},
 		"nameColWidth": {
 			"type": "number",
@@ -59,7 +59,7 @@
 		},
 		"cellAlign": {
 			"type": "string",
-			"default": "center"
+			"default": "left"
 		},
 		"showCta": {
 			"type": "boolean",
