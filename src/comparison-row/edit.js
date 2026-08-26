@@ -12,14 +12,16 @@ import {
 	PanelColorSettings
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, SelectControl } from '@wordpress/components';
+import MarkIcon, { MARK_OPTIONS } from './marks';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/cta-button' ];
-// セル内では既定でコンパクトなCTAボタンにする
+// セル内では既定でコンパクトなCTAボタンにする（角丸4px・余白12px・14px はテーブルデザインの基準値）
 const TEMPLATE = [ [ 'madoguchi/cta-button', {
 	text: '公式サイト',
 	fontSize: 14,
-	borderRadius: 6,
-	padding: { top: '9px', right: '14px', bottom: '9px', left: '14px' }
+	borderRadius: 4,
+	badgeGap: 4,
+	padding: { top: '12px', right: '12px', bottom: '12px', left: '12px' }
 } ] ];
 
 export default function Edit( { attributes, setAttributes, context }) {
@@ -157,13 +159,10 @@ export default function Edit( { attributes, setAttributes, context }) {
 								<span className="comparison-row-edit__check">
 									<SelectControl
 										value={ ( cellValue && cellValue.mark ) || 'none' }
-										options={ [
-											{ label: __( 'なし', 'madoguchi-blocks' ), value: 'none' },
-											{ label: __( '✓（あり）', 'madoguchi-blocks' ), value: 'check' },
-											{ label: __( '✕（なし）', 'madoguchi-blocks' ), value: 'cross' }
-										] }
+										options={ MARK_OPTIONS }
 										onChange={ ( v ) => updateValueField( i, 'mark', v, { mark: 'none', text: '' } ) }
 									/>
+									<MarkIcon mark={ ( cellValue && cellValue.mark ) || 'none' } />
 									<RichText
 										tagName="span"
 										className="comparison-row-edit__val"

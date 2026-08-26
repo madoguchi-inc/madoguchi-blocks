@@ -51,6 +51,19 @@ if ( ! empty( $block->parsed_block['innerBlocks'] ) ) {
 
 $name_style = $name_color ? ' style="color:' . esc_attr( $name_color ) . '"' : '';
 
+/**
+ * チェック列の記号（◎／✓／△／✕）の SVG。
+ * 図形は Figma「記号」コンポーネントの path をそのまま使う。色は CSS（currentColor）で与える。
+ * ※ エディタ側 src/comparison-row/marks.js にも同じ図形を持つ。追加・変更したら両方を同期すること。
+ */
+$mark_svg_attrs = 'class="comparison-table__mark-icon comparison-table__mark-icon--%s" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"';
+$mark_svgs      = array(
+	'circle'   => '<svg viewBox="0 0 16.7647 16.7647" ' . sprintf( $mark_svg_attrs, 'circle' ) . ' stroke-width="1.76471" stroke-linecap="square"><path d="M15.8824 8.38235C15.8824 12.5245 12.5245 15.8824 8.38235 15.8824C4.24022 15.8824 0.882353 12.5245 0.882353 8.38235C0.882353 4.24022 4.24022 0.882353 8.38235 0.882353C12.5245 0.882353 15.8824 4.24022 15.8824 8.38235Z"/><path d="M11.8824 8.38235C11.8824 10.3153 10.3153 11.8824 8.38235 11.8824C6.44936 11.8824 4.88235 10.3153 4.88235 8.38235C4.88235 6.44936 6.44936 4.88235 8.38235 4.88235C10.3153 4.88235 11.8824 6.44936 11.8824 8.38235Z"/></svg>',
+	'check'    => '<svg viewBox="0 0 17 15" ' . sprintf( $mark_svg_attrs, 'check' ) . ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1.00004 8L6.0385 12L16 2"/></svg>',
+	'triangle' => '<svg viewBox="0 0 18.7059 15.8824" ' . sprintf( $mark_svg_attrs, 'triangle' ) . ' stroke-width="1.76471" stroke-linejoin="round"><path d="M17.8235 15H0.882353L9.35294 0.882353L17.8235 15Z"/></svg>',
+	'cross'    => '<svg viewBox="0 0 15.8824 15.8824" ' . sprintf( $mark_svg_attrs, 'cross' ) . ' stroke-width="1.76471" stroke-linecap="round"><path d="M0.882353 0.882353L15 15M15 0.882353L0.882353 15"/></svg>',
+);
+
 $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__row' ) );
 ?>
 <div <?php echo $wrapper; ?>>
@@ -65,7 +78,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		<?php if ( 'pr' === $rating_display ) : ?>
 			<span class="comparison-table__pr-badge"><?php esc_html_e( 'PR', 'madoguchi-blocks' ); ?></span>
 		<?php elseif ( 'star' === $rating_display && $rating > 0 ) : ?>
-			<span class="comparison-table__rating">
+			<span class="comparison-table__rating" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: 評価値 */ __( '評価 %s / 5', 'madoguchi-blocks' ), number_format( $rating, 1 ) ) ); ?>">
 				<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $width ); ?>%"></span></span>
 				<span class="comparison-table__score"><?php echo esc_html( number_format( $rating, 1 ) ); ?></span>
 			</span>
@@ -103,17 +116,16 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		<div class="<?php echo esc_attr( $cell_class ); ?>"<?php echo $col_style_attr; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にesc_attr済み ?>>
 			<?php if ( 'check' === $col_type ) : ?>
 				<?php
-				// チェック列: { mark: 'check'|'cross'|'none', text: string } の想定（旧データ・型不一致時はテキストのみ扱いにフォールバック）。
+				// チェック列: { mark: 'none'|'circle'|'check'|'triangle'|'cross', text: string } の想定
+				// （旧データ・型不一致時はテキストのみ扱いにフォールバック）。記号の下に補足テキストを縦に並べる。
 				$mark = ( is_array( $cell_value ) && isset( $cell_value['mark'] ) ) ? $cell_value['mark'] : '';
 				$text = ( is_array( $cell_value ) && isset( $cell_value['text'] ) )
 					? wp_kses( $cell_value['text'], array( 'br' => array(), 'strong' => array(), 'em' => array() ) )
 					: ( is_array( $cell_value ) ? '' : wp_strip_all_tags( (string) $cell_value ) );
 				?>
 				<span class="comparison-table__check">
-					<?php if ( 'check' === $mark ) : ?>
-						<span class="comparison-table__check-icon comparison-table__check-icon--check" aria-hidden="true">✓</span>
-					<?php elseif ( 'cross' === $mark ) : ?>
-						<span class="comparison-table__check-icon comparison-table__check-icon--cross" aria-hidden="true">✕</span>
+					<?php if ( isset( $mark_svgs[ $mark ] ) ) : ?>
+						<?php echo $mark_svgs[ $mark ]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 固定SVG ?>
 					<?php endif; ?>
 					<?php if ( '' !== trim( wp_strip_all_tags( $text ) ) ) : ?>
 						<span class="comparison-table__check-text"><?php echo $text; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 事前にwp_kses済み ?></span>
@@ -122,6 +134,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 			<?php elseif ( 'review' === $col_type ) : ?>
 				<?php
 				// 口コミ列: { mode: 'stars'|'pr'|'none', rating: number }。旧データ・数値のみの場合は星評価として扱う。
+				// 表示は「数値（上）→ 星（下）」の縦並び。
 				$mode   = ( is_array( $cell_value ) && isset( $cell_value['mode'] ) ) ? $cell_value['mode'] : 'stars';
 				$rating = ( is_array( $cell_value ) && isset( $cell_value['rating'] ) ) ? floatval( $cell_value['rating'] ) : ( is_numeric( $cell_value ) ? floatval( $cell_value ) : 0 );
 				$rwidth = max( 0, min( 100, ( $rating / 5 ) * 100 ) );
@@ -129,9 +142,9 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 				<?php if ( 'pr' === $mode ) : ?>
 					<span class="comparison-table__pr-badge"><?php esc_html_e( 'PR', 'madoguchi-blocks' ); ?></span>
 				<?php elseif ( 'none' !== $mode ) : ?>
-					<span class="comparison-table__rating">
-						<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $rwidth ); ?>%"></span></span>
+					<span class="comparison-table__rating" aria-label="<?php echo esc_attr( sprintf( /* translators: %s: 評価値 */ __( '評価 %s / 5', 'madoguchi-blocks' ), number_format( $rating, 1 ) ) ); ?>">
 						<span class="comparison-table__score"><?php echo esc_html( number_format( $rating, 1 ) ); ?></span>
+						<span class="comparison-table__stars"><span class="comparison-table__stars-fill" style="width:<?php echo esc_attr( $rwidth ); ?>%"></span></span>
 					</span>
 				<?php endif; ?>
 			<?php elseif ( 'score' === $col_type ) : ?>
