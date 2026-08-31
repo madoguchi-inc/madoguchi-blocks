@@ -55,6 +55,20 @@
 		display: inline-block;
 	}
 
+	// ラベル前のアイコン（電話など）。色は文字色（currentColor）に追従。ラベルとの間隔は gap 属性で調整する。
+	&__icon {
+		display: inline-flex;
+		flex: 0 0 auto;
+		width: 16px;
+		height: 16px;
+
+		svg {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	}
+
 	// 比較テーブルのセル内で使うコンパクト版（見た目はCTAボタンに統一）
 	&--table {
 		width: 100%;

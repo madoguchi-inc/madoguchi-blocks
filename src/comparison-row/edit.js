@@ -12,14 +12,16 @@ import {
 	PanelColorSettings
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, SelectControl } from '@wordpress/components';
+import MarkIcon, { MARK_OPTIONS } from './marks';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/cta-button' ];
-// セル内では既定でコンパクトなCTAボタンにする
+// セル内では既定でコンパクトなCTAボタンにする（角丸4px・余白12px・14px はテーブルデザインの基準値）
 const TEMPLATE = [ [ 'madoguchi/cta-button', {
 	text: '公式サイト',
 	fontSize: 14,
-	borderRadius: 6,
-	padding: { top: '9px', right: '14px', bottom: '9px', left: '14px' }
+	borderRadius: 4,
+	badgeGap: 4,
+	padding: { top: '12px', right: '12px', bottom: '12px', left: '12px' }
 } ] ];
 
 export default function Edit( { attributes, setAttributes, context }) {
@@ -56,7 +58,8 @@ export default function Edit( { attributes, setAttributes, context }) {
 						value={ ratingDisplay || 'star' }
 						options={ [
 							{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'star' },
-							{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' }
+							{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' },
+							{ label: __( 'なし（表示しない）', 'madoguchi-blocks' ), value: 'none' }
 						] }
 						onChange={ ( value ) => setAttributes({ ratingDisplay: value }) }
 					/>
@@ -110,7 +113,7 @@ export default function Edit( { attributes, setAttributes, context }) {
 						allowedFormats={ [] }
 					/>
 					{ 'pr' === ratingDisplay && <span className="comparison-row-edit__rating">{ __( 'PR', 'madoguchi-blocks' ) }</span> }
-					{ 'pr' !== ratingDisplay && rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }
+					{ 'star' === ( ratingDisplay || 'star' ) && rating > 0 && <span className="comparison-row-edit__rating">★ { Number( rating ).toFixed( 1 ) }</span> }
 				</div>
 				{ showCta && (
 					<div className="comparison-row-edit__field comparison-row-edit__field--cta">
@@ -156,13 +159,10 @@ export default function Edit( { attributes, setAttributes, context }) {
 								<span className="comparison-row-edit__check">
 									<SelectControl
 										value={ ( cellValue && cellValue.mark ) || 'none' }
-										options={ [
-											{ label: __( 'なし', 'madoguchi-blocks' ), value: 'none' },
-											{ label: __( '✓（あり）', 'madoguchi-blocks' ), value: 'check' },
-											{ label: __( '✕（なし）', 'madoguchi-blocks' ), value: 'cross' }
-										] }
+										options={ MARK_OPTIONS }
 										onChange={ ( v ) => updateValueField( i, 'mark', v, { mark: 'none', text: '' } ) }
 									/>
+									<MarkIcon mark={ ( cellValue && cellValue.mark ) || 'none' } />
 									<RichText
 										tagName="span"
 										className="comparison-row-edit__val"
@@ -180,11 +180,12 @@ export default function Edit( { attributes, setAttributes, context }) {
 										value={ ( cellValue && cellValue.mode ) || 'stars' }
 										options={ [
 											{ label: __( '☆（星評価）', 'madoguchi-blocks' ), value: 'stars' },
-											{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' }
+											{ label: __( 'PRバッジ', 'madoguchi-blocks' ), value: 'pr' },
+											{ label: __( 'なし（表示しない）', 'madoguchi-blocks' ), value: 'none' }
 										] }
 										onChange={ ( v ) => updateValueField( i, 'mode', v, { mode: 'stars', rating: 0 } ) }
 									/>
-									{ 'pr' !== ( ( cellValue && cellValue.mode ) || 'stars' ) && (
+									{ 'stars' === ( ( cellValue && cellValue.mode ) || 'stars' ) && (
 										<RangeControl
 											value={ ( cellValue && cellValue.rating ) || 0 }
 											onChange={ ( v ) => updateValueField( i, 'rating', v, { mode: 'stars', rating: 0 } ) }

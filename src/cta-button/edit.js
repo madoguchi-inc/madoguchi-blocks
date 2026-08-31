@@ -18,6 +18,13 @@ import {
 	RangeControl,
 	__experimentalBoxControl as BoxControl
 } from '@wordpress/components';
+import CardIcon from '../condition-card/icons';
+
+// ラベル前に表示できるアイコン（図形は condition-card/icons.js と blocks/cta-button/render.php を同期）
+const ICON_CHOICES = [
+	{ label: __( 'なし', 'madoguchi-blocks' ), value: '' },
+	{ label: __( '電話', 'madoguchi-blocks' ), value: 'phone' }
+];
 
 // margin/padding のオブジェクトを React の style へ変換する
 function boxToStyle( box, prop ) {
@@ -34,7 +41,7 @@ function boxToStyle( box, prop ) {
 }
 
 export default function Edit( { attributes, setAttributes }) {
-	const { text, badgeText, badgePosition, badgeGap, badgeFontSize, badgeTextColor, url, backgroundColor, bgType, gradientFrom, gradientTo, gradientAngle, textColor, borderRadius, fontSize, align, margin, padding } = attributes;
+	const { text, badgeText, badgePosition, badgeGap, badgeFontSize, badgeTextColor, icon, url, backgroundColor, bgType, gradientFrom, gradientTo, gradientAngle, textColor, borderRadius, fontSize, align, margin, padding } = attributes;
 	const showBadge = badgePosition !== 'none';
 	const isGradient = bgType === 'gradient';
 
@@ -129,6 +136,13 @@ export default function Edit( { attributes, setAttributes }) {
 						min={ 10 }
 						max={ 40 }
 					/>
+					<SelectControl
+						label={ __( 'アイコン', 'madoguchi-blocks' ) }
+						value={ icon || '' }
+						options={ ICON_CHOICES }
+						onChange={ ( value ) => setAttributes({ icon: value }) }
+						help={ __( 'ボタン文言の前に表示します（例: 電話する）。色は文字色に追従します。', 'madoguchi-blocks' ) }
+					/>
 				</PanelBody>
 				<PanelBody title={ __( 'バッジ', 'madoguchi-blocks' ) }>
 					<SelectControl
@@ -203,6 +217,11 @@ export default function Edit( { attributes, setAttributes }) {
 			<div { ...blockProps }>
 				<span className="cta-button" style={ buttonStyle }>
 					{ badgePosition === 'before' && badge }
+					{ icon && (
+						<span className="cta-button__icon" aria-hidden="true">
+							<CardIcon iconKey={ icon } className="" size={ 16 } />
+						</span>
+					) }
 					<RichText
 						tagName="span"
 						className="cta-button__label"

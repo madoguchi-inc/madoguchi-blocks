@@ -53,6 +53,8 @@ const INLINE_GUARDS = [
 	{ sel: '.cta-button', props: null },
 	{ sel: '__stars-fill', props: [ 'width' ] },
 	{ sel: '.comparison-table__grid', props: [ 'grid-template-columns' ] },
+	// 2段ヘッダー時のヘッダーセルの列位置（インライン grid-column）を優先させる
+	{ sel: '.comparison-table__gcell--head', props: [ 'grid-column' ] },
 	// カード背景色（ルート要素のインライン style）を優先させる
 	{
 		selEnds: [

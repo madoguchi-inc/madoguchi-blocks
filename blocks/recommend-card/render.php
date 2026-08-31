@@ -44,6 +44,8 @@ $icon_paths = array(
 	'search'    => '<circle cx="11" cy="11" r="6.5"/><path d="M15.8 15.8L20.5 20.5"/>',
 	'checklist' => '<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V4a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4v1"/><path d="M8.5 11.5l2 2 4.5-4.5"/><path d="M8.5 17h7"/>',
 	'info'      => '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.5v.01"/>',
+	// 電話（塗り）: Figma phone-filled（16px 基準）を 24px 基準に拡大。CTAボタンの blocks/cta-button/render.php と同一図形。
+	'phone'     => '<g transform="scale(1.5)" fill="currentColor" stroke="none"><path d="M10.3708 9.69851L10.0671 10.0181C10.0671 10.0181 9.34539 10.778 7.37539 8.70392C5.40541 6.6299 6.12713 5.87006 6.12713 5.87006L6.31833 5.66875C6.78939 5.17283 6.83379 4.37665 6.42279 3.7954L5.58217 2.60641C5.07352 1.887 4.09064 1.79197 3.50763 2.40576L2.46123 3.50743C2.17215 3.81178 1.97843 4.2063 2.00193 4.64397C2.06203 5.76365 2.54047 8.17274 5.21024 10.9835C8.04139 13.9642 10.6979 14.0826 11.7842 13.9754C12.1278 13.9415 12.4266 13.7562 12.6674 13.5027L13.6145 12.5057C14.2537 11.8326 14.0735 10.6788 13.2555 10.208L11.9819 9.47489C11.4448 9.16578 10.7905 9.25656 10.3708 9.69851Z"/></g>',
 );
 $icon_shape = isset( $icon_paths[ $icon_key ] ) ? $icon_paths[ $icon_key ] : $icon_paths['search'];
 $icon_svg   = '<svg class="recommend-card__icon-svg" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $icon_shape . '</svg>';
