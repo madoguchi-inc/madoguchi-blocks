@@ -23,8 +23,8 @@ if ( '' === trim( wp_strip_all_tags( $text ) ) && ! $show_badge ) {
 
 $align  = in_array( ( isset( $attributes['align'] ) ? $attributes['align'] : 'center' ), array( 'left', 'center', 'right' ), true ) ? $attributes['align'] : 'center';
 $radius = isset( $attributes['borderRadius'] ) ? max( 0, (int) $attributes['borderRadius'] ) : 10;
-$bg     = isset( $attributes['backgroundColor'] ) ? sanitize_hex_color( $attributes['backgroundColor'] ) : '';
-$color  = isset( $attributes['textColor'] ) ? sanitize_hex_color( $attributes['textColor'] ) : '';
+$bg     = isset( $attributes['backgroundColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['backgroundColor'] ) : '';
+$color  = isset( $attributes['textColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['textColor'] ) : '';
 
 // CSS長さ値のサニタイズ（数値のみなら px を付与、単位付きは許可単位のみ通す）
 $len = function( $v ) {
@@ -60,8 +60,8 @@ $wrapper      = get_block_wrapper_attributes( array( 'class' => 'cta-button-wrap
 // ボタン: 背景（単色 or グラデーション）・文字色・角丸・padding
 $btn_style = '';
 $bg_type   = isset( $attributes['bgType'] ) ? $attributes['bgType'] : 'solid';
-$g_from    = isset( $attributes['gradientFrom'] ) ? sanitize_hex_color( $attributes['gradientFrom'] ) : '';
-$g_to      = isset( $attributes['gradientTo'] ) ? sanitize_hex_color( $attributes['gradientTo'] ) : '';
+$g_from    = isset( $attributes['gradientFrom'] ) ? madoguchi_blocks_sanitize_color( $attributes['gradientFrom'] ) : '';
+$g_to      = isset( $attributes['gradientTo'] ) ? madoguchi_blocks_sanitize_color( $attributes['gradientTo'] ) : '';
 $g_angle   = isset( $attributes['gradientAngle'] ) ? (int) $attributes['gradientAngle'] : 90;
 if ( 'gradient' === $bg_type && $g_from && $g_to ) {
 	$btn_style .= 'background:linear-gradient(' . $g_angle . 'deg,' . $g_from . ',' . $g_to . ');';
@@ -79,11 +79,11 @@ if ( $font_size > 0 ) {
 	$btn_style .= 'font-size:' . $font_size . 'px;';
 }
 $btn_style .= $box_css( isset( $attributes['padding'] ) ? $attributes['padding'] : array(), 'padding' );
-// 各値は sanitize_hex_color / (int) / 長さバリデーション済みのため、esc_attr で出力する
+// 各値は madoguchi_blocks_sanitize_color / (int) / 長さバリデーション済みのため、esc_attr で出力する
 // （safecss_filter_attr は linear-gradient を除去する場合があるため使用しない）
 
 $badge_fs     = isset( $attributes['badgeFontSize'] ) ? (int) $attributes['badgeFontSize'] : 0;
-$badge_color  = isset( $attributes['badgeTextColor'] ) ? sanitize_hex_color( $attributes['badgeTextColor'] ) : '';
+$badge_color  = isset( $attributes['badgeTextColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['badgeTextColor'] ) : '';
 $badge_styles = array();
 if ( $badge_fs > 0 ) {
 	$badge_styles[] = 'font-size:' . $badge_fs . 'px';

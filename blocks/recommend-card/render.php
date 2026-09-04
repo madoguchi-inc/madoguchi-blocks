@@ -53,12 +53,12 @@ $icon_svg   = '<svg class="recommend-card__icon-svg" viewBox="0 0 24 24" width="
 // ラッパー（パターン別クラス + アクセントカラー + カード背景色）
 $wrapper_args = array( 'class' => 'recommend-card recommend-card--' . $pattern );
 $styles       = array();
-$accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
+$accent       = isset( $attributes['accentColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['accentColor'] ) : '';
 if ( $accent ) {
 	$styles[] = '--md-brand:' . $accent;
 }
 // カード背景色はインライン style で出力（パターン既定の背景より優先される）
-$card_bg = isset( $attributes['backgroundColor'] ) ? sanitize_hex_color( $attributes['backgroundColor'] ) : '';
+$card_bg = isset( $attributes['backgroundColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['backgroundColor'] ) : '';
 if ( $card_bg ) {
 	$styles[] = 'background:' . $card_bg;
 }

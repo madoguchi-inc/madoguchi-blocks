@@ -85,11 +85,11 @@ $default_avatar = '<svg class="author-box__avatar-svg" viewBox="0 0 64 64" width
 // ラッパー（アクセントカラー・枠線の色/太さ/角丸）
 $wrapper_args = array( 'class' => 'author-box' );
 $styles       = array();
-$accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
+$accent       = isset( $attributes['accentColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['accentColor'] ) : '';
 if ( $accent ) {
 	$styles[] = '--md-brand:' . $accent;
 }
-$border_color = isset( $attributes['borderColor'] ) ? sanitize_hex_color( $attributes['borderColor'] ) : '';
+$border_color = isset( $attributes['borderColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['borderColor'] ) : '';
 if ( $border_color ) {
 	$styles[] = '--md-border-color:' . $border_color;
 }

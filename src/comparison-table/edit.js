@@ -10,9 +10,10 @@ import {
 	useInnerBlocksProps,
 	RichText,
 	InspectorControls,
-	PanelColorSettings
+	PanelColorSettings,
+	ColorPalette
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, RangeControl, Button, ToggleControl, Dropdown, ColorPalette, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl, RangeControl, Button, ToggleControl, Dropdown, SelectControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 const ALLOWED_BLOCKS = [ 'madoguchi/comparison-row' ];
