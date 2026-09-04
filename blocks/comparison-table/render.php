@@ -76,7 +76,7 @@ for ( $i = 0; $i < $col_count; $i++ ) {
 	} else {
 		$groups[]   = array(
 			'label' => $group_label,
-			'color' => isset( $col['groupColor'] ) ? sanitize_hex_color( $col['groupColor'] ) : '',
+			'color' => isset( $col['groupColor'] ) ? madoguchi_blocks_sanitize_color( $col['groupColor'] ) : '',
 			'start' => $i,
 			'count' => 1,
 		);
@@ -92,7 +92,7 @@ $col_base = 1 + ( $show_cta ? 1 : 0 );
 $cell_align   = ( isset( $attributes['cellAlign'] ) && 'center' === $attributes['cellAlign'] ) ? 'center' : 'left';
 $wrapper_args = array( 'class' => 'comparison-table' . ( 'left' === $cell_align ? ' comparison-table--align-left' : '' ) );
 $styles       = array();
-$accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
+$accent       = isset( $attributes['accentColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['accentColor'] ) : '';
 if ( $accent ) {
 	$styles[] = '--md-brand:' . $accent;
 }
@@ -100,16 +100,16 @@ $font_size = isset( $attributes['fontSize'] ) ? (int) $attributes['fontSize'] : 
 if ( $font_size > 0 ) {
 	$styles[] = '--md-table-size:' . $font_size . 'px';
 }
-$name_bg = isset( $attributes['nameColBgColor'] ) ? sanitize_hex_color( $attributes['nameColBgColor'] ) : '';
+$name_bg = isset( $attributes['nameColBgColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['nameColBgColor'] ) : '';
 if ( $name_bg ) {
 	$styles[] = '--md-name-bg:' . $name_bg;
 }
 // ヘッダー行の背景色・文字色（未設定は既存の既定色のまま）
-$header_bg = isset( $attributes['headerBgColor'] ) ? sanitize_hex_color( $attributes['headerBgColor'] ) : '';
+$header_bg = isset( $attributes['headerBgColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['headerBgColor'] ) : '';
 if ( $header_bg ) {
 	$styles[] = '--md-header-bg:' . $header_bg;
 }
-$header_text = isset( $attributes['headerTextColor'] ) ? sanitize_hex_color( $attributes['headerTextColor'] ) : '';
+$header_text = isset( $attributes['headerTextColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['headerTextColor'] ) : '';
 if ( $header_text ) {
 	$styles[] = '--md-header-text:' . $header_text;
 }
@@ -118,7 +118,7 @@ $cta_note_size = isset( $attributes['ctaNoteFontSize'] ) ? (int) $attributes['ct
 if ( $cta_note_size > 0 ) {
 	$styles[] = '--md-cta-note-size:' . $cta_note_size . 'px';
 }
-$cta_note_color = isset( $attributes['ctaNoteColor'] ) ? sanitize_hex_color( $attributes['ctaNoteColor'] ) : '';
+$cta_note_color = isset( $attributes['ctaNoteColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['ctaNoteColor'] ) : '';
 if ( $cta_note_color ) {
 	$styles[] = '--md-cta-note-color:' . $cta_note_color;
 }
@@ -145,7 +145,7 @@ $col_style_decls = function( $col ) {
 	if ( $col_size > 0 ) {
 		$decls[] = '--md-col-size:' . $col_size . 'px';
 	}
-	$col_color = isset( $col['color'] ) ? sanitize_hex_color( $col['color'] ) : '';
+	$col_color = isset( $col['color'] ) ? madoguchi_blocks_sanitize_color( $col['color'] ) : '';
 	if ( $col_color ) {
 		$decls[] = '--md-col-color:' . $col_color;
 	}

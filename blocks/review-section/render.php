@@ -88,7 +88,7 @@ $json = wp_json_encode( $ld, JSON_UNESCAPED_UNICODE );
 // ラッパー（アクセントカラー・吹き出し角丸）
 $wrapper_args = array( 'class' => 'review-section' );
 $styles       = array();
-$accent       = isset( $attributes['accentColor'] ) ? sanitize_hex_color( $attributes['accentColor'] ) : '';
+$accent       = isset( $attributes['accentColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['accentColor'] ) : '';
 if ( $accent ) {
 	$styles[] = '--md-brand:' . $accent;
 }

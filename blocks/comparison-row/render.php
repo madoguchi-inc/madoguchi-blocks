@@ -14,7 +14,7 @@
 $name       = isset( $attributes['name'] ) ? wp_strip_all_tags( $attributes['name'] ) : '';
 $rating     = isset( $attributes['rating'] ) ? floatval( $attributes['rating'] ) : 0;
 $values     = ( isset( $attributes['values'] ) && is_array( $attributes['values'] ) ) ? $attributes['values'] : array();
-$name_color = isset( $attributes['nameColor'] ) ? sanitize_hex_color( $attributes['nameColor'] ) : '';
+$name_color = isset( $attributes['nameColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['nameColor'] ) : '';
 $cta_note   = isset( $attributes['ctaNote'] ) ? wp_kses( $attributes['ctaNote'], array( 'br' => array(), 'strong' => array(), 'em' => array() ) ) : '';
 
 // CTA下の補足文の文字サイズ・色（未設定ならテーブル側の既定値をCSS継承で使う）
@@ -23,7 +23,7 @@ $cta_note_size   = isset( $attributes['ctaNoteFontSize'] ) ? (int) $attributes['
 if ( $cta_note_size > 0 ) {
 	$cta_note_styles[] = '--md-cta-note-size:' . $cta_note_size . 'px';
 }
-$cta_note_color = isset( $attributes['ctaNoteColor'] ) ? sanitize_hex_color( $attributes['ctaNoteColor'] ) : '';
+$cta_note_color = isset( $attributes['ctaNoteColor'] ) ? madoguchi_blocks_sanitize_color( $attributes['ctaNoteColor'] ) : '';
 if ( $cta_note_color ) {
 	$cta_note_styles[] = '--md-cta-note-color:' . $cta_note_color;
 }
@@ -102,7 +102,7 @@ $wrapper = get_block_wrapper_attributes( array( 'class' => 'comparison-table__ro
 		if ( $col_size > 0 ) {
 			$col_styles[] = '--md-col-size:' . $col_size . 'px';
 		}
-		$col_color = isset( $col['color'] ) ? sanitize_hex_color( $col['color'] ) : '';
+		$col_color = isset( $col['color'] ) ? madoguchi_blocks_sanitize_color( $col['color'] ) : '';
 		if ( $col_color ) {
 			$col_styles[] = '--md-col-color:' . $col_color;
 		}

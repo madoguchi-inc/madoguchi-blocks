@@ -26,6 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'MADOGUCHI_BLOCKS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MADOGUCHI_BLOCKS_URL', plugin_dir_url( __FILE__ ) );
 
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/color.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/settings.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/class-style-inliner.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/review-avatars.php';
