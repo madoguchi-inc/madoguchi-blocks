@@ -159,6 +159,30 @@ function madoguchi_blocks_register_settings() {
 		'madoguchi-blocks',
 		'madoguchi_blocks_authors'
 	);
+
+	register_setting(
+		'madoguchi_blocks',
+		'madoguchi_blocks_phone_cta_api_urls',
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => 'madoguchi_blocks_sanitize_phone_cta_api_urls',
+			'default'           => array(),
+		)
+	);
+
+	add_settings_section(
+		'madoguchi_blocks_phone_cta',
+		__( '電話CTA（店舗マスタ API）', 'madoguchi-blocks' ),
+		'madoguchi_blocks_phone_cta_section_intro',
+		'madoguchi-blocks'
+	);
+	add_settings_field(
+		'madoguchi_blocks_phone_cta_api_urls',
+		__( 'サービス別 API ベース URL', 'madoguchi-blocks' ),
+		'madoguchi_blocks_phone_cta_api_urls_field',
+		'madoguchi-blocks',
+		'madoguchi_blocks_phone_cta'
+	);
 }
 add_action( 'admin_init', 'madoguchi_blocks_register_settings' );
 
@@ -349,3 +373,83 @@ function madoguchi_blocks_settings_page() {
 	</div>
 	<?php
 }
+
+/**
+ * 電話CTA: サービス別 API URL のサニタイズ。定義済みキーだけ残し、URL は esc_url_raw。
+ */
+function madoguchi_blocks_sanitize_phone_cta_api_urls( $value ) {
+	$out = array();
+	foreach ( array_keys( Madoguchi_Blocks_Phone_Cta_Services::KEYS ) as $key ) {
+		$url         = isset( $value[ $key ] ) ? trim( (string) $value[ $key ] ) : '';
+		$out[ $key ] = '' === $url ? '' : esc_url_raw( $url, array( 'http', 'https' ) );
+	}
+	return $out;
+}
+
+/**
+ * 電話CTA: サービス別 API URL（3 キーすべて含む。未設定は空文字）。
+ */
+function madoguchi_blocks_phone_cta_api_urls() {
+	$saved = get_option( 'madoguchi_blocks_phone_cta_api_urls', array() );
+	$out   = array();
+	foreach ( array_keys( Madoguchi_Blocks_Phone_Cta_Services::KEYS ) as $key ) {
+		$out[ $key ] = isset( $saved[ $key ] ) ? (string) $saved[ $key ] : '';
+	}
+	return $out;
+}
+
+/**
+ * 電話CTA: URL が設定されているサービスだけ（key => 表示名）。
+ */
+function madoguchi_blocks_phone_cta_enabled_services() {
+	$out = array();
+	foreach ( madoguchi_blocks_phone_cta_api_urls() as $key => $url ) {
+		if ( '' !== $url ) {
+			$out[ $key ] = Madoguchi_Blocks_Phone_Cta_Services::label( $key );
+		}
+	}
+	return $out;
+}
+
+function madoguchi_blocks_phone_cta_section_intro() {
+	echo '<p>' . esc_html__( '記事内の電話CTAブロックが店舗情報を取得する estima の API です。使うサービスだけ URL を入れてください(例: https://api.ekaitori.com)。店舗情報は 10 分キャッシュされます。', 'madoguchi-blocks' ) . '</p>';
+}
+
+function madoguchi_blocks_phone_cta_api_urls_field() {
+	$urls = madoguchi_blocks_phone_cta_api_urls();
+	echo '<table class="form-table" role="presentation" style="margin:0"><tbody>';
+	foreach ( Madoguchi_Blocks_Phone_Cta_Services::KEYS as $key => $label ) {
+		printf(
+			'<tr><th scope="row" style="padding:6px 10px 6px 0;width:6em">%1$s <code>%2$s</code></th><td style="padding:6px 0"><input type="url" class="regular-text" name="madoguchi_blocks_phone_cta_api_urls[%2$s]" value="%3$s" placeholder="https://api.example.com"></td></tr>',
+			esc_html( $label ),
+			esc_attr( $key ),
+			esc_attr( $urls[ $key ] )
+		);
+	}
+	echo '</tbody></table>';
+
+	$refresh_url = wp_nonce_url( admin_url( 'admin-post.php?action=madoguchi_phone_cta_refresh' ), 'madoguchi_phone_cta_refresh' );
+	printf(
+		'<p style="margin-top:12px"><a class="button" href="%s">%s</a> <span class="description">%s</span></p>',
+		esc_url( $refresh_url ),
+		esc_html__( '店舗データを今すぐ更新', 'madoguchi-blocks' ),
+		esc_html__( 'キャッシュを消して、次の表示時に API から取り直します。', 'madoguchi-blocks' )
+	);
+	if ( isset( $_GET['phone_cta_refreshed'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		echo '<div class="notice notice-success inline"><p>' . esc_html__( '店舗データのキャッシュを消しました。', 'madoguchi-blocks' ) . '</p></div>';
+	}
+}
+
+/**
+ * 電話CTA: 「今すぐ更新」の受け口(admin-post)。
+ */
+function madoguchi_blocks_phone_cta_handle_refresh() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( '権限がありません。', 'madoguchi-blocks' ) );
+	}
+	check_admin_referer( 'madoguchi_phone_cta_refresh' );
+	Madoguchi_Blocks_Phone_Cta_Repository::default()->refresh();
+	wp_safe_redirect( add_query_arg( array( 'page' => 'madoguchi-blocks', 'phone_cta_refreshed' => '1' ), admin_url( 'options-general.php' ) ) );
+	exit;
+}
+add_action( 'admin_post_madoguchi_phone_cta_refresh', 'madoguchi_blocks_phone_cta_handle_refresh' );

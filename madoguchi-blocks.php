@@ -30,6 +30,14 @@ require_once MADOGUCHI_BLOCKS_DIR . 'inc/color.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/settings.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/class-style-inliner.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/review-avatars.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-services.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-reception.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-tel.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-view.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-store.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-repository.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/render-helpers.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-rest.php';
 
 /**
  * GitHub リリースを更新元とした自動更新を有効化する。
