@@ -22,6 +22,7 @@ import {
 import { useServices, useShopDetail } from '../phone-cta/use-shops';
 import ShopPicker from '../phone-cta/shop-picker';
 import CardIcon from '../condition-card/icons';
+import { textsFor } from '../phone-cta/texts';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { service, shop, catchText, showWebButton, webButtonUrl, isVisible } =
@@ -31,6 +32,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		( [ value, label ] ) => ( { label, value } )
 	);
 	const { shop: detail } = useShopDetail( service, shop?.uuid );
+	const texts = textsFor( service );
 
 	const item = shop || {
 		uuid: '',
@@ -42,9 +44,21 @@ export default function Edit( { attributes, setAttributes } ) {
 		? (
 				item.buttonLabel ||
 				detail.button_label ||
-				'{shop}に電話で査定額を聞く'
+				texts.shopLabel
 		  ).replace( '{shop}', detail.name )
-		: item.buttonLabel || __( '電話で査定額を聞く', 'madoguchi-blocks' );
+		: item.buttonLabel || texts.genericLabel;
+
+	// サービス切替時、キャッチコピーが「切替前サービスの既定文言のまま」なら新サービスの
+	// 既定文言に差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。
+	const changeService = ( next ) => {
+		const prevTexts = textsFor( service );
+		const nextTexts = textsFor( next );
+		const patch = { service: next, shop: null };
+		if ( catchText === prevTexts.footerCatch ) {
+			patch.catchText = nextTexts.footerCatch;
+		}
+		setAttributes( patch );
+	};
 
 	// 静的な編集キャンバスでは position: fixed を解除して見せる
 	const blockProps = useBlockProps( {
@@ -75,9 +89,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								? serviceOptions
 								: [ { label: service, value: service } ]
 						}
-						onChange={ ( v ) =>
-							setAttributes( { service: v, shop: null } )
-						}
+						onChange={ changeService }
 					/>
 					{ shop ? (
 						<>
@@ -168,20 +180,13 @@ export default function Edit( { attributes, setAttributes } ) {
 				<div className="phone-cta-footer__buttons">
 					{ showWebButton && (
 						<span className="phone-cta-footer__web">
-							{ __(
-								'24時間年中無休で受付中！ オンライン無料一括査定',
-								'madoguchi-blocks'
-							) }
+							{ texts.webButton }
 						</span>
 					) }
 					<span className="phone-cta-footer__tel">
 						{ detail && (
 							<span className="phone-cta-footer__balloon">
-								{ item.balloonText ||
-									__(
-										'その場でかんたん無料査定！',
-										'madoguchi-blocks'
-									) }
+								{ item.balloonText || texts.balloon }
 							</span>
 						) }
 						<CardIcon iconKey="phone" className="" size={ 18 } />

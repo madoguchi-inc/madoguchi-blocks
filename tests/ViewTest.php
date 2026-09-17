@@ -37,6 +37,27 @@ class ViewTest extends TestCase {
 		$this->assertNull( Madoguchi_Blocks_Phone_Cta_View::pick_number( array( 'numbers' => array() ), null ) );
 	}
 
+	public function test_pick_number_ignores_non_array_entries(): void {
+		$shop = $this->shop( array( 'numbers' => array( 'garbage', array( 'id' => 1, 'phone_number' => '0120-000-000' ) ) ) );
+		$number = Madoguchi_Blocks_Phone_Cta_View::pick_number( $shop, null );
+		$this->assertSame( 1, $number['id'] );
+		$this->assertNull( Madoguchi_Blocks_Phone_Cta_View::pick_number( array( 'numbers' => array( 'garbage', 'also garbage' ) ), null ) );
+	}
+
+	public function test_card_state_handles_missing_phone_number_without_error(): void {
+		$shop  = $this->shop( array( 'numbers' => array( array( 'id' => 1 ) ) ) ); // phone_number キー欠落
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, array(), $this->now( '2026-09-16 12:00' ) );
+		$this->assertSame( '', $state['tel_href'] );
+		$this->assertSame( '', $state['tel_display'] );
+	}
+
+	public function test_footer_state_handles_missing_phone_number_without_error(): void {
+		$shop  = $this->shop( array( 'numbers' => array( array( 'id' => 1 ) ) ) ); // phone_number キー欠落
+		$attrs = array( 'numberId' => null, 'buttonLabel' => '', 'balloonText' => '' );
+		$state = Madoguchi_Blocks_Phone_Cta_View::footer_state( $shop, $attrs, $this->now( '2026-09-16 12:00' ), 'kaitori' );
+		$this->assertSame( '', $state['tel_href'] );
+	}
+
 	public function test_button_label_replaces_shop_and_respects_override(): void {
 		$shop = $this->shop();
 		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, '' ) );

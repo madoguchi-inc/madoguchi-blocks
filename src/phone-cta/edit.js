@@ -20,6 +20,7 @@ import {
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import CardIcon from '../condition-card/icons';
+import { textsFor } from './texts';
 
 const MAX_SHOPS = 3;
 
@@ -61,7 +62,7 @@ function CardPreview( { service, item } ) {
 	const label = (
 		item.buttonLabel ||
 		shop.button_label ||
-		'{shop}に電話で査定額を聞く'
+		textsFor( service ).shopLabel
 	).replace( '{shop}', shop.name );
 	return (
 		<li className="phone-cta__card is-open">
@@ -133,6 +134,21 @@ export default function Edit( { attributes, setAttributes } ) {
 			],
 		} );
 
+	// サービス切替時、見出し／説明が「切替前サービスの既定文言のまま」なら新サービスの既定文言に
+	// 差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。
+	const changeService = ( next ) => {
+		const prevTexts = textsFor( service );
+		const nextTexts = textsFor( next );
+		const patch = { service: next, shops: [] };
+		if ( heading === prevTexts.heading ) {
+			patch.heading = nextTexts.heading;
+		}
+		if ( description === prevTexts.description ) {
+			patch.description = nextTexts.description;
+		}
+		setAttributes( patch );
+	};
+
 	const blockProps = useBlockProps( {
 		className: `phone-cta phone-cta--cols-${ Math.max(
 			1,
@@ -163,9 +179,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								? serviceOptions
 								: [ { label: service, value: service } ]
 						}
-						onChange={ ( v ) =>
-							setAttributes( { service: v, shops: [] } )
-						}
+						onChange={ changeService }
 						help={ __(
 							'サービスを変えると店舗の選択はリセットされます。',
 							'madoguchi-blocks'

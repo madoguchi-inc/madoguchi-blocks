@@ -12,7 +12,6 @@
 	"render": "file:./render.php",
 	"supports": {
 		"html": false,
-		"anchor": true,
 		"multiple": true
 	},
 	"attributes": {

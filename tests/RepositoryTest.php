@@ -15,6 +15,15 @@ class Fake_Store extends Madoguchi_Blocks_Phone_Cta_Store {
 	}
 }
 
+/**
+ * 外部オブジェクトキャッシュ利用時を模す: 前方一致の transient 列挙が常に空を返す。
+ */
+class Fake_Store_No_Prefix_Listing extends Fake_Store {
+	public function get_transient_keys_with_prefix( string $prefix ): array {
+		return array();
+	}
+}
+
 class RepositoryTest extends TestCase {
 	private $calls = array();
 
@@ -49,6 +58,12 @@ class RepositoryTest extends TestCase {
 		$this->assertSame( array(), $repo->list( 'nope' ) );
 	}
 
+	public function test_list_does_not_cache_malformed_json(): void {
+		list( $repo, $store ) = $this->repo( array( '/v1/phone_ctas' => array( 'code' => 200, 'body' => 'not json' ) ) );
+		$this->assertSame( array(), $repo->list( 'kaitori' ) );
+		$this->assertArrayNotHasKey( 'madoguchi_phone_cta_list_kaitori', $store->transients );
+	}
+
 	public function test_find_fetches_and_saves_last_good(): void {
 		list( $repo, $store ) = $this->repo( array( '/v1/phone_ctas/u1' => array( 'code' => 200, 'body' => '{"uuid":"u1","name":"大吉","numbers":[]}' ) ) );
 		$shop = $repo->find( 'kaitori', 'u1' );
@@ -80,6 +95,34 @@ class RepositoryTest extends TestCase {
 		$this->assertSame( array(), $this->calls );
 	}
 
+	public function test_find_backs_off_after_failure_with_last_good(): void {
+		$store = new Fake_Store();
+		$store->options['madoguchi_phone_cta_last_kaitori_u1'] = array( 'uuid' => 'u1', 'name' => '保存済み' );
+		list( $repo ) = $this->repo( array( '/v1/phone_ctas/u1' => array( 'code' => 500, 'body' => '' ) ), $store );
+		$this->assertSame( '保存済み', $repo->find( 'kaitori', 'u1' )['name'] );
+		$this->assertCount( 1, $this->calls );
+		// バックオフ中（TTL内）は last-good を返し続け、再問い合わせしない
+		$this->assertSame( '保存済み', $repo->find( 'kaitori', 'u1' )['name'] );
+		$this->assertCount( 1, $this->calls, '失敗直後のバックオフ中は再問い合わせしない' );
+	}
+
+	public function test_find_backs_off_after_failure_without_last_good(): void {
+		list( $repo ) = $this->repo( array( '/v1/phone_ctas/u1' => array( 'code' => 500, 'body' => '' ) ) );
+		$this->assertNull( $repo->find( 'kaitori', 'u1' ) );
+		$this->assertCount( 1, $this->calls );
+		// バックオフ中（TTL内）は null を返し続け、再問い合わせしない
+		$this->assertNull( $repo->find( 'kaitori', 'u1' ) );
+		$this->assertCount( 1, $this->calls, '失敗直後のバックオフ中は再問い合わせしない' );
+	}
+
+	public function test_refresh_clears_failure_marker(): void {
+		$store = new Fake_Store();
+		$store->transients['madoguchi_phone_cta_kaitori_u1'] = Madoguchi_Blocks_Phone_Cta_Repository::FAILED;
+		list( $repo ) = $this->repo( array(), $store );
+		$repo->refresh( 'kaitori' );
+		$this->assertArrayNotHasKey( 'madoguchi_phone_cta_kaitori_u1', $store->transients );
+	}
+
 	public function test_refresh_clears_transients_but_keeps_options(): void {
 		$store = new Fake_Store();
 		$store->transients['madoguchi_phone_cta_list_kaitori'] = array();
@@ -92,5 +135,25 @@ class RepositoryTest extends TestCase {
 		$this->assertArrayHasKey( 'madoguchi_phone_cta_last_kaitori_u1', $store->options );
 		$repo->refresh();
 		$this->assertSame( array(), $store->transients );
+	}
+
+	public function test_refresh_deletes_deterministic_list_key_even_without_prefix_listing(): void {
+		$store = new Fake_Store_No_Prefix_Listing();
+		$store->transients['madoguchi_phone_cta_list_kaitori'] = array( array( 'uuid' => 'u1', 'name' => 'x' ) );
+		list( $repo ) = $this->repo( array(), $store );
+		$repo->refresh( 'kaitori' );
+		$this->assertArrayNotHasKey( 'madoguchi_phone_cta_list_kaitori', $store->transients, 'オブジェクトキャッシュ利用時でも決め打ちキーは消す' );
+	}
+
+	public function test_refresh_all_deletes_every_service_list_key_even_without_prefix_listing(): void {
+		$store = new Fake_Store_No_Prefix_Listing();
+		foreach ( array_keys( Madoguchi_Blocks_Phone_Cta_Services::KEYS ) as $service ) {
+			$store->transients[ 'madoguchi_phone_cta_list_' . $service ] = array();
+		}
+		list( $repo ) = $this->repo( array(), $store );
+		$repo->refresh();
+		foreach ( array_keys( Madoguchi_Blocks_Phone_Cta_Services::KEYS ) as $service ) {
+			$this->assertArrayNotHasKey( 'madoguchi_phone_cta_list_' . $service, $store->transients );
+		}
 	}
 }

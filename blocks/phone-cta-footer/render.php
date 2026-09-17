@@ -27,7 +27,7 @@ $show_tel = 'web_only' !== $state['mode'];
 if ( ! $show_tel && ! $show_web ) {
 	return; // 出すボタンが無い
 }
-if ( ! madoguchi_blocks_phone_cta_once( 'footer' ) ) {
+if ( ! madoguchi_blocks_phone_cta_once( 'footer:' . (int) get_the_ID() ) ) {
 	return; // 1 記事に 1 つだけ
 }
 

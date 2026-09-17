@@ -80,8 +80,16 @@ const triple = ( root ) => root.repeat( 3 );
  * `.phone-cta__description` のような単一クラスのセレクタ（特異性 0,1,0）は、
  * 配信先テーマの `.entry-content p{color:red !important}`（クラス+要素で 0,1,1）に
  * !important 同士で負けてしまう（要素セレクタ1つ分、相手の方が特異性が高いため）。
- * セレクタ中の各クラスを1つずつ複製し（マッチ対象は変わらない）、
- * ルートの3連結と同じ考え方で全宣言の特異性を底上げする。
+ * セレクタ中の各クラスと単純な擬似クラス（`:hover` 等）を1つずつ複製する
+ * （マッチ対象は変わらない）。クラス1個・擬似クラス1個の複製で特異性を (0,2,0) まで
+ * 底上げでき、これは `.entry-content p !important`（0,1,1）には勝てるが、
+ * (0,2,1) 以上のセレクタにはまだ負ける。ルート要素は別途3連結（`triple()`）で
+ * さらに高い特異性を確保する。
+ *
+ * 擬似クラスの複製は `:hover` `:first-child` のような引数を持たない単純な擬似クラスのみを
+ * 対象にする。`:not(...)` `:is(...)` `:where(...)` のようにセレクタリストを引数に持つコンテナ
+ * 自体は複製しない（意味が変わる／無意味に肥大化するため）。内側のクラスは walkClasses が
+ * 別途処理する。
  */
 function boostSpecificity( selector ) {
 	return selectorParser( ( selectors ) => {
@@ -92,6 +100,17 @@ function boostSpecificity( selector ) {
 			});
 			classNodes.forEach( ( classNode ) => {
 				classNode.parent.insertAfter( classNode, classNode.clone() );
+			});
+			const pseudoNodes = [];
+			sel.walkPseudos( ( pseudoNode ) => {
+				// ::before 等の擬似要素、:not() 等の引数持ちコンテナは除外し、
+				// :hover / :first-child のような単純な擬似クラスだけを複製する。
+				if ( ! pseudoNode.value.startsWith( '::' ) && ! pseudoNode.nodes.length ) {
+					pseudoNodes.push( pseudoNode );
+				}
+			});
+			pseudoNodes.forEach( ( pseudoNode ) => {
+				pseudoNode.parent.insertAfter( pseudoNode, pseudoNode.clone() );
 			});
 		});
 	}).processSync( selector );

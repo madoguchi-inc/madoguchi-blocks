@@ -45,7 +45,7 @@ $extra = array(
 	'data-phone-cta' => '',
 	'data-service'   => $service,
 );
-if ( madoguchi_blocks_phone_cta_once( 'first-block' ) ) {
+if ( madoguchi_blocks_phone_cta_once( 'first-block:' . (int) get_the_ID() ) ) {
 	$extra['id'] = 'phone-cta';
 }
 $wrapper = get_block_wrapper_attributes( $extra );
@@ -83,7 +83,7 @@ $wrapper = get_block_wrapper_attributes( $extra );
 						<?php echo madoguchi_blocks_phone_cta_icon( 'touch' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html( $texts['web_label'] ); ?>
 					</a>
 				<?php else : ?>
-					<a class="phone-cta__button" href="<?php echo esc_attr( $c['tel_href'] ); ?>">
+					<a class="phone-cta__button" href="<?php echo esc_url( $c['tel_href'] ); ?>">
 						<?php echo madoguchi_blocks_phone_cta_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html( $c['label'] ); ?>
 					</a>
 					<p class="phone-cta__number"><?php echo esc_html( $c['tel_display'] ); ?></p>

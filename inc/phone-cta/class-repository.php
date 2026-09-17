@@ -8,9 +8,11 @@
  */
 class Madoguchi_Blocks_Phone_Cta_Repository {
 
-	const TTL      = 600;
-	const TIMEOUT  = 5;
+	const TTL       = 600;
+	const TIMEOUT   = 5;
 	const NOT_FOUND = '__404__';
+	const FAIL_TTL  = 60;      // 取得失敗時のバックオフ（この間は再問い合わせしない）
+	const FAILED    = '__fail__';
 
 	/** @var array<string,string> */
 	private $api_urls;
@@ -53,8 +55,11 @@ class Madoguchi_Blocks_Phone_Cta_Repository {
 		if ( 200 !== $res['code'] ) {
 			return array();
 		}
-		$json  = json_decode( $res['body'], true );
-		$shops = isset( $json['shops'] ) && is_array( $json['shops'] ) ? $json['shops'] : array();
+		$json = json_decode( $res['body'], true );
+		if ( ! is_array( $json ) || ! isset( $json['shops'] ) || ! is_array( $json['shops'] ) ) {
+			return array(); // 壊れた JSON は成功として transient 化しない
+		}
+		$shops = $json['shops'];
 		$list  = array();
 		foreach ( $shops as $s ) {
 			if ( isset( $s['uuid'], $s['name'] ) ) {
@@ -74,7 +79,7 @@ class Madoguchi_Blocks_Phone_Cta_Repository {
 		$last_key = 'madoguchi_phone_cta_last_' . $service . '_' . $uuid;
 
 		$cached = $this->store->get_transient( $key );
-		if ( self::NOT_FOUND === $cached ) {
+		if ( self::NOT_FOUND === $cached || self::FAILED === $cached ) {
 			return null;
 		}
 		if ( is_array( $cached ) ) {
@@ -95,9 +100,15 @@ class Madoguchi_Blocks_Phone_Cta_Repository {
 			$this->store->delete_option( $last_key );
 			return null;
 		}
-		// 通信失敗・5xx・壊れた JSON: 最後に成功したデータで描画を続ける
+		// 通信失敗・5xx・壊れた JSON: 最後に成功したデータで描画を続け、短い TTL でバックオフする
+		// （estima がダウンしている間、ページビューのたびに 5 秒の wp_remote_get を再実行させない）
 		$last = $this->store->get_option( $last_key );
-		return is_array( $last ) ? $last : null;
+		if ( is_array( $last ) ) {
+			$this->store->set_transient( $key, $last, self::FAIL_TTL );
+			return $last;
+		}
+		$this->store->set_transient( $key, self::FAILED, self::FAIL_TTL );
+		return null;
 	}
 
 	public function refresh( ?string $service = null ): void {
@@ -115,6 +126,12 @@ class Madoguchi_Blocks_Phone_Cta_Repository {
 				}
 				$this->store->delete_transient( $key );
 			}
+		}
+		// 外部オブジェクトキャッシュ利用時は transient が wp_options に無いため前方一致列挙が
+		// 何も見つけられない。list() の決め打ちキーだけは常に個別削除して確実に消す。
+		$services = null === $service ? array_keys( Madoguchi_Blocks_Phone_Cta_Services::KEYS ) : array( $service );
+		foreach ( $services as $s ) {
+			$this->store->delete_transient( 'madoguchi_phone_cta_list_' . $s );
 		}
 	}
 

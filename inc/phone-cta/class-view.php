@@ -36,7 +36,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	 * 使う電話番号を決める。指定 id → is_default → 先頭。無ければ null。
 	 */
 	public static function pick_number( array $shop, $number_id ): ?array {
-		$numbers = isset( $shop['numbers'] ) && is_array( $shop['numbers'] ) ? $shop['numbers'] : array();
+		$numbers = isset( $shop['numbers'] ) && is_array( $shop['numbers'] ) ? array_values( array_filter( $shop['numbers'], 'is_array' ) ) : array();
 		if ( empty( $numbers ) ) {
 			return null;
 		}
@@ -80,6 +80,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			$mode = 'tel_closed';
 		}
 		$lead = isset( $item['leadText'] ) && '' !== trim( (string) $item['leadText'] ) ? (string) $item['leadText'] : ( isset( $shop['lead_text'] ) ? (string) $shop['lead_text'] : '' );
+		$phone_number = isset( $number['phone_number'] ) ? (string) $number['phone_number'] : '';
 
 		return array(
 			'mode'           => $mode,
@@ -90,8 +91,8 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'lead'           => $lead,
 			'specialty'      => isset( $shop['specialty_text'] ) ? (string) $shop['specialty_text'] : '',
 			'label'          => self::button_label( $shop, isset( $item['buttonLabel'] ) ? (string) $item['buttonLabel'] : '' ),
-			'tel_href'       => Madoguchi_Blocks_Phone_Cta_Tel::to_href( (string) $number['phone_number'] ),
-			'tel_display'    => (string) $number['phone_number'],
+			'tel_href'       => '' !== $phone_number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( $phone_number ) : '',
+			'tel_display'    => $phone_number,
 			'is_toll_free'   => ! isset( $number['is_toll_free'] ) || (bool) $number['is_toll_free'],
 			'reception_text' => isset( $shop['reception_text'] ) ? (string) $shop['reception_text'] : '',
 			'fallback_url'   => $fallback,
@@ -121,9 +122,10 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			);
 		}
 
-		$number   = self::pick_number( $shop, isset( $attrs['numberId'] ) ? $attrs['numberId'] : null );
-		$is_open  = null !== $number && Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
-		$fallback = isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '';
+		$number       = self::pick_number( $shop, isset( $attrs['numberId'] ) ? $attrs['numberId'] : null );
+		$phone_number = isset( $number['phone_number'] ) ? (string) $number['phone_number'] : '';
+		$is_open      = null !== $number && Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
+		$fallback     = isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '';
 		if ( $is_open ) {
 			$mode = 'tel';
 		} elseif ( '' !== $fallback ) {
@@ -134,7 +136,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		return array(
 			'mode'         => $mode,
 			'label'        => 'web' === $mode ? $texts['web_label'] : self::button_label( $shop, isset( $attrs['buttonLabel'] ) ? (string) $attrs['buttonLabel'] : '' ),
-			'tel_href'     => null !== $number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( (string) $number['phone_number'] ) : '',
+			'tel_href'     => '' !== $phone_number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( $phone_number ) : '',
 			'balloon'      => $balloon,
 			'fallback_url' => $fallback,
 			'name'         => isset( $shop['name'] ) ? (string) $shop['name'] : '',
