@@ -121,9 +121,11 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	&--cols-3 &__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	&--cols-1 &__list { max-width: 36rem; margin: 0 auto; }
 
+	// Figma: 内容は上下中央寄せ（items-start justify-center）。カードは行内で等高、中身は中央に集まる
 	&__card {
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 		gap: 2.4rem;
 		margin: 0;
 		padding: 1.6rem;
@@ -193,7 +195,6 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		align-items: center;
 		gap: 0.8rem;
 		width: 100%;
-		margin-top: auto;
 	}
 
 	&__button {
@@ -296,40 +297,23 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	&__free,
 	&__chevron { display: none; }
 
-	// PC は tel: が動かないので番号を添える
-	&__number {
-		margin: 0;
-		font-size: 1.4rem;
-		font-weight: 700;
-		line-height: 1.2;
-		letter-spacing: 0.02em;
-		color: $pc-black;
-	}
-
+	// 「受付時間：9:00〜19:00」の 1 行。PC は tel: が動かないので番号を同じ行に小さく添える
 	&__hours {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
-		gap: 0.4rem 0.8rem;
+		gap: 0.2rem 1rem;
 		margin: 0;
 		font-size: 1.1rem;
 		line-height: 1.2;
 		color: $pc-black;
 	}
 
-	&__hours-text { display: block; }
+	&__hours-text,
+	&__hours-tel { display: block; }
 
-	&__badge {
-		display: inline-block;
-		padding: 0.1rem 0.6rem;
-		border: 1px solid $pc-border;
-		border-radius: 999px;
-		font-size: 1rem;
-		font-weight: 700;
-		line-height: 1.4;
-		color: $font_color_light;
-	}
+	&__hours-tel { font-weight: 700; letter-spacing: 0.02em; }
 
 	&__note,
 	&__notice {
@@ -350,17 +334,38 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		box-shadow: none;
 	}
 
-	/* ---- キャンペーン ---- */
+	/* ---- キャンペーン（カードの外、一覧の下。showCampaign=true のときだけ） ---- */
+	&__campaigns {
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+		margin: 0.8rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
 	&__campaign {
+		display: flex;
+		gap: 1.2rem;
+		align-items: flex-start;
 		margin: 0;
-		padding: 1rem;
+		padding: 1rem 1.2rem;
 		border: 1px dashed $pc-orange-to;
-		border-radius: 0.4rem;
 		background: #fff7ee;
 		text-align: left;
 
-		&-image { display: block; width: 100%; height: auto; margin-bottom: 0.6rem; border-radius: 0.4rem; }
+		&-image { display: block; flex: 0 0 12rem; width: 12rem; height: auto; }
+		&-text { flex: 1 1 auto; min-width: 0; }
 		&-name { margin: 0 0 0.2rem; font-size: 1.3rem; font-weight: 700; line-height: 1.4; color: $pc-black; }
+		&-shop {
+			display: inline-block;
+			margin-right: 0.6rem;
+			padding: 0 0.6rem;
+			background: $pc-orange-from;
+			font-size: 1.1rem;
+			line-height: 1.8;
+			color: #fff;
+		}
 		&-body { margin: 0; font-size: 1.2rem; line-height: $line_height; color: $pc-black; }
 		&-terms { margin: 0.4rem 0 0; font-size: 1rem; line-height: 1.4; color: $font_color_light; }
 	}
@@ -512,8 +517,11 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		&__balloon { top: -1.3rem; }
 
 		// SP はボタン自体が tel: リンクなので番号は出さない
-		&__number { display: none; }
+		&__hours-tel { display: none; }
 
 		&__hours { font-size: 1.1rem; }
+
+		&__campaign { flex-direction: column; gap: 0.8rem; }
+		&__campaign-image { flex-basis: auto; width: 100%; }
 	}
 }

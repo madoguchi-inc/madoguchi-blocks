@@ -190,7 +190,7 @@
 | description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText。見出しの**上**に出る小見出し（ゴールド・13px） |
 | points | string[] / 「強引な営業なし」「個人情報必要なし」「相談だけでもOK」 | POINT1〜3 のバッジ文言。空文字は出さない |
 | shops | array / `[]` | `{ uuid, numberId, buttonLabel, leadText }` × 1〜3。numberId null なら既定番号。buttonLabel / leadText 空ならマスタ値 |
-| showCampaign | bool / true | |
+| showCampaign | bool / **false** | true のときマスタのキャンペーンをカード一覧の**下**に店名付きで出す（Figma のカードに枠が無いため既定はオフ） |
 | isVisible | bool / true | false なら何も出力しない |
 
 **エディタ（edit.js）**
@@ -229,12 +229,11 @@
           </span>
           <span class="phone-cta__chevron"></span>                             <!-- SP のみ表示 -->
         </a>
-        <p class="phone-cta__number">0120-000-000</p>                            <!-- PC のみ表示 -->
-        <p class="phone-cta__hours"><span class="phone-cta__hours-text">受付時間：10:00〜20:00</span><span class="phone-cta__badge">通話料無料</span></p>
+        <p class="phone-cta__hours"><span class="phone-cta__hours-text">受付時間：10:00〜20:00</span><span class="phone-cta__hours-tel">TEL：0120-000-000</span></p>  <!-- TEL は PC のみ -->
       </div>
-      <div class="phone-cta__campaign">…</div>
     </li>
   </ul>
+  <ul class="phone-cta__campaigns"><li class="phone-cta__campaign">…</li></ul>   <!-- showCampaign=true のときだけ -->
 </section>
 ```
 
@@ -249,9 +248,10 @@
 | 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン無料査定はこちら」（指アイコン。SP はアイコン無し）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
 | 時間外・fallback なし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
 
-- `is_toll_free=false` の番号: バッジを出さず `phone-cta__note`「通話料はお客様のご負担となります」
-- `phone-cta__number`（番号テキスト）は PC のみ表示（SP は CSS で非表示）
-- `showCampaign` かつ `campaign` non-null のとき `phone-cta__campaign`（画像・名称・内容・注意事項）
+- カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」
+- PC は `tel:` が動かないので、受付時間の行に `phone-cta__hours-tel`「TEL：0120-000-000」を添える（SP は CSS で非表示）
+- `showCampaign=true` かつ `campaign` non-null の店舗があれば、カード一覧の下に `phone-cta__campaigns`（店名バッジ・画像・名称・内容・注意事項）。カード内には出さない
+- カードは行内で等高、中身は上下中央寄せ（Figma の justify-center）
 - マスタに無い／非公開の店舗はスキップ。0 件なら `''` を返す。`id="phone-cta"` は記事内最初のブロックのみ付与（固定フッターの汎用リンク先）。「最初」の判定は投稿 ID 単位（REST の一覧レスポンスでは複数投稿が同一リクエストで描画されるため）。固定フッターの「1 記事 1 つ」も同様
 - 列数クラスは出力件数から `--cols-1/2/3`
 

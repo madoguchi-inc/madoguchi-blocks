@@ -127,17 +127,16 @@ function CardPreview( { service, item } ) {
 					</span>
 					<span className="phone-cta__chevron" aria-hidden="true" />
 				</span>
-				{ number && (
-					<p className="phone-cta__number">{ number.phone_number }</p>
-				) }
 				<p className="phone-cta__hours">
 					{ shop.reception_text && (
 						<span className="phone-cta__hours-text">
 							{ `受付時間：${ shop.reception_text }` }
 						</span>
 					) }
-					{ number?.is_toll_free !== false && (
-						<span className="phone-cta__badge">通話料無料</span>
+					{ number && (
+						<span className="phone-cta__hours-tel">
+							{ `TEL：${ number.phone_number }` }
+						</span>
 					) }
 				</p>
 			</div>
@@ -295,6 +294,10 @@ export default function Edit( { attributes, setAttributes } ) {
 				>
 					<ToggleControl
 						label={ __( 'キャンペーンを表示', 'madoguchi-blocks' ) }
+						help={ __(
+							'オンにするとマスタのキャンペーンをカード一覧の下に店名付きで出します（既定はオフ）。',
+							'madoguchi-blocks'
+						) }
 						checked={ showCampaign }
 						onChange={ ( v ) =>
 							setAttributes( { showCampaign: v } )

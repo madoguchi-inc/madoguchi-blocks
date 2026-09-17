@@ -17,7 +17,7 @@ if ( empty( $items ) ) {
 $repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
 $now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
 $texts = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service );
-$show_campaign = ! isset( $attributes['showCampaign'] ) || $attributes['showCampaign'];
+$show_campaign = ! empty( $attributes['showCampaign'] ); // 既定は非表示（Figma のカードにキャンペーン枠は無い）
 
 $cards = array();
 foreach ( $items as $item ) {
@@ -138,21 +138,23 @@ $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 							</span>
 							<span class="phone-cta__chevron" aria-hidden="true"></span>
 						</a>
-						<p class="phone-cta__number"><?php echo esc_html( $c['tel_display'] ); ?></p>
 					<?php endif; ?>
 
 					<?php if ( 'tel_closed' === $c['mode'] ) : ?>
 						<p class="phone-cta__notice"><?php esc_html_e( '現在は受付時間外です', 'madoguchi-blocks' ); ?></p>
 					<?php endif; ?>
 
-					<?php $show_toll_free = 'web' !== $c['mode'] && $c['is_toll_free']; // WEB 誘導中は電話番号を出さないので通話料の注記も出さない ?>
-					<?php if ( '' !== $c['reception_text'] || $show_toll_free ) : ?>
+					<?php
+					// Figma どおり受付時間の 1 行だけ。PC は tel: が動かないので番号を同じ行に小さく添える（SP は CSS で非表示）。
+					$show_tel_text = 'web' !== $c['mode'] && '' !== $c['tel_display'];
+					?>
+					<?php if ( '' !== $c['reception_text'] || $show_tel_text ) : ?>
 						<p class="phone-cta__hours">
 							<?php if ( '' !== $c['reception_text'] ) : ?>
 								<span class="phone-cta__hours-text"><?php echo esc_html( sprintf( __( '受付時間：%s', 'madoguchi-blocks' ), $c['reception_text'] ) ); ?></span>
 							<?php endif; ?>
-							<?php if ( $show_toll_free ) : ?>
-								<span class="phone-cta__badge"><?php esc_html_e( '通話料無料', 'madoguchi-blocks' ); ?></span>
+							<?php if ( $show_tel_text ) : ?>
+								<span class="phone-cta__hours-tel"><?php echo esc_html( sprintf( __( 'TEL：%s', 'madoguchi-blocks' ), $c['tel_display'] ) ); ?></span>
 							<?php endif; ?>
 						</p>
 					<?php endif; ?>
@@ -160,15 +162,35 @@ $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 						<p class="phone-cta__note"><?php esc_html_e( '通話料はお客様のご負担となります', 'madoguchi-blocks' ); ?></p>
 					<?php endif; ?>
 				</div>
+			</li>
+		<?php endforeach; ?>
+	</ul>
 
-				<?php if ( $show_campaign && is_array( $c['campaign'] ) ) : $cp = $c['campaign']; ?>
-					<div class="phone-cta__campaign">
-						<?php if ( ! empty( $cp['image_url'] ) ) : ?>
-							<img class="phone-cta__campaign-image" src="<?php echo esc_url( $cp['image_url'] ); ?>" alt="<?php echo esc_attr( isset( $cp['name'] ) ? $cp['name'] : '' ); ?>" loading="lazy">
-						<?php endif; ?>
-						<?php if ( ! empty( $cp['name'] ) ) : ?>
-							<p class="phone-cta__campaign-name"><?php echo esc_html( $cp['name'] ); ?></p>
-						<?php endif; ?>
+	<?php
+	// キャンペーンは Figma のカードに無いので、カードの外（一覧の下）に店名付きでまとめて出す。既定は非表示。
+	$campaigns = array();
+	if ( $show_campaign ) {
+		foreach ( $cards as $c ) {
+			if ( is_array( $c['campaign'] ) ) {
+				$campaigns[] = $c;
+			}
+		}
+	}
+	?>
+	<?php if ( ! empty( $campaigns ) ) : ?>
+		<ul class="phone-cta__campaigns">
+			<?php foreach ( $campaigns as $c ) : $cp = $c['campaign']; ?>
+				<li class="phone-cta__campaign">
+					<?php if ( ! empty( $cp['image_url'] ) ) : ?>
+						<img class="phone-cta__campaign-image" src="<?php echo esc_url( $cp['image_url'] ); ?>" alt="<?php echo esc_attr( isset( $cp['name'] ) ? $cp['name'] : '' ); ?>" loading="lazy">
+					<?php endif; ?>
+					<div class="phone-cta__campaign-text">
+						<p class="phone-cta__campaign-name">
+							<span class="phone-cta__campaign-shop"><?php echo esc_html( $c['name'] ); ?></span>
+							<?php if ( ! empty( $cp['name'] ) ) : ?>
+								<?php echo esc_html( $cp['name'] ); ?>
+							<?php endif; ?>
+						</p>
 						<?php if ( ! empty( $cp['body'] ) ) : ?>
 							<p class="phone-cta__campaign-body"><?php echo nl2br( esc_html( $cp['body'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 						<?php endif; ?>
@@ -176,8 +198,8 @@ $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 							<p class="phone-cta__campaign-terms"><?php echo nl2br( esc_html( $cp['terms'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 						<?php endif; ?>
 					</div>
-				<?php endif; ?>
-			</li>
-		<?php endforeach; ?>
-	</ul>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	<?php endif; ?>
 </section>
