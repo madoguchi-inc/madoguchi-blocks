@@ -158,7 +158,7 @@
 **取得層** `inc/phone-cta/class-repository.php`（`Madoguchi_Blocks_Phone_Cta_Repository`。既存コードに合わせ PHP 名前空間は使わず、クラス名プレフィックスで表す）
 
 - `list(string $service): array` … エディタのプルダウン用。transient `madoguchi_phone_cta_list_{service}`（TTL 600 秒）→ 無ければ `wp_remote_get("{base}/v1/phone_ctas", timeout 5s)`。失敗時は `[]`（表示には使わないのでフォールバック不要）
-- `find(string $service, string $uuid): ?array` … 表示用。transient `madoguchi_phone_cta_{service}_{uuid}`（TTL 600 秒）→ 無ければ `GET /v1/phone_ctas/{uuid}` → 成功で transient と option `madoguchi_phone_cta_last_{service}_{uuid}`（最後に成功したデータ）を更新 → 通信失敗（タイムアウト・5xx）は option を返す → 404 は `null` を同じ TTL でネガティブキャッシュし、option も削除（非公開になった店舗を出さない）
+- `find(string $service, string $uuid): ?array` … 表示用。transient `madoguchi_phone_cta_{service}_{uuid}`（TTL 600 秒）→ 無ければ `GET /v1/phone_ctas/{uuid}` → 成功で transient と option `madoguchi_phone_cta_last_{service}_{uuid}`（最後に成功したデータ）を更新 → 通信失敗（タイムアウト・5xx・壊れた JSON）は option を返し、再試行を間引くため 60 秒の短期 transient（last-good、無ければ失敗マーカー）を置く → 404 は `null` を同じ TTL でネガティブキャッシュし、option も削除（非公開になった店舗を出さない）
 - `refresh(?string $service)` … 一覧・単体の transient をまとめて削除（option は残す）
 - 1 記事あたりの店舗は最大 3 社、サイト全体でも数十社なので、店舗ごとの単体取得でも API 呼び出しは「店舗数 ÷ 10 分」で収まる
 - 取得処理はこのクラスに閉じ、将来データソースを変える場合はここだけ差し替える
@@ -229,7 +229,7 @@
 - `is_toll_free=false` の番号: バッジを出さず `phone-cta__note`「通話料はお客様のご負担となります」
 - `phone-cta__number`（番号テキスト）は PC のみ表示（SP は CSS で非表示）
 - `showCampaign` かつ `campaign` non-null のとき `phone-cta__campaign`（画像・名称・内容・注意事項）
-- マスタに無い／非公開の店舗はスキップ。0 件なら `''` を返す。`id="phone-cta"` は記事内最初のブロックのみ付与（固定フッターの汎用リンク先）
+- マスタに無い／非公開の店舗はスキップ。0 件なら `''` を返す。`id="phone-cta"` は記事内最初のブロックのみ付与（固定フッターの汎用リンク先）。「最初」の判定は投稿 ID 単位（REST の一覧レスポンスでは複数投稿が同一リクエストで描画されるため）。固定フッターの「1 記事 1 つ」も同様
 - 列数クラスは出力件数から `--cols-1/2/3`
 
 **CSS** `scss/phone-cta/_block.scss`
