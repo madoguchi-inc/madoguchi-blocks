@@ -31,6 +31,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const postcss = require( 'postcss' );
+const selectorParser = require( 'postcss-selector-parser' );
 
 const SRC = path.resolve( __dirname, '../build/style.css' );
 const DEST = path.resolve( __dirname, '../build/style-rest.css' );
@@ -72,6 +73,29 @@ const INLINE_GUARDS = [
 
 // ルートクラスを3連結して特異性を上げる（class="checklist-cta" に .a.a.a はマッチする）
 const triple = ( root ) => root.repeat( 3 );
+
+/**
+ * 個々の宣言のセレクタ特異性を底上げする。
+ *
+ * `.phone-cta__description` のような単一クラスのセレクタ（特異性 0,1,0）は、
+ * 配信先テーマの `.entry-content p{color:red !important}`（クラス+要素で 0,1,1）に
+ * !important 同士で負けてしまう（要素セレクタ1つ分、相手の方が特異性が高いため）。
+ * セレクタ中の各クラスを1つずつ複製し（マッチ対象は変わらない）、
+ * ルートの3連結と同じ考え方で全宣言の特異性を底上げする。
+ */
+function boostSpecificity( selector ) {
+	return selectorParser( ( selectors ) => {
+		selectors.each( ( sel ) => {
+			const classNodes = [];
+			sel.walkClasses( ( classNode ) => {
+				classNodes.push( classNode );
+			});
+			classNodes.forEach( ( classNode ) => {
+				classNode.parent.insertAfter( classNode, classNode.clone() );
+			});
+		});
+	}).processSync( selector );
+}
 
 function isGuarded( selector, prop ) {
 	return INLINE_GUARDS.some( ( g ) => {
@@ -154,6 +178,11 @@ root.walkDecls( ( decl ) => {
 		decl.important = true;
 	}
 	importantified++;
+});
+
+// 全ルールのセレクタ特異性を底上げ（配信先テーマの「クラス+要素」セレクタに !important 同士で負けないように）
+root.walkRules( ( rule ) => {
+	rule.selector = boostSpecificity( rule.selector );
 });
 
 const banner = '/*! madoguchi-blocks REST用（自動生成: tools/build-rest-css.js — 直接編集しない） */';
