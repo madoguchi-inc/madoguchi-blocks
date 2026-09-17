@@ -43,7 +43,8 @@ const ROOTS = [
 	'.author-box',
 	'.review-section',
 	'.comparison-table',
-	'.recommend-card'
+	'.recommend-card',
+	'.phone-cta'
 ];
 
 // !important を付与しない（インライン style を優先させる）セレクタ×プロパティ

@@ -1,0 +1,169 @@
+/*----- # 電話CTA（店舗別） -----*/
+.phone-cta {
+	margin: 3.2rem 0;
+	padding: 2rem 1.6rem;
+	border: 1px solid #e3e8ec;
+	border-radius: 1.2rem;
+	background: #fff;
+
+	&__heading {
+		margin: 0 0 0.6rem;
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: $line_height_narrow;
+		color: $font_color;
+		text-align: center;
+	}
+
+	&__description {
+		margin: 0 0 1.6rem;
+		font-size: 1.4rem;
+		line-height: $line_height;
+		color: $font_color_light;
+		text-align: center;
+	}
+
+	&__list {
+		display: grid;
+		gap: 1.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		grid-template-columns: repeat(1, minmax(0, 1fr));
+	}
+
+	&--cols-2 &__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	&--cols-3 &__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	&--cols-1 &__list { max-width: 42rem; margin: 0 auto; }
+
+	&__card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.8rem;
+		margin: 0;
+		padding: 1.6rem;
+		border: 1px solid #e3e8ec;
+		border-radius: 1rem;
+		background: #fff;
+		text-align: center;
+	}
+
+	&__logo {
+		display: block;
+		width: auto;
+		max-width: 16rem;
+		height: 4.8rem;
+		margin: 0 auto;
+		object-fit: contain;
+	}
+
+	&__name {
+		margin: 0;
+		font-size: 1.8rem;
+		font-weight: 700;
+		color: $font_color;
+	}
+
+	&__lead {
+		margin: 0;
+		padding: 0.8rem 1rem;
+		border-radius: 0.8rem;
+		background: #f4f6f8;
+		font-size: 1.3rem;
+		line-height: $line_height;
+		color: $font_color;
+		text-align: left;
+	}
+
+	&__specialty {
+		margin: 0;
+		font-size: 1.2rem;
+		color: $font_color_light;
+	}
+
+	&__button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.8rem;
+		margin-top: auto;
+		padding: 1.4rem 1.2rem;
+		border-radius: 0.8rem;
+		background: var(--md-brand, $color_orange);
+		box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: $line_height_narrow;
+		color: #fff !important;
+		text-decoration: none !important;
+		transition: transform $transition_duration;
+
+		&:hover { transform: translateY(1px); }
+	}
+
+	&__icon svg { display: block; }
+
+	&__number {
+		margin: 0;
+		font-size: 2rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		color: var(--md-brand, $color_orange);
+	}
+
+	&__hours {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.8rem;
+		margin: 0;
+		font-size: 1.2rem;
+		color: $font_color_light;
+	}
+
+	&__badge {
+		padding: 0.2rem 0.8rem;
+		border-radius: 999px;
+		background: #e8f6ee;
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: #1f8a4c;
+	}
+
+	&__note,
+	&__notice {
+		margin: 0;
+		font-size: 1.1rem;
+		color: $font_color_light;
+	}
+
+	&__notice { color: #b7791f; font-weight: 700; }
+
+	&__campaign {
+		margin-top: 0.4rem;
+		padding: 1rem;
+		border-radius: 0.8rem;
+		background: #fff7ee;
+		text-align: left;
+
+		&-image { display: block; width: 100%; height: auto; border-radius: 0.6rem; margin-bottom: 0.6rem; }
+		&-name { margin: 0 0 0.2rem; font-size: 1.3rem; font-weight: 700; color: $font_color; }
+		&-body { margin: 0; font-size: 1.2rem; line-height: $line_height; color: $font_color; }
+		&-terms { margin: 0.4rem 0 0; font-size: 1rem; color: $font_color_light; }
+	}
+
+	@include mq-max(md) {
+		padding: 5vw 4vw;
+
+		&__heading { font-size: 4.6vw; }
+		&__description { font-size: 3.6vw; }
+		&--cols-2 &__list,
+		&--cols-3 &__list { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+		&__card { padding: 4vw; }
+		&__logo { height: 11vw; max-width: 40vw; }
+		&__lead { font-size: 3.4vw; }
+		&__button { padding: 4vw 3vw; font-size: 4vw; }
+		&__number { display: none; } // SP はボタンが tel: リンクなので番号は出さない
+		&__hours { font-size: 3.2vw; }
+	}
+}

@@ -1,0 +1,38 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/phone-cta",
+	"title": "電話CTA（店舗別）",
+	"category": "madoguchi",
+	"icon": "phone",
+	"description": "店舗マスタから選んだ買取店 1〜3 社の「電話で査定額を聞く」カードを表示します。受付時間外は WEB 査定ボタンに自動で切り替わります。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"render": "file:./render.php",
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"multiple": true
+	},
+	"attributes": {
+		"service": { "type": "string", "default": "kaitori" },
+		"heading": { "type": "string", "default": "電話で査定額を聞ける提携買取店" },
+		"description": { "type": "string", "default": "複数の買取店で査定してもらうことが高く売るコツ！" },
+		"shops": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object",
+				"properties": {
+					"uuid": { "type": "string" },
+					"numberId": { "type": ["number", "string", "null"] },
+					"buttonLabel": { "type": "string" },
+					"leadText": { "type": "string" }
+				}
+			}
+		},
+		"showCampaign": { "type": "boolean", "default": true },
+		"isVisible": { "type": "boolean", "default": true }
+	}
+}

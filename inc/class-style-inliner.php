@@ -32,6 +32,7 @@ class Madoguchi_Blocks_Style_Inliner {
 		'madoguchi/comparison-table',
 		'madoguchi/cta-button',
 		'madoguchi/recommend-card',
+		'madoguchi/phone-cta',
 	);
 
 	/**
