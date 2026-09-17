@@ -1,0 +1,34 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "madoguchi/phone-cta-footer",
+	"title": "電話CTA 固定フッター",
+	"category": "madoguchi",
+	"icon": "align-wide",
+	"description": "画面下に固定表示される電話CTAバー。店舗を指定すると店名入りの文言になり、受付時間外は WEB 査定に切り替わります。1 記事に 1 つ。",
+	"textdomain": "madoguchi-blocks",
+	"editorScript": "madoguchi-blocks-editor",
+	"style": "madoguchi-blocks-style",
+	"render": "file:./render.php",
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"attributes": {
+		"service": { "type": "string", "default": "kaitori" },
+		"shop": {
+			"type": ["object", "null"],
+			"default": null,
+			"properties": {
+				"uuid": { "type": "string" },
+				"numberId": { "type": ["number", "string", "null"] },
+				"buttonLabel": { "type": "string" },
+				"balloonText": { "type": "string" }
+			}
+		},
+		"catchText": { "type": "string", "default": "完全無料査定 複数社で比較して1番高く売ろう" },
+		"showWebButton": { "type": "boolean", "default": true },
+		"webButtonUrl": { "type": "string", "default": "/form" },
+		"isVisible": { "type": "boolean", "default": true }
+	}
+}

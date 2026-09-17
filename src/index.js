@@ -48,6 +48,10 @@ import phoneCtaMeta from '../blocks/phone-cta/block.json';
 import PhoneCtaEdit from './phone-cta/edit';
 import phoneCtaSave from './phone-cta/save';
 
+import phoneCtaFooterMeta from '../blocks/phone-cta-footer/block.json';
+import PhoneCtaFooterEdit from './phone-cta-footer/edit';
+import phoneCtaFooterSave from './phone-cta-footer/save';
+
 // 子（condition-card）を先に登録してから親を登録する
 // （checklist / condition-card は旧マークアップからの自動移行用に deprecated を持つ）
 registerBlockType( checklistMeta, { edit: checklistEdit, save: checklistSave, deprecated: checklistDeprecated });
@@ -62,3 +66,4 @@ registerBlockType( comparisonMeta, { edit: comparisonEdit, save: comparisonSave 
 registerBlockType( ctaMeta, { edit: ctaEdit, save: ctaSave });
 registerBlockType( recommendMeta, { edit: recommendEdit, save: recommendSave });
 registerBlockType( phoneCtaMeta, { edit: PhoneCtaEdit, save: phoneCtaSave });
+registerBlockType( phoneCtaFooterMeta, { edit: PhoneCtaFooterEdit, save: phoneCtaFooterSave });

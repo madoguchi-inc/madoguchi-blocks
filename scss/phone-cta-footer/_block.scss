@@ -1,0 +1,85 @@
+/*----- # 電話CTA 固定フッター -----*/
+.phone-cta-footer {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 70; // SPA の StickyBottomCta（z-60）より上
+	padding: 0.8rem 1.6rem 1.2rem;
+	background: rgba(24, 25, 30, 0.9);
+	color: #fff;
+	box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+
+	&__catch {
+		margin: 0 0 0.6rem;
+		font-size: 1.4rem;
+		font-weight: 700;
+		line-height: $line_height_narrow;
+		text-align: center;
+		color: #fff;
+	}
+
+	&__buttons {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.2rem;
+		max-width: 96rem;
+		margin: 0 auto;
+	}
+
+	&--single &__buttons {
+		grid-template-columns: minmax(0, 48rem);
+		justify-content: center;
+	}
+
+	&__web,
+	&__tel {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.8rem;
+		padding: 1.4rem 1.2rem;
+		border-radius: 0.8rem;
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: $line_height_narrow;
+		text-align: center;
+		text-decoration: none !important;
+		color: #fff !important;
+	}
+
+	&__web {
+		background: #1b2430;
+		box-shadow: 0 3px 0 #000;
+	}
+
+	&__tel {
+		background: var(--md-brand, $color_orange);
+		box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+	}
+
+	&__balloon {
+		position: absolute;
+		top: -1.4rem;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.2rem 1rem;
+		border-radius: 999px;
+		background: #fff;
+		font-size: 1.1rem;
+		font-weight: 700;
+		white-space: nowrap;
+		color: var(--md-brand, $color_orange);
+	}
+
+	@include mq-max(md) {
+		padding: 2vw 3vw 3vw;
+
+		&__catch { font-size: 3.4vw; }
+		&__buttons { gap: 2vw; }
+		&__web,
+		&__tel { padding: 3.6vw 2vw; font-size: 3.6vw; }
+		&__balloon { top: -3.2vw; font-size: 2.8vw; }
+	}
+}

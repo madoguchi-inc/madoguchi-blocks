@@ -44,7 +44,8 @@ const ROOTS = [
 	'.review-section',
 	'.comparison-table',
 	'.recommend-card',
-	'.phone-cta'
+	'.phone-cta',
+	'.phone-cta-footer'
 ];
 
 // !important を付与しない（インライン style を優先させる）セレクタ×プロパティ
