@@ -16,8 +16,13 @@
 	},
 	"attributes": {
 		"service": { "type": "string", "default": "kaitori" },
-		"heading": { "type": "string", "default": "電話で査定額を聞ける提携買取店" },
+		"heading": { "type": "string", "default": "今すぐ電話でかんたん無料査定" },
 		"description": { "type": "string", "default": "複数の買取店で査定してもらうことが高く売るコツ！" },
+		"points": {
+			"type": "array",
+			"default": [ "強引な営業なし", "個人情報必要なし", "相談だけでもOK" ],
+			"items": { "type": "string" }
+		},
 		"shops": {
 			"type": "array",
 			"default": [],

@@ -2,6 +2,7 @@
  * 電話CTA（店舗別） — エディタ表示
  * 店舗マスタから選んだ 1〜3 店舗の「電話で査定額を聞く」カードをプレビューする。
  * サービス／店舗の選択・番号・文言の上書きはサイドバーで行う。
+ * マークアップは blocks/phone-cta/render.php と同じクラス構成にし、style.css を共有する。
  */
 
 import { __ } from '@wordpress/i18n';
@@ -14,33 +15,49 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	TextControl,
 	Button,
 	Notice,
 } from '@wordpress/components';
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import CardIcon from '../condition-card/icons';
-import { textsFor } from './texts';
+import { textsFor, splitLabel } from './texts';
 
 const MAX_SHOPS = 3;
+const MAX_POINTS = 3;
+
+// render-helpers.php の madoguchi_blocks_phone_cta_icon() と同じ構造（白丸の中にアイコン）
+function Icon( { iconKey } ) {
+	return (
+		<span className="phone-cta__icon" aria-hidden="true">
+			<CardIcon iconKey={ iconKey } className="" size={ 18 } />
+		</span>
+	);
+}
 
 function CardPreview( { service, item } ) {
+	const texts = textsFor( service );
 	const { shop, loading, error } = useShopDetail( service, item.uuid );
 	if ( ! item.uuid ) {
 		return (
 			<li className="phone-cta__card">
-				<p className="phone-cta__lead">
-					{ __( '店舗を選択してください', 'madoguchi-blocks' ) }
-				</p>
+				<div className="phone-cta__lead">
+					<p className="phone-cta__lead-text">
+						{ __( '店舗を選択してください', 'madoguchi-blocks' ) }
+					</p>
+				</div>
 			</li>
 		);
 	}
 	if ( loading ) {
 		return (
 			<li className="phone-cta__card">
-				<p className="phone-cta__lead">
-					{ __( '読み込み中…', 'madoguchi-blocks' ) }
-				</p>
+				<div className="phone-cta__lead">
+					<p className="phone-cta__lead-text">
+						{ __( '読み込み中…', 'madoguchi-blocks' ) }
+					</p>
+				</div>
 			</li>
 		);
 	}
@@ -59,57 +76,94 @@ function CardPreview( { service, item } ) {
 		) ||
 		( shop.numbers || [] ).find( ( n ) => n.is_default ) ||
 		( shop.numbers || [] )[ 0 ];
-	const label = (
-		item.buttonLabel ||
-		shop.button_label ||
-		textsFor( service ).shopLabel
-	).replace( '{shop}', shop.name );
+	const [ labelShop, labelRest ] = splitLabel(
+		item.buttonLabel || shop.button_label || texts.shopLabel,
+		shop.name
+	);
+	const lead = item.leadText || shop.lead_text;
 	return (
 		<li className="phone-cta__card is-open">
-			{ shop.logo_url ? (
-				<img
-					className="phone-cta__logo"
-					src={ shop.logo_url }
-					alt={ shop.name }
-				/>
-			) : (
-				<p className="phone-cta__name">{ shop.name }</p>
-			) }
-			{ ( item.leadText || shop.lead_text ) && (
-				<p className="phone-cta__lead">
-					{ item.leadText || shop.lead_text }
-				</p>
-			) }
-			{ shop.specialty_text && (
-				<p className="phone-cta__specialty">{ shop.specialty_text }</p>
-			) }
-			<span className="phone-cta__button">
-				<CardIcon iconKey="phone" className="" size={ 18 } />
-				{ label }
-			</span>
-			{ number && (
-				<p className="phone-cta__number">{ number.phone_number }</p>
-			) }
-			<p className="phone-cta__hours">
-				{ shop.reception_text
-					? `受付時間：${ shop.reception_text }`
-					: '' }
-				{ number?.is_toll_free !== false && (
-					<span className="phone-cta__badge">通話料無料</span>
+			<div className="phone-cta__intro">
+				<div className="phone-cta__logo-box">
+					{ shop.logo_url ? (
+						<img
+							className="phone-cta__logo"
+							src={ shop.logo_url }
+							alt={ shop.name }
+						/>
+					) : (
+						<p className="phone-cta__name">{ shop.name }</p>
+					) }
+				</div>
+				{ ( lead || shop.specialty_text ) && (
+					<div className="phone-cta__lead">
+						{ lead && (
+							<p className="phone-cta__lead-text">{ lead }</p>
+						) }
+						{ shop.specialty_text && (
+							<p className="phone-cta__specialty">
+								{ shop.specialty_text }
+							</p>
+						) }
+					</div>
 				) }
-			</p>
+			</div>
+			<div className="phone-cta__action">
+				<span className="phone-cta__button phone-cta__button--balloon">
+					<span className="phone-cta__balloon">{ texts.balloon }</span>
+					<span className="phone-cta__free">{ texts.freeTag }</span>
+					<span className="phone-cta__button-body">
+						<Icon iconKey="phone" />
+						<span className="phone-cta__button-label">
+							{ labelShop && (
+								<span className="phone-cta__button-shop">
+									{ labelShop }
+								</span>
+							) }
+							<span className="phone-cta__button-rest">
+								{ labelRest }
+							</span>
+						</span>
+					</span>
+					<span className="phone-cta__chevron" aria-hidden="true" />
+				</span>
+				{ number && (
+					<p className="phone-cta__number">{ number.phone_number }</p>
+				) }
+				<p className="phone-cta__hours">
+					{ shop.reception_text && (
+						<span className="phone-cta__hours-text">
+							{ `受付時間：${ shop.reception_text }` }
+						</span>
+					) }
+					{ number?.is_toll_free !== false && (
+						<span className="phone-cta__badge">通話料無料</span>
+					) }
+				</p>
+			</div>
 		</li>
 	);
 }
 
 export default function Edit( { attributes, setAttributes } ) {
-	const { service, heading, description, shops, showCampaign, isVisible } =
-		attributes;
+	const {
+		service,
+		heading,
+		description,
+		points,
+		shops,
+		showCampaign,
+		isVisible,
+	} = attributes;
 	const { services, loading: servicesLoading } = useServices();
 	const serviceOptions = Object.entries( services ).map(
 		( [ value, label ] ) => ( { label, value } )
 	);
 	const noServices = ! servicesLoading && serviceOptions.length === 0;
+	const pointList = Array.isArray( points ) ? points : [];
+	const visiblePoints = pointList
+		.filter( ( p ) => String( p || '' ).trim() !== '' )
+		.slice( 0, MAX_POINTS );
 
 	const updateShop = ( i, next ) =>
 		setAttributes( {
@@ -133,6 +187,14 @@ export default function Edit( { attributes, setAttributes } ) {
 				{ uuid: '', numberId: null, buttonLabel: '', leadText: '' },
 			],
 		} );
+	const updatePoint = ( i, value ) => {
+		const next = [ ...pointList ];
+		while ( next.length < MAX_POINTS ) {
+			next.push( '' );
+		}
+		next[ i ] = value;
+		setAttributes( { points: next } );
+	};
 
 	// サービス切替時、見出し／説明が「切替前サービスの既定文言のまま」なら新サービスの既定文言に
 	// 差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。
@@ -209,6 +271,25 @@ export default function Edit( { attributes, setAttributes } ) {
 					</Button>
 				</PanelBody>
 				<PanelBody
+					title={ __( 'POINT バッジ', 'madoguchi-blocks' ) }
+					initialOpen={ false }
+				>
+					{ [ 0, 1, 2 ].map( ( i ) => (
+						<TextControl
+							key={ i }
+							label={ `POINT${ i + 1 }` }
+							value={ pointList[ i ] || '' }
+							onChange={ ( v ) => updatePoint( i, v ) }
+						/>
+					) ) }
+					<p className="description">
+						{ __(
+							'空にしたバッジは表示されません。',
+							'madoguchi-blocks'
+						) }
+					</p>
+				</PanelBody>
+				<PanelBody
 					title={ __( '表示', 'madoguchi-blocks' ) }
 					initialOpen={ false }
 				>
@@ -232,22 +313,42 @@ export default function Edit( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<section { ...blockProps }>
-				<RichText
-					tagName="h2"
-					className="phone-cta__heading"
-					value={ heading }
-					onChange={ ( v ) => setAttributes( { heading: v } ) }
-					placeholder={ __( '見出し', 'madoguchi-blocks' ) }
-				/>
-				<RichText
-					tagName="p"
-					className="phone-cta__description"
-					value={ description }
-					onChange={ ( v ) => setAttributes( { description: v } ) }
-					placeholder={ __( '説明文', 'madoguchi-blocks' ) }
-				/>
+				<header className="phone-cta__header">
+					<div className="phone-cta__titles">
+						<RichText
+							tagName="p"
+							className="phone-cta__description"
+							value={ description }
+							onChange={ ( v ) =>
+								setAttributes( { description: v } )
+							}
+							placeholder={ __( '小見出し', 'madoguchi-blocks' ) }
+						/>
+						<RichText
+							tagName="h2"
+							className="phone-cta__heading"
+							value={ heading }
+							onChange={ ( v ) => setAttributes( { heading: v } ) }
+							placeholder={ __( '見出し', 'madoguchi-blocks' ) }
+						/>
+					</div>
+					{ visiblePoints.length > 0 && (
+						<ul className="phone-cta__points">
+							{ visiblePoints.map( ( p, i ) => (
+								<li key={ i } className="phone-cta__point">
+									<span className="phone-cta__point-label">
+										{ `POINT${ i + 1 }` }
+									</span>
+									<span className="phone-cta__point-text">
+										{ p }
+									</span>
+								</li>
+							) ) }
+						</ul>
+					) }
+				</header>
 				{ shops.length === 0 ? (
-					<p className="phone-cta__description">
+					<p className="phone-cta__note">
 						{ __(
 							'サイドバーから店舗を追加してください。',
 							'madoguchi-blocks'

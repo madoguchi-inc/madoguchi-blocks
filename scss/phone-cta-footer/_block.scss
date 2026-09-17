@@ -1,85 +1,270 @@
 /*----- # 電話CTA 固定フッター -----*/
+// Figma「みんなの買取」202607_電話送客プロジェクト 固定フッター(14065-33207)
+$pcf-gold        : #c4ab46;
+$pcf-black       : #18191e;
+$pcf-orange-from : #eb4614;
+$pcf-orange-to   : #f78b08;
+$pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 100%);
+
 .phone-cta-footer {
 	position: fixed;
 	left: 0;
 	right: 0;
 	bottom: 0;
 	z-index: 70; // SPA の StickyBottomCta（z-60）より上
-	padding: 0.8rem 1.6rem 1.2rem;
-	background: rgba(24, 25, 30, 0.9);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.8rem;
+	padding: 1.6rem;
+	background: linear-gradient(180deg, rgba(24, 25, 30, 0.6) 0%, rgba(24, 25, 30, 0.4) 100%);
 	color: #fff;
-	box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
 
+	/* ---- キャッチ「＼ [完全無料査定] 複数社で比較して1番高く売ろう ／」 ---- */
 	&__catch {
-		margin: 0 0 0.6rem;
-		font-size: 1.4rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		margin: 0;
+		font-size: 1.9rem;
 		font-weight: 700;
-		line-height: $line_height_narrow;
+		line-height: 1.3;
 		text-align: center;
+		color: #fff;
+
+		// 両端の斜線
+		&::before,
+		&::after {
+			content: "";
+			display: block;
+			flex: 0 0 auto;
+			width: 2.4rem;
+			height: 2px;
+			margin: 0 0.4rem;
+			background: #fff;
+			align-self: flex-end;
+			transform: translateY(-0.6rem) rotate(60deg);
+		}
+
+		&::after { transform: translateY(-0.6rem) rotate(-60deg); }
+	}
+
+	&__catch-badge {
+		display: inline-block;
+		padding: 0.4rem;
+		background: $pcf-gold;
+		font-size: 1.4rem;
+		line-height: 1.3;
 		color: #fff;
 	}
 
-	&__buttons {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 1.2rem;
-		max-width: 96rem;
-		margin: 0 auto;
+	&__catch-text {
+		display: inline-block;
+		color: #fff;
 	}
 
-	&--single &__buttons {
-		grid-template-columns: minmax(0, 48rem);
+	/* ---- ボタン群 ---- */
+	&__buttons {
+		display: flex;
+		align-items: stretch;
 		justify-content: center;
+		gap: 2.4rem;
+		max-width: 96rem;
 	}
 
 	&__web,
 	&__tel {
-		position: relative;
+		border-radius: 0.4rem;
+		font-weight: 700;
+		text-align: center;
+		text-decoration: none !important;
+		color: #fff !important;
+		transition: transform $transition_duration;
+
+		&:hover { transform: translateY(1px); }
+	}
+
+	// 黒：オンライン無料一括査定。PC は「24時間年中無休で受付中！」を上、アイコン＋文言を下
+	&__web {
+		display: grid;
+		grid-template-columns: auto auto;
+		grid-template-areas: "sub sub" "icon main";
+		align-items: center;
+		justify-items: center;
+		column-gap: 0.8rem;
+		row-gap: 0.4rem;
+		padding: 0.8rem 3.2rem;
+		background: $pcf-black;
+		box-shadow: 0 0 12px rgba(24, 25, 30, 0.4);
+
+		.phone-cta__icon {
+			grid-area: icon;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 2.4rem;
+			height: 2.4rem;
+			border-radius: 50%;
+			background: #fff;
+			color: $pcf-black;
+
+			svg { display: block; width: 1.6rem; height: 1.6rem; }
+		}
+	}
+
+	&__web-sub {
+		grid-area: sub;
+		display: block;
+		font-size: 1.2rem;
+		line-height: 1.25;
+	}
+
+	&__web-main {
+		grid-area: main;
+		display: block;
+		font-size: 2rem;
+		line-height: 1.3;
+		white-space: nowrap;
+
+		// PC は「オンライン無料一括査定」、SP は Figma どおり短い「オンライン一括査定」
+		&--sp { display: none; }
+	}
+
+	// オレンジ：電話で査定額を聞く。PC は「その場でかんたん無料査定！」を上、アイコン＋文言を下
+	&__tel {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		padding: 0.8rem 2.4rem;
+		background: $pcf-orange-grad;
+		box-shadow: 0 0 12px rgba(235, 70, 20, 0.4);
+	}
+
+	&__balloon {
+		display: block;
+		font-size: 1.3rem;
+		line-height: 1.25;
+		white-space: nowrap;
+		color: #fff;
+	}
+
+	&__tel-main {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		gap: 0.8rem;
-		padding: 1.4rem 1.2rem;
-		border-radius: 0.8rem;
-		font-size: 1.5rem;
-		font-weight: 700;
-		line-height: $line_height_narrow;
-		text-align: center;
-		text-decoration: none !important;
-		color: #fff !important;
+		font-size: 2rem;
+		line-height: 1.3;
+
+		.phone-cta__icon {
+			display: flex;
+			flex: 0 0 auto;
+			align-items: center;
+			justify-content: center;
+			width: 2.4rem;
+			height: 2.4rem;
+			border-radius: 50%;
+			background: #fff;
+			color: $pcf-orange-from;
+
+			svg { display: block; width: 1.7rem; height: 1.7rem; }
+		}
 	}
 
-	&__web {
-		background: #1b2430;
-		box-shadow: 0 3px 0 #000;
-	}
-
-	&__tel {
-		background: var(--md-brand, $color_orange);
-		box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
-	}
-
-	&__balloon {
-		position: absolute;
-		top: -1.4rem;
-		left: 50%;
-		transform: translateX(-50%);
-		padding: 0.2rem 1rem;
-		border-radius: 999px;
-		background: #fff;
-		font-size: 1.1rem;
-		font-weight: 700;
+	&__tel-label {
+		display: block;
 		white-space: nowrap;
-		color: var(--md-brand, $color_orange);
 	}
 
-	@include mq-max(md) {
-		padding: 2vw 3vw 3vw;
+	// 「おたからやに｜電話で査定額を聞く」の 2 片（SP で語の途中で折らせない）
+	&__tel-shop,
+	&__tel-rest {
+		display: inline-block;
+	}
 
-		&__catch { font-size: 3.4vw; }
-		&__buttons { gap: 2vw; }
-		&__web,
-		&__tel { padding: 3.6vw 2vw; font-size: 3.6vw; }
-		&__balloon { top: -3.2vw; font-size: 2.8vw; }
+	/* ================= SP（〜896px） ================= */
+	@include mq-max(md) {
+		gap: 0.8rem;
+		padding: 1.6rem;
+
+		// 390px 幅でも 1 行に収まるよう vw で詰める（Figma は 430px 幅で 16px / 13px）
+		&__catch {
+			gap: 0.4rem;
+			max-width: 100%;
+			font-size: 3.8vw;
+			white-space: nowrap;
+
+			&::before,
+			&::after { width: 4.6vw; margin: 0; }
+		}
+
+		&__catch-badge { padding: 0.2rem 0.4rem; font-size: 3.1vw; }
+
+		&__buttons {
+			width: 100%;
+			gap: 0.8rem;
+			justify-content: space-between;
+		}
+
+		&--single &__buttons { justify-content: center; }
+
+		// 黒：左にアイコン、右に「オンライン一括査定」「24時間年中無休で受付中」の 2 段
+		&__web {
+			flex: 1 1 0;
+			min-width: 0;
+			grid-template-columns: auto minmax(0, 1fr);
+			grid-template-areas: "icon main" "icon sub";
+			justify-items: center;
+			column-gap: 0.6rem;
+			row-gap: 0.3rem;
+			padding: 1rem 0.8rem;
+
+			.phone-cta__icon {
+				width: 3rem;
+				height: 3rem;
+
+				svg { width: 2.1rem; height: 2.1rem; }
+			}
+		}
+
+		&__web-main {
+			font-size: 1.3rem;
+			line-height: 1.3;
+			white-space: nowrap;
+
+			&--pc { display: none; }
+			&--sp { display: block; }
+		}
+
+		&__web-sub { font-size: 0.9rem; line-height: 1.2; white-space: nowrap; }
+
+		// オレンジ：左にアイコン、右に店名入り文言（吹き出し行は無し）
+		&__tel {
+			flex: 1 1 0;
+			min-width: 0;
+			flex-direction: row;
+			gap: 0.7rem;
+			padding: 1rem 0.8rem;
+		}
+
+		&__balloon { display: none; }
+
+		&__tel-main {
+			gap: 0.6rem;
+			font-size: 1.3rem;
+			line-height: 1.2;
+
+			.phone-cta__icon {
+				width: 3rem;
+				height: 3rem;
+
+				svg { width: 2.1rem; height: 2.1rem; }
+			}
+		}
+
+		&__tel-label { white-space: normal; }
 	}
 }

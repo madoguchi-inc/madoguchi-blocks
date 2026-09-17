@@ -186,45 +186,68 @@
 | 属性 | 型 / 既定 | 内容 |
 |---|---|---|
 | service | string / `kaitori` | サービスキー |
-| heading | string / 「電話で査定額を聞ける提携買取店」 | RichText |
-| description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText |
+| heading | string / 「今すぐ電話でかんたん無料査定」 | RichText。見出し（黒・24px） |
+| description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText。見出しの**上**に出る小見出し（ゴールド・13px） |
+| points | string[] / 「強引な営業なし」「個人情報必要なし」「相談だけでもOK」 | POINT1〜3 のバッジ文言。空文字は出さない |
 | shops | array / `[]` | `{ uuid, numberId, buttonLabel, leadText }` × 1〜3。numberId null なら既定番号。buttonLabel / leadText 空ならマスタ値 |
 | showCampaign | bool / true | |
 | isVisible | bool / true | false なら何も出力しない |
 
 **エディタ（edit.js）**
 - キャンバス: heading / description は RichText。カードは中継 REST の店舗データで描画（受付時間内の見た目、注記「表示側は受付時間で自動切替」）
-- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、ボタン文言上書き、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ トグル（キャンペーン表示 / このブロックを表示）
+- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、ボタン文言上書き、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ POINT バッジ（3 つのテキスト）→ トグル（キャンペーン表示 / このブロックを表示）
 - API URL 未設定・取得失敗・店舗がマスタに無い場合は黄色の Notice を出し、保存は妨げない
 
 **出力（render.php）**
 
 ```html
 <section class="phone-cta phone-cta--cols-3" id="phone-cta" data-phone-cta data-service="kaitori">
-  <h2 class="phone-cta__heading">…</h2>
-  <p class="phone-cta__description">…</p>
+  <header class="phone-cta__header">              <!-- PC: 左に小見出し＋見出し、右に POINT、下にゴールド罫線＋▼ -->
+    <div class="phone-cta__titles">
+      <p class="phone-cta__description">複数の買取店で査定してもらうことが高く売るコツ！</p>
+      <h2 class="phone-cta__heading">今すぐ電話でかんたん無料査定</h2>   <!-- SP は両脇に ▼ -->
+    </div>
+    <ul class="phone-cta__points">
+      <li class="phone-cta__point"><span class="phone-cta__point-label">POINT1</span><span class="phone-cta__point-text">強引な営業なし</span></li>
+      …
+    </ul>
+  </header>
   <ul class="phone-cta__list">
     <li class="phone-cta__card is-open" data-shop-uuid="…" data-shop-name="買取大吉"
         data-tel="+81120000000" data-open="1" data-fallback-url="…" data-reception-text="…">
-      <img class="phone-cta__logo" src="…" alt="買取大吉" loading="lazy">
-      <p class="phone-cta__lead">…</p>
-      <p class="phone-cta__specialty">…</p>
-      <a class="phone-cta__button" href="tel:+81120000000"><svg class="phone-cta__icon">…</svg>買取大吉に電話で査定額を聞く</a>
-      <p class="phone-cta__number">0120-000-000</p>
-      <p class="phone-cta__hours">受付時間：10:00〜20:00 <span class="phone-cta__badge">通話料無料</span></p>
+      <div class="phone-cta__intro">                <!-- PC: 縦積み / SP: ロゴ左・紹介文右 -->
+        <div class="phone-cta__logo-box"><img class="phone-cta__logo" src="…" alt="買取大吉" loading="lazy"></div>
+        <div class="phone-cta__lead"><p class="phone-cta__lead-text">…</p><p class="phone-cta__specialty">…</p></div>
+      </div>
+      <div class="phone-cta__action">
+        <a class="phone-cta__button phone-cta__button--balloon" href="tel:+81120000000">
+          <span class="phone-cta__balloon">その場でかんたん無料査定！</span>   <!-- 受付時間内のみ -->
+          <span class="phone-cta__free">査定無料</span>                        <!-- SP のみ表示（縦書きタブ） -->
+          <span class="phone-cta__button-body">
+            <span class="phone-cta__icon"><svg>…</svg></span>
+            <span class="phone-cta__button-label"><span class="phone-cta__button-shop">買取大吉に</span><span class="phone-cta__button-rest">電話で査定額を聞く</span></span>
+          </span>
+          <span class="phone-cta__chevron"></span>                             <!-- SP のみ表示 -->
+        </a>
+        <p class="phone-cta__number">0120-000-000</p>                            <!-- PC のみ表示 -->
+        <p class="phone-cta__hours"><span class="phone-cta__hours-text">受付時間：10:00〜20:00</span><span class="phone-cta__badge">通話料無料</span></p>
+      </div>
       <div class="phone-cta__campaign">…</div>
     </li>
   </ul>
 </section>
 ```
 
+- 見た目は Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC 14065-29201 / コラム_SP 14065-30761 / 電話査定受付時間外 14065-33169）に合わせる。ゴールド `#c4ab46`、黒 `#18191e`、オレンジグラデ `#eb4614→#f78b08`、カード罫線 `#ddd`、紹介文背景 `#f7f7f7`、SP「査定無料」タブ `#f39072`
+- ボタン文言は `View::label_parts()` で「店名＋助詞」「残り」に分け、各片を inline-block にして「おたからやに｜電話で査定額を聞く」で折り返す（語の途中で折らない）
+
 - 出し分け（リクエスト時 JST、`Reception::is_open`）
 
 | 状態 | ボタン |
 |---|---|
 | 受付時間内 / 24 時間 | 電話ボタン `tel:` |
-| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン無料査定はこちら」（指アイコン）→ fallback URL |
-| 時間外・fallback なし | 電話ボタンのまま＋`phone-cta__notice`「現在は受付時間外です」 |
+| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン無料査定はこちら」（指アイコン。SP はアイコン無し）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
+| 時間外・fallback なし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
 
 - `is_toll_free=false` の番号: バッジを出さず `phone-cta__note`「通話料はお客様のご負担となります」
 - `phone-cta__number`（番号テキスト）は PC のみ表示（SP は CSS で非表示）
@@ -234,7 +257,7 @@
 
 **CSS** `scss/phone-cta/_block.scss`
 - グリッドで各カード等高。SP（既存ミックスイン `mq-max`＝896px 以下）は 1 列、それ以上は `--cols-n` で n 列
-- 色は `--md-brand`。ボタンは既存 `.cta-button` の見た目（角丸・影）を踏襲
+- 色は Figma のトークンを直接持つ（`--md-brand` は使わない。買取のブランドカラーがそのままデザイン指定のため）
 - `class-style-inliner.php` の `$block_names`、`tools/build-rest-css.js` の `ROOTS` に `.phone-cta` を登録
 
 ### 5. madoguchi-blocks: ブロック `madoguchi/phone-cta-footer`（動的）
@@ -245,7 +268,8 @@
 |---|---|---|
 | service | string / `kaitori` | |
 | shop | object / null | `{ uuid, numberId, buttonLabel, balloonText }`。null なら店名なしの汎用文言 |
-| catchText | string / 「完全無料査定 複数社で比較して1番高く売ろう」 | RichText |
+| catchBadge | string / 「完全無料査定」 | キャッチ左のゴールドのバッジ。空なら出さない |
+| catchText | string / 「複数社で比較して1番高く売ろう」 | RichText。両脇に「＼ ／」の斜線を CSS で付ける |
 | showWebButton | bool / true | 黒ボタン |
 | webButtonUrl | string / `/form` | |
 | isVisible | bool / true | |
@@ -255,20 +279,33 @@
 ```html
 <div class="phone-cta-footer" data-phone-cta-footer data-service="kaitori"
      data-shop-uuid="…" data-shop-name="おたからや" data-tel="+81…" data-open="1">
-  <p class="phone-cta-footer__catch">…</p>
+  <p class="phone-cta-footer__catch"><span class="phone-cta-footer__catch-badge">完全無料査定</span><span class="phone-cta-footer__catch-text">複数社で比較して1番高く売ろう</span></p>
   <div class="phone-cta-footer__buttons">
-    <a class="phone-cta-footer__web" href="/form">24時間年中無休で受付中！ オンライン無料一括査定</a>
-    <a class="phone-cta-footer__tel" href="tel:+81…"><span class="phone-cta-footer__balloon">その場でかんたん無料査定！</span>おたからやに電話で査定額を聞く</a>
+    <a class="phone-cta-footer__web" href="/form">        <!-- PC: 「24時間年中無休で受付中！」を上段、アイコン＋文言を下段 / SP: アイコン左、文言 2 段 -->
+      <span class="phone-cta__icon"><svg>…</svg></span>
+      <span class="phone-cta-footer__web-main phone-cta-footer__web-main--pc">オンライン無料一括査定</span>
+      <span class="phone-cta-footer__web-main phone-cta-footer__web-main--sp">オンライン一括査定</span>
+      <span class="phone-cta-footer__web-sub">24時間年中無休で受付中！</span>
+    </a>
+    <a class="phone-cta-footer__tel" href="tel:+81…">
+      <span class="phone-cta-footer__balloon">その場でかんたん無料査定！</span>   <!-- PC のみ（SP は CSS で非表示） -->
+      <span class="phone-cta-footer__tel-main">
+        <span class="phone-cta__icon"><svg>…</svg></span>
+        <span class="phone-cta-footer__tel-label"><span class="phone-cta-footer__tel-shop">おたからやに</span><span class="phone-cta-footer__tel-rest">電話で査定額を聞く</span></span>
+      </span>
+    </a>
   </div>
 </div>
 ```
+
+- 見た目は Figma 固定フッター（14065-33207）。背景は `rgba(24,25,30,.6)→.4` の縦グラデ、黒ボタン `#18191e`、橙ボタンはオレンジグラデ。PC はボタンを中央寄せ（幅は内容なり）、SP は 2 等分
 
 | 状態 | 橙ボタン |
 |---|---|
 | 店舗あり・時間内 | 「{店名}に電話で査定額を聞く」＋吹き出し、`tel:` |
 | 店舗あり・時間外・fallback あり | 「WEBでカンタン無料査定はこちら」→ fallback |
 | 店舗あり・時間外・fallback なし | 電話ボタン非表示（黒ボタンのみの 1 列レイアウト） |
-| 店舗なし | 「電話で査定額を聞く」→ `#phone-cta` へページ内リンク |
+| 店舗なし | 「電話で査定額を聞く」＋吹き出し → `#phone-cta` へページ内リンク（Figma「それ以外」） |
 
 - `position: fixed; bottom: 0; z-index` は SPA の StickyBottomCta（z-60）と同等以上。記事内の位置は問わない
 - 1 記事 1 つ。render.php は静的フラグで 2 つ目以降を `''` にする

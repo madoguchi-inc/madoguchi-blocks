@@ -26,7 +26,8 @@
 				"balloonText": { "type": "string" }
 			}
 		},
-		"catchText": { "type": "string", "default": "完全無料査定 複数社で比較して1番高く売ろう" },
+		"catchBadge": { "type": "string", "default": "完全無料査定" },
+		"catchText": { "type": "string", "default": "複数社で比較して1番高く売ろう" },
 		"showWebButton": { "type": "boolean", "default": true },
 		"webButtonUrl": { "type": "string", "default": "/form" },
 		"isVisible": { "type": "boolean", "default": true }

@@ -122,8 +122,22 @@ class ViewTest extends TestCase {
 		$this->assertSame( '電話で見積もりを聞く', $s['label'] );
 	}
 
+	public function test_label_parts_splits_after_particle(): void {
+		$shop = $this->shop();
+		// 既定テンプレート: 店名＋「に」で切れる
+		$this->assertSame( array( '買取大吉に', '電話で査定額を聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '' ) );
+		// 他の助詞（へ・の・で・と）も店名側に付ける
+		$this->assertSame( array( '買取大吉へ', '今すぐ電話' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '{shop}へ今すぐ電話' ) );
+		// 助詞が続かないテンプレート: 店名だけが前半
+		$this->assertSame( array( '買取大吉', '：電話する' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '{shop}：電話する' ) );
+		// {shop} 無し: 全文が後半
+		$this->assertSame( array( '', '今すぐ電話' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '今すぐ電話' ) );
+		// button_label と label_parts の結合は一致する
+		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, '' ) );
+	}
+
 	public function test_default_texts_by_service(): void {
-		$this->assertSame( '電話で査定額を聞ける提携買取店', Madoguchi_Blocks_Phone_Cta_View::default_texts( 'kaitori' )['heading'] );
-		$this->assertSame( '電話で見積もりを聞ける提携業者', Madoguchi_Blocks_Phone_Cta_View::default_texts( 'osouji' )['heading'] );
+		$this->assertSame( '今すぐ電話でかんたん無料査定', Madoguchi_Blocks_Phone_Cta_View::default_texts( 'kaitori' )['heading'] );
+		$this->assertSame( '今すぐ電話でかんたん無料見積もり', Madoguchi_Blocks_Phone_Cta_View::default_texts( 'osouji' )['heading'] );
 	}
 }
