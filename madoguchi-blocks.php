@@ -182,3 +182,12 @@ function madoguchi_blocks_boot_style_inliner() {
 	$inliner->init();
 }
 add_action( 'init', 'madoguchi_blocks_boot_style_inliner' );
+
+/**
+ * 電話CTA: エディタ向け中継 REST を登録する。
+ */
+function madoguchi_blocks_boot_phone_cta_rest() {
+	$rest = new Madoguchi_Blocks_Phone_Cta_Rest();
+	$rest->init();
+}
+add_action( 'init', 'madoguchi_blocks_boot_phone_cta_rest' );
