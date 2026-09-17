@@ -3,3 +3,8 @@ node_modules/
 
 # package.sh が生成する配布 zip の出力先
 dist-zip/
+
+# PHPUnit（composer install で復元。配布 zip には含めない）
+vendor/
+composer.phar
+.phpunit.result.cache
