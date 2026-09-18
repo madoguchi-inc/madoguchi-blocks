@@ -103,7 +103,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	/**
 	 * 記事内カード 1 枚の状態。
 	 *
-	 * @param array  $item    ブロック属性 shops[] の 1 要素（uuid, numberId, leadText）
+	 * @param array  $item    ブロック属性 shops[] の 1 要素（uuid, numberId, leadText, webUrl）
 	 * @param string $service サービスキー。ボタン文言の固定テンプレートを引くのに使う
 	 */
 	public static function card_state( array $shop, array $item, DateTimeImmutable $now, string $service = 'kaitori' ): ?array {
@@ -111,8 +111,11 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		if ( null === $number ) {
 			return null;
 		}
-		$is_open  = Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
-		$fallback = isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '';
+		$is_open = Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
+		// WEB 査定のリンク先は記事のカード単位の指定を優先し、空ならマスタの値を使う
+		$fallback = isset( $item['webUrl'] ) && '' !== trim( (string) $item['webUrl'] )
+			? trim( (string) $item['webUrl'] )
+			: ( isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '' );
 		if ( $is_open ) {
 			$mode = 'tel';
 		} elseif ( '' !== $fallback ) {

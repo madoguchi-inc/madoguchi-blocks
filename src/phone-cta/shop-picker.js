@@ -1,7 +1,7 @@
 /**
  * 電話CTAブロック — 1 店舗分の選択 UI（店舗 → 番号 → 文言上書き）。
  * サイドバー（Task 9）とフッター（Task 10）の両方から使う共通コンポーネント。
- * item: { uuid, numberId, leadText }（ボタン文言は店名以外サービスごとに固定なので上書き項目は無い）
+ * item: { uuid, numberId, leadText, webUrl }（ボタン文言は店名以外サービスごとに固定なので上書き項目は無い）
  */
 
 import { __ } from '@wordpress/i18n';
@@ -27,6 +27,7 @@ export default function ShopPicker( {
 	canMoveUp,
 	canMoveDown,
 	showLead = true,
+	showWebUrl = true,
 } ) {
 	const { shops, loading: listLoading } = useShopList( service );
 	const {
@@ -129,6 +130,22 @@ export default function ShopPicker( {
 							} )
 						}
 					/>
+					{ showWebUrl && (
+						<TextControl
+							label={ __(
+								'WEB査定のリンク（任意）',
+								'madoguchi-blocks'
+							) }
+							help={ __(
+								'受付時間外に出す「WEBでカンタン無料査定」の遷移先。空なら店舗マスタの値を使います。',
+								'madoguchi-blocks'
+							) }
+							value={ item.webUrl || '' }
+							onChange={ ( webUrl ) =>
+								onChange( { ...item, webUrl } )
+							}
+						/>
+					) }
 					{ showLead && (
 						<TextareaControl
 							label={ __( '紹介文の上書き', 'madoguchi-blocks' ) }

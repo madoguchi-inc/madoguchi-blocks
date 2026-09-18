@@ -32,7 +32,8 @@
 				"properties": {
 					"uuid": { "type": "string" },
 					"numberId": { "type": ["number", "string", "null"] },
-					"leadText": { "type": "string" }
+					"leadText": { "type": "string" },
+					"webUrl": { "type": "string" }
 				}
 			}
 		},

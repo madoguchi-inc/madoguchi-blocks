@@ -115,6 +115,7 @@ export default function Edit( { attributes, setAttributes } ) {
 									setAttributes( { shop: null } )
 								}
 								showLead={ false }
+								showWebUrl={ false }
 							/>
 							<TextControl
 								label={ __(

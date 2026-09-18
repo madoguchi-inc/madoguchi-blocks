@@ -189,7 +189,10 @@ export default function Edit( { attributes, setAttributes } ) {
 	};
 	const addShop = () =>
 		setAttributes( {
-			shops: [ ...shops, { uuid: '', numberId: null, leadText: '' } ],
+			shops: [
+				...shops,
+				{ uuid: '', numberId: null, leadText: '', webUrl: '' },
+			],
 		} );
 	const updatePoint = ( i, value ) => {
 		const next = [ ...pointList ];

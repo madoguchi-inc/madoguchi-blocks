@@ -95,6 +95,22 @@ class ViewTest extends TestCase {
 		$this->assertSame( '買取大吉に電話で見積もりを聞く', $state['label'] );
 	}
 
+	public function test_card_state_prefers_item_web_url(): void {
+		$closed = $this->now( '2026-09-16 21:00' );
+		// カード単位の指定があればマスタより優先する
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array( 'webUrl' => 'https://article.example/lp' ), $closed, 'kaitori' );
+		$this->assertSame( 'web', $state['mode'] );
+		$this->assertSame( 'https://article.example/lp', $state['fallback_url'] );
+
+		// 空白のみならマスタの値を使う
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array( 'webUrl' => '  ' ), $closed, 'kaitori' );
+		$this->assertSame( 'https://lp.example/', $state['fallback_url'] );
+
+		// マスタが空でもカード単位の指定があれば WEB ボタンになる
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop( array( 'web_fallback_url' => '' ) ), array( 'webUrl' => 'https://article.example/lp' ), $closed, 'kaitori' );
+		$this->assertSame( 'web', $state['mode'] );
+	}
+
 	public function test_card_state_without_numbers_is_null(): void {
 		$this->assertNull( Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop( array( 'numbers' => array() ) ), array(), $this->now( '2026-09-16 12:00' ) ) );
 	}

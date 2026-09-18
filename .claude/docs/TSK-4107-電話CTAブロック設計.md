@@ -192,13 +192,13 @@
 | bannerImageUrl | string / `''` | `custom` のときの画像 URL |
 | bannerImageAlt | string / `''` | 代替テキスト。空ならパターン既定 |
 | bannerLinkUrl | string / `''` | バナーのリンク先。空ならリンクなし |
-| shops | array / `[]` | `{ uuid, numberId, leadText }` × 1〜3。numberId null なら既定番号。leadText 空ならマスタ値。ボタン文言は上書き不可 |
+| shops | array / `[]` | `{ uuid, numberId, leadText, webUrl }` × 1〜3。numberId null なら既定番号。leadText / webUrl 空ならマスタ値。ボタン文言は上書き不可 |
 | showCampaign | bool / **false** | true のときマスタのキャンペーンをカード一覧の**下**に店名付きで出す（Figma のカードに枠が無いため既定はオフ） |
 | isVisible | bool / true | false なら何も出力しない |
 
 **エディタ（edit.js）**
 - キャンバス: heading / description は RichText。カードは中継 REST の店舗データで描画（受付時間内の見た目、注記「表示側は受付時間で自動切替」）
-- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ 先頭のバナー（パターン選択／カスタム画像／代替テキスト／リンク先）→ POINT バッジ（3 つのテキスト）→ トグル（キャンペーン表示 / このブロックを表示）
+- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、WEB査定のリンク上書き、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ 先頭のバナー（パターン選択／カスタム画像／代替テキスト／リンク先）→ POINT バッジ（3 つのテキスト）→ トグル（キャンペーン表示 / このブロックを表示）
 - API URL 未設定・取得失敗・店舗がマスタに無い場合は黄色の Notice を出し、保存は妨げない
 
 **出力（render.php）**
@@ -267,8 +267,10 @@
 | 状態 | ボタン |
 |---|---|
 | 受付時間内 / 24 時間 | 電話ボタン `tel:` |
-| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン／無料査定はこちら」（Figma の指タップアイコン。PC・SP とも表示）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
-| 時間外・fallback なし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
+| 時間外・WEBリンクあり | `phone-cta__button--web`「WEBでカンタン／無料査定はこちら」（Figma の指タップアイコン。PC・SP とも表示）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
+| 時間外・WEBリンクなし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
+
+- WEB 査定のリンク先は **記事のカード単位の `webUrl` を優先**し、空なら店舗マスタの `web_fallback_url` を使う（記事ごとに専用 LP へ送りたい場合に使う）。固定フッターはマスタの値のみ
 
 - カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」
 - `showCampaign=true` かつ `campaign` non-null の店舗があれば、カード一覧の下に `phone-cta__campaigns`（店名バッジ・画像・名称・内容・注意事項）。カード内には出さない
