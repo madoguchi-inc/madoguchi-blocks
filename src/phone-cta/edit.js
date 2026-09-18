@@ -76,10 +76,8 @@ function CardPreview( { service, item } ) {
 		) ||
 		( shop.numbers || [] ).find( ( n ) => n.is_default ) ||
 		( shop.numbers || [] )[ 0 ];
-	const [ labelShop, labelRest ] = splitLabel(
-		item.buttonLabel || shop.button_label || texts.shopLabel,
-		shop.name
-	);
+	// ボタン文言は店名以外サービスごとに固定（PHP 側 View::label_parts と同じ）
+	const [ labelShop, labelRest ] = splitLabel( texts.shopLabel, shop.name );
 	const lead = item.leadText || shop.lead_text;
 	return (
 		<li className="phone-cta__card is-open">
@@ -183,7 +181,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		setAttributes( {
 			shops: [
 				...shops,
-				{ uuid: '', numberId: null, buttonLabel: '', leadText: '' },
+				{ uuid: '', numberId: null, leadText: '' },
 			],
 		} );
 	const updatePoint = ( i, value ) => {

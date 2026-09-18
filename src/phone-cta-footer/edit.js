@@ -54,15 +54,12 @@ export default function Edit( { attributes, setAttributes } ) {
 	const item = shop || {
 		uuid: '',
 		numberId: null,
-		buttonLabel: '',
 		balloonText: '',
 	};
+	// ボタン文言は店名以外サービスごとに固定（PHP 側 View::footer_state と同じ）
 	const [ labelShop, labelRest ] = detail
-		? splitLabel(
-				item.buttonLabel || detail.button_label || texts.shopLabel,
-				detail.name
-		  )
-		: [ '', item.buttonLabel || texts.genericLabel ];
+		? splitLabel( texts.shopLabel, detail.name )
+		: [ '', texts.genericLabel ];
 
 	// サービス切替時、キャッチコピーが「切替前サービスの既定文言のまま」なら新サービスの
 	// 既定文言に差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。

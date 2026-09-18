@@ -1,7 +1,7 @@
 /**
  * 電話CTAブロック — 1 店舗分の選択 UI（店舗 → 番号 → 文言上書き）。
  * サイドバー（Task 9）とフッター（Task 10）の両方から使う共通コンポーネント。
- * item: { uuid, numberId, buttonLabel, leadText }
+ * item: { uuid, numberId, leadText }（ボタン文言は店名以外サービスごとに固定なので上書き項目は無い）
  */
 
 import { __ } from '@wordpress/i18n';
@@ -127,17 +127,6 @@ export default function ShopPicker( {
 								...item,
 								numberId: v === '' ? null : v,
 							} )
-						}
-					/>
-					<TextControl
-						label={ __( 'ボタン文言の上書き', 'madoguchi-blocks' ) }
-						help={ __(
-							'空ならマスタの文言。{shop} は店舗名に置き換わります。',
-							'madoguchi-blocks'
-						) }
-						value={ item.buttonLabel || '' }
-						onChange={ ( buttonLabel ) =>
-							onChange( { ...item, buttonLabel } )
 						}
 					/>
 					{ showLead && (

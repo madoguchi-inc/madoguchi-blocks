@@ -14,7 +14,6 @@ class ViewTest extends TestCase {
 			'logo_url'         => 'https://cdn/logo.png',
 			'specialty_text'   => '時計・バッグ',
 			'lead_text'        => '全国1,300店舗',
-			'button_label'     => '{shop}に電話で査定額を聞く',
 			'web_fallback_url' => 'https://lp.example/',
 			'is_always_open'   => false,
 			'reception_text'   => '10:00〜20:00',
@@ -53,16 +52,17 @@ class ViewTest extends TestCase {
 
 	public function test_footer_state_handles_missing_phone_number_without_error(): void {
 		$shop  = $this->shop( array( 'numbers' => array( array( 'id' => 1 ) ) ) ); // phone_number キー欠落
-		$attrs = array( 'numberId' => null, 'buttonLabel' => '', 'balloonText' => '' );
+		$attrs = array( 'numberId' => null, 'balloonText' => '' );
 		$state = Madoguchi_Blocks_Phone_Cta_View::footer_state( $shop, $attrs, $this->now( '2026-09-16 12:00' ), 'kaitori' );
 		$this->assertSame( '', $state['tel_href'] );
 	}
 
-	public function test_button_label_replaces_shop_and_respects_override(): void {
+	public function test_button_label_is_fixed_per_service_except_shop_name(): void {
 		$shop = $this->shop();
-		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, '' ) );
-		$this->assertSame( '大吉へ電話', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, '大吉へ電話' ) );
-		$this->assertSame( '今すぐ買取大吉へ', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, '今すぐ{shop}へ' ) );
+		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, 'kaitori' ) );
+		$this->assertSame( '買取大吉に電話で見積もりを聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, 'osouji' ) );
+		// マスタ側に button_label が残っていても無視する（文言は全記事で揃える）
+		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $this->shop( array( 'button_label' => '独自' ) ), 'kaitori' ) );
 	}
 
 	public function test_card_state_open(): void {
@@ -88,10 +88,12 @@ class ViewTest extends TestCase {
 		$this->assertFalse( $state['is_open'] );
 	}
 
-	public function test_card_state_overrides_lead_and_label(): void {
-		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array( 'leadText' => '独自リード', 'buttonLabel' => '独自ラベル' ), $this->now( '2026-09-16 12:00' ) );
+	public function test_card_state_overrides_lead_but_not_label(): void {
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array( 'leadText' => '独自リード', 'buttonLabel' => '独自ラベル' ), $this->now( '2026-09-16 12:00' ), 'kaitori' );
 		$this->assertSame( '独自リード', $state['lead'] );
-		$this->assertSame( '独自ラベル', $state['label'] );
+		$this->assertSame( '買取大吉に電話で査定額を聞く', $state['label'] ); // 旧属性 buttonLabel が残っていても無視
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array(), $this->now( '2026-09-16 12:00' ), 'fuyouhin' );
+		$this->assertSame( '買取大吉に電話で見積もりを聞く', $state['label'] );
 	}
 
 	public function test_card_state_without_numbers_is_null(): void {
@@ -101,7 +103,7 @@ class ViewTest extends TestCase {
 	public function test_footer_states(): void {
 		$open   = $this->now( '2026-09-16 12:00' );
 		$closed = $this->now( '2026-09-16 21:00' );
-		$attrs  = array( 'numberId' => null, 'buttonLabel' => '', 'balloonText' => '' );
+		$attrs  = array( 'numberId' => null, 'balloonText' => '' );
 
 		$s = Madoguchi_Blocks_Phone_Cta_View::footer_state( $this->shop(), $attrs, $open, 'kaitori' );
 		$this->assertSame( 'tel', $s['mode'] );
@@ -124,16 +126,13 @@ class ViewTest extends TestCase {
 
 	public function test_label_parts_splits_after_particle(): void {
 		$shop = $this->shop();
-		// 既定テンプレート: 店名＋「に」で切れる
-		$this->assertSame( array( '買取大吉に', '電話で査定額を聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '' ) );
-		// 他の助詞（へ・の・で・と）も店名側に付ける
-		$this->assertSame( array( '買取大吉へ', '今すぐ電話' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '{shop}へ今すぐ電話' ) );
-		// 助詞が続かないテンプレート: 店名だけが前半
-		$this->assertSame( array( '買取大吉', '：電話する' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '{shop}：電話する' ) );
-		// {shop} 無し: 全文が後半
-		$this->assertSame( array( '', '今すぐ電話' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, '今すぐ電話' ) );
+		// 店名＋「に」で切れる（買取 / 回収・清掃）
+		$this->assertSame( array( '買取大吉に', '電話で査定額を聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'kaitori' ) );
+		$this->assertSame( array( '買取大吉に', '電話で見積もりを聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'fuyouhin' ) );
+		// 店名が無ければ助詞だけが前半
+		$this->assertSame( array( 'に', '電話で査定額を聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( array(), 'kaitori' ) );
 		// button_label と label_parts の結合は一致する
-		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, '' ) );
+		$this->assertSame( '買取大吉に電話で査定額を聞く', Madoguchi_Blocks_Phone_Cta_View::button_label( $shop, 'kaitori' ) );
 	}
 
 	public function test_default_texts_by_service(): void {

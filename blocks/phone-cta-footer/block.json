@@ -22,7 +22,6 @@
 			"properties": {
 				"uuid": { "type": "string" },
 				"numberId": { "type": ["number", "string", "null"] },
-				"buttonLabel": { "type": "string" },
 				"balloonText": { "type": "string" }
 			}
 		},

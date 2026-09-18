@@ -63,7 +63,6 @@
 | reception_text | string | 受付時間の表示文。空なら hours から自動生成 |
 | specialty_text | string | 得意な買取品目の 1 行文 |
 | lead_text | string | カードの紹介文 |
-| button_label | string, default `{shop}に電話で査定額を聞く` | `{shop}` を店舗名に置換 |
 | web_fallback_url | string | 時間外の遷移先。空なら時間外でも電話ボタン＋注記 |
 | has_campaign | boolean, default false | |
 | campaign_name / campaign_body / campaign_terms | string / text / text | |
@@ -130,7 +129,6 @@
   "name": "買取大吉",
   "logo_url": "https://.../logo.png",
   "specialty_text": "…", "lead_text": "…",
-  "button_label": "{shop}に電話で査定額を聞く",
   "web_fallback_url": "https://…",
   "is_always_open": false,
   "reception_text": "月〜金 10:00〜20:00 / 土日 10:00〜18:00",
@@ -189,7 +187,7 @@
 | heading | string / 「今すぐ電話でかんたん無料査定」 | RichText。見出し（黒・24px） |
 | description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText。見出しの**上**に出る小見出し（ゴールド・13px） |
 | points | string[] / 「強引な営業なし」「個人情報必要なし」「相談だけでもOK」 | POINT1〜3 のバッジ文言。空文字は出さない |
-| shops | array / `[]` | `{ uuid, numberId, buttonLabel, leadText }` × 1〜3。numberId null なら既定番号。buttonLabel / leadText 空ならマスタ値 |
+| shops | array / `[]` | `{ uuid, numberId, leadText }` × 1〜3。numberId null なら既定番号。leadText 空ならマスタ値。ボタン文言は上書き不可 |
 | showCampaign | bool / **false** | true のときマスタのキャンペーンをカード一覧の**下**に店名付きで出す（Figma のカードに枠が無いため既定はオフ） |
 | isVisible | bool / true | false なら何も出力しない |
 
@@ -238,6 +236,7 @@
 ```
 
 - 見た目は Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC 14065-29201 / コラム_SP 14065-30761 / 電話査定受付時間外 14065-33169）に合わせる。ゴールド `#c4ab46`、黒 `#18191e`、オレンジグラデ `#eb4614→#f78b08`、カード罫線 `#ddd`、紹介文背景 `#f7f7f7`、SP「査定無料」タブ `#f39072`
+- ボタン文言は店名以外**サービスごとに固定**（買取「{shop}に電話で査定額を聞く」／回収・清掃「{shop}に電話で見積もりを聞く」。`default_texts` の `shop_label`）。店舗マスタ・ブロック属性からの上書きは無い
 - ボタン文言は `View::label_parts()` で「店名＋助詞」「残り」に分け、各片を inline-block にして「おたからやに｜電話で査定額を聞く」で折り返す（語の途中で折らない）
 
 - 出し分け（リクエスト時 JST、`Reception::is_open`）
@@ -267,7 +266,7 @@
 | 属性 | 型 / 既定 | 内容 |
 |---|---|---|
 | service | string / `kaitori` | |
-| shop | object / null | `{ uuid, numberId, buttonLabel, balloonText }`。null なら店名なしの汎用文言 |
+| shop | object / null | `{ uuid, numberId, balloonText }`。null なら店名なしの汎用文言 |
 | catchBadge | string / 「完全無料査定」 | キャッチ左のゴールドのバッジ。空なら出さない |
 | catchText | string / 「複数社で比較して1番高く売ろう」 | RichText。両脇に「＼ ／」の斜線を CSS で付ける |
 | showWebButton | bool / true | 黒ボタン |

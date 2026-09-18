@@ -28,7 +28,7 @@ foreach ( $items as $item ) {
 	if ( null === $shop ) {
 		continue; // マスタに無い／非公開の店舗は出さない
 	}
-	$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now );
+	$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $service );
 	if ( null !== $state ) {
 		$cards[] = $state;
 	}

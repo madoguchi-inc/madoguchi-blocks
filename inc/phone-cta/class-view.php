@@ -68,8 +68,12 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		return $numbers[0];
 	}
 
-	public static function button_label( array $shop, string $override ): string {
-		return implode( '', self::label_parts( $shop, $override ) );
+	/**
+	 * ボタン文言。店名以外はサービス（商材）ごとの固定文言で、{shop} だけを店名に置換する。
+	 * 店舗マスタやブロック属性からの上書きは受け付けない（文言を全記事で揃えるため）。
+	 */
+	public static function button_label( array $shop, string $service ): string {
+		return implode( '', self::label_parts( $shop, $service ) );
 	}
 
 	/**
@@ -79,8 +83,8 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	 *
 	 * @return array{0:string,1:string}
 	 */
-	public static function label_parts( array $shop, string $override ): array {
-		$template = '' !== trim( $override ) ? $override : ( isset( $shop['button_label'] ) && '' !== $shop['button_label'] ? $shop['button_label'] : '{shop}に電話で査定額を聞く' );
+	public static function label_parts( array $shop, string $service ): array {
+		$template = self::default_texts( $service )['shop_label'];
 		$name     = isset( $shop['name'] ) ? (string) $shop['name'] : '';
 		$pos      = strpos( $template, '{shop}' );
 		if ( false === $pos ) {
@@ -97,9 +101,10 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	/**
 	 * 記事内カード 1 枚の状態。
 	 *
-	 * @param array $item ブロック属性 shops[] の 1 要素（uuid, numberId, buttonLabel, leadText）
+	 * @param array  $item    ブロック属性 shops[] の 1 要素（uuid, numberId, leadText）
+	 * @param string $service サービスキー。ボタン文言の固定テンプレートを引くのに使う
 	 */
-	public static function card_state( array $shop, array $item, DateTimeImmutable $now ): ?array {
+	public static function card_state( array $shop, array $item, DateTimeImmutable $now, string $service = 'kaitori' ): ?array {
 		$number = self::pick_number( $shop, isset( $item['numberId'] ) ? $item['numberId'] : null );
 		if ( null === $number ) {
 			return null;
@@ -124,8 +129,8 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'logo_url'       => isset( $shop['logo_url'] ) ? (string) $shop['logo_url'] : '',
 			'lead'           => $lead,
 			'specialty'      => isset( $shop['specialty_text'] ) ? (string) $shop['specialty_text'] : '',
-			'label'          => self::button_label( $shop, isset( $item['buttonLabel'] ) ? (string) $item['buttonLabel'] : '' ),
-			'label_parts'    => self::label_parts( $shop, isset( $item['buttonLabel'] ) ? (string) $item['buttonLabel'] : '' ),
+			'label'          => self::button_label( $shop, $service ),
+			'label_parts'    => self::label_parts( $shop, $service ),
 			'tel_href'       => '' !== $phone_number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( $phone_number ) : '',
 			'tel_display'    => $phone_number,
 			'is_toll_free'   => ! isset( $number['is_toll_free'] ) || (bool) $number['is_toll_free'],
@@ -139,14 +144,14 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	 * 固定フッターの状態。$shop が null なら汎用文言。
 	 * Figma では店舗未指定（それ以外）でも「その場でかんたん無料査定！」を添えるので、汎用でも吹き出しを返す。
 	 *
-	 * @param array $attrs ブロック属性 shop（numberId, buttonLabel, balloonText）
+	 * @param array $attrs ブロック属性 shop（numberId, balloonText）
 	 */
 	public static function footer_state( ?array $shop, array $attrs, DateTimeImmutable $now, string $service ): array {
 		$texts   = self::default_texts( $service );
 		$balloon = isset( $attrs['balloonText'] ) && '' !== trim( (string) $attrs['balloonText'] ) ? (string) $attrs['balloonText'] : $texts['balloon'];
 
 		if ( null === $shop ) {
-			$generic = isset( $attrs['buttonLabel'] ) && '' !== trim( (string) $attrs['buttonLabel'] ) ? (string) $attrs['buttonLabel'] : $texts['footer_generic_label'];
+			$generic = $texts['footer_generic_label'];
 			return array(
 				'mode'         => 'generic',
 				'label'        => $generic,
@@ -171,11 +176,10 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		} else {
 			$mode = 'web_only';
 		}
-		$override = isset( $attrs['buttonLabel'] ) ? (string) $attrs['buttonLabel'] : '';
 		return array(
 			'mode'         => $mode,
-			'label'        => 'web' === $mode ? $texts['web_label'] : self::button_label( $shop, $override ),
-			'label_parts'  => 'web' === $mode ? array( '', $texts['web_label'] ) : self::label_parts( $shop, $override ),
+			'label'        => 'web' === $mode ? $texts['web_label'] : self::button_label( $shop, $service ),
+			'label_parts'  => 'web' === $mode ? array( '', $texts['web_label'] ) : self::label_parts( $shop, $service ),
 			'tel_href'     => '' !== $phone_number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( $phone_number ) : '',
 			'balloon'      => 'tel' === $mode ? $balloon : '',
 			'fallback_url' => $fallback,
