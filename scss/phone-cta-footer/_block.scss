@@ -179,7 +179,7 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 		white-space: nowrap;
 	}
 
-	// 「おたからやに｜電話で査定額を聞く」の 2 片（SP で語の途中で折らせない）
+	// 「おたからやに｜電話で査定額を聞く」の 2 片。PC は Figma どおり 1 行、SP は「に」の後で改行（下の mq-max）
 	&__tel-shop,
 	&__tel-rest {
 		display: inline-block;
@@ -266,5 +266,6 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 		}
 
 		&__tel-label { white-space: normal; }
+		&__tel-shop { display: block; } // 「おたからやに」で改行して 2 行に
 	}
 }

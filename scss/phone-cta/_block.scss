@@ -238,11 +238,9 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		min-width: 0;
 	}
 
-	// 「おたからやに｜電話で査定額を聞く」の 2 片。inline-block にして語の途中で折らせない
-	&__button-shop,
-	&__button-rest {
-		display: inline-block;
-	}
+	// 「おたからやに｜電話で査定額を聞く」の 2 片。店名側を block にして常に「に」の後で改行する（Figma と同じ 2 行）
+	&__button-shop { display: block; }
+	&__button-rest { display: inline-block; }
 
 	&__icon {
 		display: flex;
