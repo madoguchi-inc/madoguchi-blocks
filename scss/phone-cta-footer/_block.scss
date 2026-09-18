@@ -20,6 +20,15 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 	background: linear-gradient(180deg, rgba(24, 25, 30, 0.6) 0%, rgba(24, 25, 30, 0.4) 100%);
 	color: #fff;
 
+	// エディタ専用の注記（render.php では出力しないクラス）
+	&__editor-hint {
+		margin: 0;
+		font-size: 1.1rem;
+		line-height: 1.4;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.75);
+	}
+
 	/* ---- キャッチ「＼ [完全無料査定] 複数社で比較して1番高く売ろう ／」 ---- */
 	&__catch {
 		display: flex;

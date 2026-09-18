@@ -9,6 +9,7 @@
 	"textdomain": "madoguchi-blocks",
 	"editorScript": "madoguchi-blocks-editor",
 	"style": "madoguchi-blocks-style",
+	"editorStyle": [ "madoguchi-blocks-style", "madoguchi-blocks-editor-style" ],
 	"render": "file:./render.php",
 	"supports": {
 		"html": false,

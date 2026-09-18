@@ -135,6 +135,19 @@ function madoguchi_blocks_register() {
 		$style_ver
 	);
 
+	// ブロックエディタ用スタイル（rem→px 変換済み）。
+	// エディタのキャンバスは root が 16px のため、rem 前提の style.css だけだと 1.6 倍になり崩れる。
+	// block.json の editorStyle から参照し、style.css の後に読み込ませて px 値で上書きする。
+	$editor_style_file = MADOGUCHI_BLOCKS_DIR . 'build/style-editor.css';
+	if ( file_exists( $editor_style_file ) ) {
+		wp_register_style(
+			'madoguchi-blocks-editor-style',
+			MADOGUCHI_BLOCKS_URL . 'build/style-editor.css',
+			array( 'madoguchi-blocks-style' ),
+			(string) filemtime( $editor_style_file )
+		);
+	}
+
 	// ブランドカラーをカスタムプロパティとして通常フロント/エディタへ供給する。
 	// （REST API 経由の場合は class-style-inliner.php 側でインライン注入する）
 	wp_add_inline_style(

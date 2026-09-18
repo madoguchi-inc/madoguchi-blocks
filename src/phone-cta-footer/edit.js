@@ -205,6 +205,12 @@ export default function Edit( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
+				<p className="phone-cta-footer__editor-hint">
+					{ __(
+						'表示側では画面の下に固定表示されます（1 記事に 1 つ。記事内のどこに置いても同じ）',
+						'madoguchi-blocks'
+					) }
+				</p>
 				<p className="phone-cta-footer__catch">
 					{ ( catchBadge || '' ).trim() !== '' && (
 						<span className="phone-cta-footer__catch-badge">

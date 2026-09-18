@@ -30,6 +30,9 @@ npm run lint:js       # ESLint (wp-scripts)
 
 - エントリ: `src/index.js`（各ブロックの edit/save）→ `build/index.js`
 - スタイル: `scss/style.scss`（明示 import のみ）→ dart-sass で `build/style.css`
+- エディタ用CSS: `tools/build-editor-css.js` が `build/style.css` から `build/style-editor.css` を生成
+  （rem→px 変換のみ。エディタのキャンバスは root=16px のため rem 前提の CSS だと 1.6 倍になり崩れる。
+  各ブロックの block.json の `editorStyle` から `madoguchi-blocks-editor-style` を参照する）
 - REST配信用CSS: `tools/build-rest-css.js` が `build/style.css` から `build/style-rest.css` を生成
   （rem→px 固定・全宣言 `!important` 化・スコープ付き `all: revert` リセットで配信先テーマCSSの影響を遮断。
   インライン style と衝突する CTAボタン系・カスタムプロパティは `!important` 化から除外）
