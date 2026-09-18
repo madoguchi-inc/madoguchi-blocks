@@ -22,6 +22,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'footer_catch'         => '複数社で比較して1番高く売ろう',
 			'footer_generic_label' => '電話で査定額を聞く',
 			'web_label'            => 'WEBでカンタン無料査定はこちら',
+			'web_label_parts'      => array( 'WEBでカンタン', '無料査定はこちら' ), // 「WEBでカンタン」で改行する
 			'web_button_sub'       => '24時間年中無休で受付中！',
 			'web_button'           => 'オンライン無料一括査定',
 			'web_button_sp'        => 'オンライン一括査定', // SP の黒ボタンは Figma 上この短い文言
@@ -37,6 +38,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'footer_catch'         => '複数社で比較して1番安く済ませよう',
 			'footer_generic_label' => '電話で見積もりを聞く',
 			'web_label'            => 'WEBでカンタン無料見積もりはこちら',
+			'web_label_parts'      => array( 'WEBでカンタン', '無料見積もりはこちら' ),
 			'web_button_sub'       => '24時間年中無休で受付中！',
 			'web_button'           => 'オンライン無料一括見積もり',
 			'web_button_sp'        => 'オンライン一括見積もり',

@@ -232,7 +232,7 @@
           <span class="phone-cta__free">査定無料</span>                        <!-- SP のみ表示（縦書きタブ） -->
           <span class="phone-cta__button-body">
             <span class="phone-cta__icon"><svg>…</svg></span>
-            <span class="phone-cta__button-label"><span class="phone-cta__button-shop">買取大吉に</span><span class="phone-cta__button-rest">電話で査定額を聞く</span></span>
+            <span class="phone-cta__button-label"><span class="phone-cta__button-head">買取大吉に</span><span class="phone-cta__button-tail">電話で査定額を聞く</span></span>
           </span>
           <span class="phone-cta__chevron"></span>                             <!-- SP のみ表示 -->
         </a>
@@ -257,14 +257,17 @@
 - 回収 `fuyouhin` / 清掃 `osouji` は画像が用意できるまで空（「なし」とカスタム画像のみ）
 - カスタム画像は 1 枚を PC・SP・モーダルで共用する
 - ボタン文言は店名以外**サービスごとに固定**（買取「{shop}に電話で査定額を聞く」／回収・清掃「{shop}に電話で見積もりを聞く」。`default_texts` の `shop_label`）。店舗マスタ・ブロック属性からの上書きは無い
-- ボタン文言は `View::label_parts()` で「店名＋助詞」「残り」に分け、各片を inline-block にして「おたからやに｜電話で査定額を聞く」で折り返す（語の途中で折らない）
+- ボタン文言は 2 片に分けて出す（前半 `phone-cta__button-head` を block にして常に同じ位置で改行）
+  - 電話: `View::label_parts()` で「店名＋助詞」と「残り」→「おたからやに／電話で査定額を聞く」
+  - WEB: `default_texts` の `web_label_parts`「WEBでカンタン」「無料査定はこちら」（回収・清掃は「無料見積もりはこちら」）
+- アイコンは `inc/phone-cta/render-helpers.php` と `src/phone-cta/icons.js` の 2 か所に同じ図形を持つ（塗りベース・`currentColor` 追従）。変更時は必ず両方を同期する
 
 - 出し分け（リクエスト時 JST、`Reception::is_open`）
 
 | 状態 | ボタン |
 |---|---|
 | 受付時間内 / 24 時間 | 電話ボタン `tel:` |
-| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン無料査定はこちら」（指アイコン。SP はアイコン無し）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
+| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン／無料査定はこちら」（Figma の指タップアイコン。SP はアイコン無し）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
 | 時間外・fallback なし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
 
 - カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」

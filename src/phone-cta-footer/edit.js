@@ -22,17 +22,8 @@ import {
 } from '@wordpress/components';
 import { useServices, useShopDetail } from '../phone-cta/use-shops';
 import ShopPicker from '../phone-cta/shop-picker';
-import CardIcon from '../condition-card/icons';
+import PhoneCtaIcon from '../phone-cta/icons';
 import { textsFor, splitLabel } from '../phone-cta/texts';
-
-// render-helpers.php の madoguchi_blocks_phone_cta_icon() と同じ構造（白丸の中にアイコン）
-function Icon( { iconKey } ) {
-	return (
-		<span className="phone-cta__icon" aria-hidden="true">
-			<CardIcon iconKey={ iconKey } className="" size={ 18 } />
-		</span>
-	);
-}
 
 export default function Edit( { attributes, setAttributes } ) {
 	const {
@@ -222,13 +213,16 @@ export default function Edit( { attributes, setAttributes } ) {
 						className="phone-cta-footer__catch-text"
 						value={ catchText }
 						onChange={ ( v ) => setAttributes( { catchText: v } ) }
-						placeholder={ __( 'キャッチコピー', 'madoguchi-blocks' ) }
+						placeholder={ __(
+							'キャッチコピー',
+							'madoguchi-blocks'
+						) }
 					/>
 				</p>
 				<div className="phone-cta-footer__buttons">
 					{ showWebButton && (
 						<span className="phone-cta-footer__web">
-							<Icon iconKey="touch" />
+							<PhoneCtaIcon iconKey="touch" />
 							<span className="phone-cta-footer__web-main phone-cta-footer__web-main--pc">
 								{ texts.webButton }
 							</span>
@@ -245,7 +239,7 @@ export default function Edit( { attributes, setAttributes } ) {
 							{ item.balloonText || texts.balloon }
 						</span>
 						<span className="phone-cta-footer__tel-main">
-							<Icon iconKey="phone" />
+							<PhoneCtaIcon iconKey="phone" />
 							<span className="phone-cta-footer__tel-label">
 								{ labelShop && (
 									<span className="phone-cta-footer__tel-shop">

@@ -23,7 +23,7 @@ import {
 } from '@wordpress/components';
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
-import CardIcon from '../condition-card/icons';
+import PhoneCtaIcon from './icons';
 import { textsFor, splitLabel } from './texts';
 
 const MAX_SHOPS = 3;
@@ -47,15 +47,6 @@ function bannerPatternOf( service, preset ) {
 	return bannerPatternsFor( service ).find( ( p ) => p.value === preset );
 }
 const MAX_POINTS = 3;
-
-// render-helpers.php の madoguchi_blocks_phone_cta_icon() と同じ構造（白丸の中にアイコン）
-function Icon( { iconKey } ) {
-	return (
-		<span className="phone-cta__icon" aria-hidden="true">
-			<CardIcon iconKey={ iconKey } className="" size={ 18 } />
-		</span>
-	);
-}
 
 function CardPreview( { service, item } ) {
 	const texts = textsFor( service );
@@ -127,14 +118,14 @@ function CardPreview( { service, item } ) {
 					</span>
 					<span className="phone-cta__free">{ texts.freeTag }</span>
 					<span className="phone-cta__button-body">
-						<Icon iconKey="phone" />
+						<PhoneCtaIcon iconKey="phone" />
 						<span className="phone-cta__button-label">
 							{ labelShop && (
-								<span className="phone-cta__button-shop">
+								<span className="phone-cta__button-head">
 									{ labelShop }
 								</span>
 							) }
-							<span className="phone-cta__button-rest">
+							<span className="phone-cta__button-tail">
 								{ labelRest }
 							</span>
 						</span>

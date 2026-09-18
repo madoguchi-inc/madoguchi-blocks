@@ -155,7 +155,8 @@ $modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal
 							<span class="phone-cta__free"><?php echo esc_html( $texts['free_tag'] ); ?></span>
 							<span class="phone-cta__button-body">
 								<?php echo madoguchi_blocks_phone_cta_icon( 'touch' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								<span class="phone-cta__button-label"><?php echo esc_html( $texts['web_label'] ); ?></span>
+								<?php // 2 片の間に空白文字が入らないよう 1 行で出す ?>
+								<span class="phone-cta__button-label"><span class="phone-cta__button-head"><?php echo esc_html( $texts['web_label_parts'][0] ); ?></span><span class="phone-cta__button-tail"><?php echo esc_html( $texts['web_label_parts'][1] ); ?></span></span>
 							</span>
 							<span class="phone-cta__chevron" aria-hidden="true"></span>
 						</a>
@@ -167,8 +168,8 @@ $modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal
 							. '<span class="phone-cta__button-body">'
 							. madoguchi_blocks_phone_cta_icon( 'phone' )
 							. '<span class="phone-cta__button-label">'
-							. ( '' !== $c['label_parts'][0] ? '<span class="phone-cta__button-shop">' . esc_html( $c['label_parts'][0] ) . '</span>' : '' )
-							. '<span class="phone-cta__button-rest">' . esc_html( $c['label_parts'][1] ) . '</span>'
+							. ( '' !== $c['label_parts'][0] ? '<span class="phone-cta__button-head">' . esc_html( $c['label_parts'][0] ) . '</span>' : '' )
+							. '<span class="phone-cta__button-tail">' . esc_html( $c['label_parts'][1] ) . '</span>'
 							. '</span></span>'
 							. '<span class="phone-cta__chevron" aria-hidden="true"></span>';
 						$button_class = 'phone-cta__button' . ( 'tel' === $c['mode'] ? ' phone-cta__button--balloon' : '' );

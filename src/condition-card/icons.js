@@ -19,7 +19,7 @@ export const ICON_OPTIONS = [
 	{ label: '検索（虫めがね）', value: 'search' },
 	{ label: 'チェックリスト', value: 'checklist' },
 	{ label: 'インフォメーション', value: 'info' },
-	{ label: '電話', value: 'phone' }
+	{ label: '電話', value: 'phone' },
 ];
 
 // キー → SVG の path/shape 要素
@@ -98,15 +98,6 @@ const PATHS = {
 			<path d="M10.3708 9.69851L10.0671 10.0181C10.0671 10.0181 9.34539 10.778 7.37539 8.70392C5.40541 6.6299 6.12713 5.87006 6.12713 5.87006L6.31833 5.66875C6.78939 5.17283 6.83379 4.37665 6.42279 3.7954L5.58217 2.60641C5.07352 1.887 4.09064 1.79197 3.50763 2.40576L2.46123 3.50743C2.17215 3.81178 1.97843 4.2063 2.00193 4.64397C2.06203 5.76365 2.54047 8.17274 5.21024 10.9835C8.04139 13.9642 10.6979 14.0826 11.7842 13.9754C12.1278 13.9415 12.4266 13.7562 12.6674 13.5027L13.6145 12.5057C14.2537 11.8326 14.0735 10.6788 13.2555 10.208L11.9819 9.47489C11.4448 9.16578 10.7905 9.25656 10.3708 9.69851Z" />
 		</g>
 	),
-	// 指でタップ（WEB 査定ボタン用）。電話CTAブロックのみで使用し、ユーザー選択肢（ICON_OPTIONS）には出さない。
-	// inc/phone-cta/render-helpers.php の madoguchi_blocks_phone_cta_icon('touch') と同じ図形を維持する。
-	touch: (
-		<>
-			<path d="M9 11V5a2 2 0 1 1 4 0v6" />
-			<path d="M13 10a2 2 0 1 1 4 0v1" />
-			<path d="M17 11a2 2 0 1 1 4 0v4a7 7 0 0 1-7 7h-1.5a7 7 0 0 1-5.7-2.9L3.6 15.2a1.8 1.8 0 0 1 2.9-2.1L9 15.5" />
-		</>
-	)
 };
 
 /**
@@ -118,7 +109,11 @@ const PATHS = {
  * @param {number} [props.size]      表示サイズ px（既定は条件カード用の28）。
  * @return {JSX.Element} SVG 要素。
  */
-export default function CardIcon( { iconKey, className = 'condition-card__icon-svg', size = 28 }) {
+export default function CardIcon( {
+	iconKey,
+	className = 'condition-card__icon-svg',
+	size = 28,
+} ) {
 	const shape = PATHS[ iconKey ] || PATHS.box;
 
 	return (
