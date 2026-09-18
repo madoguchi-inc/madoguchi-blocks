@@ -159,13 +159,17 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		width: 100%;
 	}
 
+	// Figma のロゴ枠（137x75）。どんな縦横比・大きさのロゴでも枠に触れないよう内側に余白を取り、
+	// はみ出す場合は contain で収める（box-sizing は REST 配信時のリセット対策で明示する）
 	&__logo-box {
+		box-sizing: border-box;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: 13.7rem;
 		height: 7.5rem;
 		margin: 0 auto;
+		padding: 0.6rem 0.8rem;
 	}
 
 	&__logo {
@@ -438,12 +442,14 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	}
 
 	&__modal-logo {
+		box-sizing: border-box;
 		display: flex;
 		flex: 0 0 auto;
 		align-items: center;
 		justify-content: center;
 		width: 8rem;
 		height: 8rem;
+		padding: 0.6rem;
 
 		img {
 			display: block;
@@ -735,9 +741,10 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 			height: auto;
 			min-height: 7.5rem;
 			margin: 0;
+			padding: 0.6rem 0.8rem;
 		}
 
-		&__logo { max-height: 7.5rem; }
+		&__logo { max-height: 6.3rem; } // 枠 7.5rem から上下の余白 0.6rem×2 を引いた高さ
 		&__name { font-size: 1.6rem; }
 
 		&__lead {

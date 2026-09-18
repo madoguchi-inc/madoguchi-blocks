@@ -223,7 +223,7 @@
     <li class="phone-cta__card is-open" data-shop-uuid="…" data-shop-name="買取大吉"
         data-tel="+81120000000" data-open="1" data-fallback-url="…" data-reception-text="…">
       <div class="phone-cta__intro">                <!-- PC: 縦積み / SP: ロゴ左・紹介文右 -->
-        <div class="phone-cta__logo-box"><img class="phone-cta__logo" src="…" alt="買取大吉" loading="lazy"></div>
+        <div class="phone-cta__logo-box"><img class="phone-cta__logo" src="…" alt="買取大吉" loading="lazy"></div>  <!-- 枠 137x75。内側に余白を取り contain で収める -->
         <div class="phone-cta__lead"><p class="phone-cta__lead-text">…</p></div>
       </div>
       <div class="phone-cta__action">
@@ -284,6 +284,8 @@
 - QR は API の `numbers[].qr_svg` をそのまま差し込む。`madoguchi_blocks_phone_cta_qr_svg()` で svg/g/path/rect の許可リストを通し、スクリプトを含む場合は出さない
 - ブロックにバナーを設定している場合はモーダル下部にもバナーを出す（同じパターンの**モーダル用画像**。Figma のキャンペーンバナー_横長）
 - `showPcModal` を false にすると PC でも `tel:` リンクのままになる
+
+- ロゴ枠は `box-sizing: border-box` ＋内側余白（PC・SP 6/8px、モーダル 6px）で、どんな縦横比・大きさのロゴでも枠に触れないようにする。はみ出す場合は `object-fit: contain` で収める
 
 **CSS** `scss/phone-cta/_block.scss`
 - グリッドで各カード等高。SP（既存ミックスイン `mq-max`＝896px 以下）は 1 列、それ以上は `--cols-n` で n 列
