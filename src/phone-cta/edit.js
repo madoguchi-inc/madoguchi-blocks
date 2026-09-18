@@ -30,13 +30,21 @@ const MAX_SHOPS = 3;
 const CUSTOM_BANNER = 'custom';
 
 // 同梱バナーのパターン一覧（madoguchi-blocks.php が localize。未供給なら「なし」だけ）
-const BANNER_PATTERNS = ( typeof window !== 'undefined' &&
-	window.madoguchiBlocksData?.phoneCtaBanners ) || [
+// 同梱バナーのパターン一覧（madoguchi-blocks.php が localize。サービスごとに別セット）
+const BANNER_PATTERNS_BY_SERVICE =
+	( typeof window !== 'undefined' &&
+		window.madoguchiBlocksData?.phoneCtaBanners ) ||
+	{};
+const BANNER_FALLBACK = [
 	{ value: '', label: 'バナーなし', url: '', alt: '' },
 ];
 
-function bannerPatternOf( preset ) {
-	return BANNER_PATTERNS.find( ( p ) => p.value === preset );
+function bannerPatternsFor( service ) {
+	return BANNER_PATTERNS_BY_SERVICE[ service ] || BANNER_FALLBACK;
+}
+
+function bannerPatternOf( service, preset ) {
+	return bannerPatternsFor( service ).find( ( p ) => p.value === preset );
 }
 const MAX_POINTS = 3;
 
@@ -207,6 +215,14 @@ export default function Edit( { attributes, setAttributes } ) {
 		const prevTexts = textsFor( service );
 		const nextTexts = textsFor( next );
 		const patch = { service: next, shops: [] };
+		// 切替後のサービスに無いバナーパターンは「なし」に戻す（カスタム画像はそのまま使える）
+		if (
+			bannerPreset &&
+			bannerPreset !== CUSTOM_BANNER &&
+			! bannerPatternOf( next, bannerPreset )
+		) {
+			patch.bannerPreset = '';
+		}
 		if ( heading === prevTexts.heading ) {
 			patch.heading = nextTexts.heading;
 		}
@@ -217,7 +233,8 @@ export default function Edit( { attributes, setAttributes } ) {
 	};
 
 	// プレビューに出すバナー（カスタムは選択済み画像、パターンは同梱画像）
-	const bannerPattern = bannerPatternOf( bannerPreset );
+	const bannerPatterns = bannerPatternsFor( service );
+	const bannerPattern = bannerPatternOf( service, bannerPreset );
 	const previewBanner =
 		bannerPreset === CUSTOM_BANNER
 			? bannerImageUrl
@@ -296,10 +313,14 @@ export default function Edit( { attributes, setAttributes } ) {
 					<SelectControl
 						label={ __( 'バナーのパターン', 'madoguchi-blocks' ) }
 						value={ bannerPreset }
-						options={ BANNER_PATTERNS.map( ( p ) => ( {
+						options={ bannerPatterns.map( ( p ) => ( {
 							label: p.label,
 							value: p.value,
 						} ) ) }
+						help={ __(
+							'画像はサービスごとに用意します（PC・SP・PCモーダルの 3 枚を自動で出し分け）。',
+							'madoguchi-blocks'
+						) }
 						onChange={ ( v ) =>
 							setAttributes( { bannerPreset: v } )
 						}

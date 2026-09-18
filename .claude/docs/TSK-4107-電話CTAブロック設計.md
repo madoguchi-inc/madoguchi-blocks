@@ -188,7 +188,7 @@
 | description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText。見出しの**上**に出る小見出し（ゴールド・13px） |
 | points | string[] / 「強引な営業なし」「個人情報必要なし」「相談だけでもOK」 | POINT1〜3 のバッジ文言。空文字は出さない |
 | showPcModal | bool / true | PC で押下時に電話番号と QR のモーダルを出す（SP は tel: で発信） |
-| bannerPreset | string / `''` | ブロック先頭のバナー。`''`（なし）／同梱パターンのキー（例 `amazon-gift-12000`）／`custom`（メディアから選ぶ） |
+| bannerPreset | string / `''` | バナーのパターン。`''`（なし）／**選択中サービスの**同梱パターンのキー（例 `amazon-gift-12000`）／`custom`（メディアから選ぶ）。サービスを切り替えると、そのサービスに無いパターンは「なし」に戻る |
 | bannerImageUrl | string / `''` | `custom` のときの画像 URL |
 | bannerImageAlt | string / `''` | 代替テキスト。空ならパターン既定 |
 | bannerLinkUrl | string / `''` | バナーのリンク先。空ならリンクなし |
@@ -245,7 +245,17 @@
 ```
 
 - 見た目は Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC 14065-29201 / コラム_SP 14065-30761 / 電話査定受付時間外 14065-33169）に合わせる。ゴールド `#c4ab46`、黒 `#18191e`、オレンジグラデ `#eb4614→#f78b08`、カード罫線 `#ddd`、紹介文背景 `#f7f7f7`、SP「査定無料」タブ `#f39072`
-- 先頭のバナーは `inc/phone-cta/class-banners.php` の `PATTERNS`（同梱画像＋既定 alt＋サイズ）から選ぶ。`@2x` が同梱されていれば srcset を付ける。パターンを増やすときは画像を `assets/img/phone-cta/` に置いて `PATTERNS` に 1 件足す（エディタの選択肢は `madoguchiBlocksData.phoneCtaBanners` 経由で自動反映）
+- バナーは `inc/phone-cta/class-banners.php` の `PATTERNS` から選ぶ。**サービス（事業）ごとに別セット**で、1 パターンが PC・SP・PC モーダルの 3 枚を持つ
+
+| 用途 | 例（買取） | サイズ | 出し方 |
+|---|---|---|---|
+| ブロック先頭 PC | `banner-amazon-gift-12000.png` | 760×101 | `<picture>` の `<img>` |
+| ブロック先頭 SP | `banner-amazon-gift-12000-sp.png` | 381×143 | `<source media="(max-width: 896px)">`（`SP_MAX_WIDTH` は scss の `mq-max(md)` と合わせる） |
+| PC モーダル下部 | `banner-amazon-gift-12000-modal.png` | 650×106 | モーダル内の `<img>` |
+
+- 画像は `assets/img/phone-cta/<service>/` に置き、`@2x` があれば srcset を付ける。パターンを増やすときは画像を置いて `PATTERNS` にそのサービスの 1 件を足す（エディタの選択肢は `madoguchiBlocksData.phoneCtaBanners`（サービス別）経由で自動反映）
+- 回収 `fuyouhin` / 清掃 `osouji` は画像が用意できるまで空（「なし」とカスタム画像のみ）
+- カスタム画像は 1 枚を PC・SP・モーダルで共用する
 - ボタン文言は店名以外**サービスごとに固定**（買取「{shop}に電話で査定額を聞く」／回収・清掃「{shop}に電話で見積もりを聞く」。`default_texts` の `shop_label`）。店舗マスタ・ブロック属性からの上書きは無い
 - ボタン文言は `View::label_parts()` で「店名＋助詞」「残り」に分け、各片を inline-block にして「おたからやに｜電話で査定額を聞く」で折り返す（語の途中で折らない）
 
@@ -269,7 +279,7 @@
 - **SPA には view.js が届かないため JS を使わない。** 隠しチェックボックス（`.phone-cta__modal-toggle`）＋ `<label>` で開閉し、`:checked ~ .phone-cta__modal` で表示する。閉じるのは右上の × と背景（どちらも同じ `for` の label）
 - ボタンは同じ中身を 2 つ出し、CSS で出し分ける: PC は `<label class="…--modal">`、SP は `<a class="…--tel" href="tel:…">`
 - QR は API の `numbers[].qr_svg` をそのまま差し込む。`madoguchi_blocks_phone_cta_qr_svg()` で svg/g/path/rect の許可リストを通し、スクリプトを含む場合は出さない
-- ブロックにバナーを設定している場合はモーダル下部にも同じバナーを出す（Figma と同じ）
+- ブロックにバナーを設定している場合はモーダル下部にもバナーを出す（同じパターンの**モーダル用画像**。Figma のキャンペーンバナー_横長）
 - `showPcModal` を false にすると PC でも `tel:` リンクのままになる
 
 **CSS** `scss/phone-cta/_block.scss`

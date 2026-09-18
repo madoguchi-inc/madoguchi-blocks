@@ -62,14 +62,28 @@ $wrapper = get_block_wrapper_attributes( $extra );
 $has_heading     = '' !== trim( wp_strip_all_tags( $heading ) );
 $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 
-// ブロック先頭のバナー（同梱パターン／カスタム画像。既定はなし）
-$banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes );
+// バナー（同梱パターン／カスタム画像。既定はなし）。PC・SP・PC モーダルで画像を出し分ける
+$banner       = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'pc' );
+$banner_sp    = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'sp' );
+$modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal' );
 ?>
 <section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( null !== $banner ) : ?>
 		<?php
+		// SP 用画像があれば <picture> で幅に応じて差し替える（SPA でも JS なしで効く）
+		$banner_sp_source = '';
+		if ( null !== $banner_sp && $banner_sp['src'] !== $banner['src'] ) {
+			$banner_sp_source = sprintf(
+				'<source media="(max-width: %1$dpx)" srcset="%2$s"%3$s%4$s>',
+				(int) Madoguchi_Blocks_Phone_Cta_Banners::SP_MAX_WIDTH,
+				esc_attr( '' !== $banner_sp['srcset'] ? $banner_sp['srcset'] : $banner_sp['src'] ),
+				$banner_sp['width'] > 0 ? ' width="' . (int) $banner_sp['width'] . '"' : '',
+				$banner_sp['height'] > 0 ? ' height="' . (int) $banner_sp['height'] . '"' : ''
+			);
+		}
 		$banner_img = sprintf(
-			'<img class="phone-cta__banner-image" src="%1$s"%2$s alt="%3$s"%4$s%5$s loading="lazy" decoding="async">',
+			'<picture class="phone-cta__banner-picture">%1$s<img class="phone-cta__banner-image" src="%2$s"%3$s alt="%4$s"%5$s%6$s loading="lazy" decoding="async"></picture>',
+			$banner_sp_source,
 			esc_url( $banner['src'] ),
 			'' !== $banner['srcset'] ? ' srcset="' . esc_attr( $banner['srcset'] ) . '"' : '',
 			esc_attr( $banner['alt'] ),
@@ -208,8 +222,24 @@ $banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes );
 											</div>
 										<?php endif; ?>
 									</div>
-									<?php if ( null !== $banner ) : ?>
-										<div class="phone-cta__modal-banner"><?php echo $banner_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+									<?php if ( null !== $modal_banner ) : ?>
+										<?php
+										$modal_banner_img = sprintf(
+											'<img src="%1$s"%2$s alt="%3$s"%4$s%5$s loading="lazy" decoding="async">',
+											esc_url( $modal_banner['src'] ),
+											'' !== $modal_banner['srcset'] ? ' srcset="' . esc_attr( $modal_banner['srcset'] ) . '"' : '',
+											esc_attr( $modal_banner['alt'] ),
+											$modal_banner['width'] > 0 ? ' width="' . (int) $modal_banner['width'] . '"' : '',
+											$modal_banner['height'] > 0 ? ' height="' . (int) $modal_banner['height'] . '"' : ''
+										);
+										?>
+										<div class="phone-cta__modal-banner">
+											<?php if ( '' !== $modal_banner['link'] ) : ?>
+												<a href="<?php echo esc_url( $modal_banner['link'] ); ?>"><?php echo $modal_banner_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+											<?php else : ?>
+												<?php echo $modal_banner_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+											<?php endif; ?>
+										</div>
 									<?php endif; ?>
 								</div>
 							</div>
