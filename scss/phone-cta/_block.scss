@@ -370,6 +370,40 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		&-terms { margin: 0.4rem 0 0; font-size: 1rem; line-height: 1.4; color: $font_color_light; }
 	}
 
+	/* ================= PC（897px〜）: 横並びカードの行高さを揃える ================= */
+	// カードを「ロゴ／紹介文／ボタン部」の 3 行の subgrid にして、行の高さを横のカード同士で共有する。
+	// これで紹介文ボックス（詳細コメント）の高さが揃い、ボタンの位置も一直線になる。
+	// subgrid 非対応ブラウザは @supports で除外され、従来どおりカード内で上下中央寄せになる。
+	@include mq-min(md) {
+		@supports (grid-template-rows: subgrid) {
+			&__card {
+				display: grid;
+				grid-template-rows: subgrid;
+				grid-row: span 3;
+				row-gap: 0;
+				align-items: start;
+			}
+
+			// ラッパーを消して、ロゴ枠と紹介文をカードの行に直接並べる
+			&__intro { display: contents; }
+
+			&__logo-box {
+				grid-row: 1;
+				align-self: end;
+			}
+
+			&__lead {
+				grid-row: 2;
+				align-self: stretch;
+			}
+
+			&__action {
+				grid-row: 3;
+				margin-top: 2.4rem;
+			}
+		}
+	}
+
 	/* ================= SP（〜896px） ================= */
 	@include mq-max(md) {
 		&__header {
