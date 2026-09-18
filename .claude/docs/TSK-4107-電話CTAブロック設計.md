@@ -267,7 +267,7 @@
 | 状態 | ボタン |
 |---|---|
 | 受付時間内 / 24 時間 | 電話ボタン `tel:` |
-| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン／無料査定はこちら」（Figma の指タップアイコン。SP はアイコン無し）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
+| 時間外・fallback あり | `phone-cta__button--web`「WEBでカンタン／無料査定はこちら」（Figma の指タップアイコン。PC・SP とも表示）→ fallback URL。吹き出し・番号・通話料バッジは出さない |
 | 時間外・fallback なし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
 
 - カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」
