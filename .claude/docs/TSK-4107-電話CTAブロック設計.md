@@ -61,7 +61,6 @@
 | is_public | boolean, default false | 電話CTAとして掲載可 |
 | is_always_open | boolean, default false | 24 時間対応。true なら hours を無視 |
 | reception_text | string | 受付時間の表示文。空なら hours から自動生成 |
-| specialty_text | string | 得意な買取品目の 1 行文 |
 | lead_text | string | カードの紹介文 |
 | web_fallback_url | string | 時間外の遷移先。空なら時間外でも電話ボタン＋注記 |
 | has_campaign | boolean, default false | |
@@ -128,7 +127,7 @@
   "uuid": "company_shop uuid",
   "name": "買取大吉",
   "logo_url": "https://.../logo.png",
-  "specialty_text": "…", "lead_text": "…",
+  "lead_text": "…",
   "web_fallback_url": "https://…",
   "is_always_open": false,
   "reception_text": "月〜金 10:00〜20:00 / 土日 10:00〜18:00",
@@ -215,7 +214,7 @@
         data-tel="+81120000000" data-open="1" data-fallback-url="…" data-reception-text="…">
       <div class="phone-cta__intro">                <!-- PC: 縦積み / SP: ロゴ左・紹介文右 -->
         <div class="phone-cta__logo-box"><img class="phone-cta__logo" src="…" alt="買取大吉" loading="lazy"></div>
-        <div class="phone-cta__lead"><p class="phone-cta__lead-text">…</p><p class="phone-cta__specialty">…</p></div>
+        <div class="phone-cta__lead"><p class="phone-cta__lead-text">…</p></div>
       </div>
       <div class="phone-cta__action">
         <a class="phone-cta__button phone-cta__button--balloon" href="tel:+81120000000">

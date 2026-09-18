@@ -103,14 +103,9 @@ $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 							<p class="phone-cta__name"><?php echo esc_html( $c['name'] ); ?></p>
 						<?php endif; ?>
 					</div>
-					<?php if ( '' !== trim( wp_strip_all_tags( $c['lead'] ) ) || '' !== $c['specialty'] ) : ?>
+					<?php if ( '' !== trim( wp_strip_all_tags( $c['lead'] ) ) ) : ?>
 						<div class="phone-cta__lead">
-							<?php if ( '' !== trim( wp_strip_all_tags( $c['lead'] ) ) ) : ?>
-								<p class="phone-cta__lead-text"><?php echo madoguchi_blocks_phone_cta_kses( $c['lead'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-							<?php endif; ?>
-							<?php if ( '' !== $c['specialty'] ) : ?>
-								<p class="phone-cta__specialty"><?php echo esc_html( $c['specialty'] ); ?></p>
-							<?php endif; ?>
+							<p class="phone-cta__lead-text"><?php echo madoguchi_blocks_phone_cta_kses( $c['lead'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 						</div>
 					<?php endif; ?>
 				</div>

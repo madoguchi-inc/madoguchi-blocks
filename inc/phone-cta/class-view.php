@@ -128,7 +128,6 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'name'           => isset( $shop['name'] ) ? (string) $shop['name'] : '',
 			'logo_url'       => isset( $shop['logo_url'] ) ? (string) $shop['logo_url'] : '',
 			'lead'           => $lead,
-			'specialty'      => isset( $shop['specialty_text'] ) ? (string) $shop['specialty_text'] : '',
 			'label'          => self::button_label( $shop, $service ),
 			'label_parts'    => self::label_parts( $shop, $service ),
 			'tel_href'       => '' !== $phone_number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( $phone_number ) : '',

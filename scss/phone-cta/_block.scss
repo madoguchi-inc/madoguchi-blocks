@@ -181,13 +181,6 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		color: $pc-black;
 	}
 
-	&__specialty {
-		margin: 0.4rem 0 0;
-		font-size: 1.1rem;
-		line-height: 1.5;
-		color: $font_color_light;
-	}
-
 	/* ---- ボタンと補足 ---- */
 	&__action {
 		display: flex;

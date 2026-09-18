@@ -12,7 +12,6 @@ class ViewTest extends TestCase {
 			'uuid'             => 'u-1',
 			'name'             => '買取大吉',
 			'logo_url'         => 'https://cdn/logo.png',
-			'specialty_text'   => '時計・バッグ',
 			'lead_text'        => '全国1,300店舗',
 			'web_fallback_url' => 'https://lp.example/',
 			'is_always_open'   => false,

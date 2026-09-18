@@ -93,16 +93,9 @@ function CardPreview( { service, item } ) {
 						<p className="phone-cta__name">{ shop.name }</p>
 					) }
 				</div>
-				{ ( lead || shop.specialty_text ) && (
+				{ lead && (
 					<div className="phone-cta__lead">
-						{ lead && (
-							<p className="phone-cta__lead-text">{ lead }</p>
-						) }
-						{ shop.specialty_text && (
-							<p className="phone-cta__specialty">
-								{ shop.specialty_text }
-							</p>
-						) }
+						<p className="phone-cta__lead-text">{ lead }</p>
 					</div>
 				) }
 			</div>
