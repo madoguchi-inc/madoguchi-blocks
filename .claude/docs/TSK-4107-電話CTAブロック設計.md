@@ -227,7 +227,7 @@
           </span>
           <span class="phone-cta__chevron"></span>                             <!-- SP のみ表示 -->
         </a>
-        <p class="phone-cta__hours"><span class="phone-cta__hours-text">受付時間：10:00〜20:00</span><span class="phone-cta__hours-tel">TEL：0120-000-000</span></p>  <!-- TEL は PC のみ -->
+        <p class="phone-cta__hours"><span class="phone-cta__hours-text">受付時間：10:00〜20:00</span></p>
       </div>
     </li>
   </ul>
@@ -248,7 +248,6 @@
 | 時間外・fallback なし | 電話ボタンのまま（グレー）＋`phone-cta__notice`「現在は受付時間外です」 |
 
 - カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」
-- PC は `tel:` が動かないので、受付時間の行に `phone-cta__hours-tel`「TEL：0120-000-000」を添える（SP は CSS で非表示）
 - `showCampaign=true` かつ `campaign` non-null の店舗があれば、カード一覧の下に `phone-cta__campaigns`（店名バッジ・画像・名称・内容・注意事項）。カード内には出さない
 - カードは行内で等高、中身は上下中央寄せ（Figma の justify-center）
 - マスタに無い／非公開の店舗はスキップ。0 件なら `''` を返す。`id="phone-cta"` は記事内最初のブロックのみ付与（固定フッターの汎用リンク先）。「最初」の判定は投稿 ID 単位（REST の一覧レスポンスでは複数投稿が同一リクエストで描画されるため）。固定フッターの「1 記事 1 つ」も同様

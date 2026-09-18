@@ -125,18 +125,13 @@ function CardPreview( { service, item } ) {
 					</span>
 					<span className="phone-cta__chevron" aria-hidden="true" />
 				</span>
-				<p className="phone-cta__hours">
-					{ shop.reception_text && (
+				{ shop.reception_text && (
+					<p className="phone-cta__hours">
 						<span className="phone-cta__hours-text">
 							{ `受付時間：${ shop.reception_text }` }
 						</span>
-					) }
-					{ number && (
-						<span className="phone-cta__hours-tel">
-							{ `TEL：${ number.phone_number }` }
-						</span>
-					) }
-				</p>
+					</p>
+				) }
 			</div>
 		</li>
 	);

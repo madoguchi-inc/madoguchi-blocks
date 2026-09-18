@@ -144,18 +144,10 @@ $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 						<p class="phone-cta__notice"><?php esc_html_e( '現在は受付時間外です', 'madoguchi-blocks' ); ?></p>
 					<?php endif; ?>
 
-					<?php
-					// Figma どおり受付時間の 1 行だけ。PC は tel: が動かないので番号を同じ行に小さく添える（SP は CSS で非表示）。
-					$show_tel_text = 'web' !== $c['mode'] && '' !== $c['tel_display'];
-					?>
-					<?php if ( '' !== $c['reception_text'] || $show_tel_text ) : ?>
+					<?php // Figma どおり受付時間の 1 行だけ（電話番号はボタンの tel: リンクに持たせる） ?>
+					<?php if ( '' !== $c['reception_text'] ) : ?>
 						<p class="phone-cta__hours">
-							<?php if ( '' !== $c['reception_text'] ) : ?>
-								<span class="phone-cta__hours-text"><?php echo esc_html( sprintf( __( '受付時間：%s', 'madoguchi-blocks' ), $c['reception_text'] ) ); ?></span>
-							<?php endif; ?>
-							<?php if ( $show_tel_text ) : ?>
-								<span class="phone-cta__hours-tel"><?php echo esc_html( sprintf( __( 'TEL：%s', 'madoguchi-blocks' ), $c['tel_display'] ) ); ?></span>
-							<?php endif; ?>
+							<span class="phone-cta__hours-text"><?php echo esc_html( sprintf( __( '受付時間：%s', 'madoguchi-blocks' ), $c['reception_text'] ) ); ?></span>
 						</p>
 					<?php endif; ?>
 					<?php if ( 'web' !== $c['mode'] && ! $c['is_toll_free'] ) : ?>
