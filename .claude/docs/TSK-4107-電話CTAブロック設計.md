@@ -41,7 +41,6 @@
 
 ### やらないこと
 
-- 電話CTA押下時モーダル（PC はカード内に番号を直接表示、SP は tel: リンク）
 - 通話の計測・課金（番号は店舗側支給、計測は先方）
 - 祝日・臨時休業・1 日 2 レンジの受付時間
 - 買取店一覧・店舗詳細ページ（Rails 側画面）の電話 CTA
@@ -133,12 +132,14 @@
   "reception_text": "月〜金 10:00〜20:00 / 土日 10:00〜18:00",
   "hours": [{ "wday": 1, "start": "10:00", "end": "20:00" }],
   "numbers": [
-    { "id": 12, "label": "標準", "phone_number": "0120-000-000", "is_toll_free": true, "is_default": true }
+    { "id": 12, "label": "標準", "phone_number": "0120-000-000", "is_toll_free": true, "is_default": true,
+      "tel_href": "tel:+81120000000", "qr_svg": "<svg …>" }
   ],
   "campaign": { "name": "…", "body": "…", "image_url": "…", "starts_on": "2026-09-01", "ends_on": "2026-09-30", "terms": "…" }
 }
 ```
 
+- `numbers[].tel_href` は数字以外を除き先頭 0 を `+81` に（国番号付き入力は `+` を保持）。`qr_svg` は `tel_href` を rqrcode で SVG 化したもの（PC モーダルの QR。生成失敗時は `null`）
 - `campaign` は has_campaign=false または期間外なら `null`
 - `is_always_open` が true のとき `hours` は `[]`。`hours` の `end <= start` は日跨ぎ（`start == end` は禁止していないので WP 側は日跨ぎ扱いになる）
 - 3 事業とも estima エンジン側の 1 実装を各ホストがそのまま提供する
@@ -186,6 +187,7 @@
 | heading | string / 「今すぐ電話でかんたん無料査定」 | RichText。見出し（黒・24px） |
 | description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText。見出しの**上**に出る小見出し（ゴールド・13px） |
 | points | string[] / 「強引な営業なし」「個人情報必要なし」「相談だけでもOK」 | POINT1〜3 のバッジ文言。空文字は出さない |
+| showPcModal | bool / true | PC で押下時に電話番号と QR のモーダルを出す（SP は tel: で発信） |
 | bannerPreset | string / `''` | ブロック先頭のバナー。`''`（なし）／同梱パターンのキー（例 `amazon-gift-12000`）／`custom`（メディアから選ぶ） |
 | bannerImageUrl | string / `''` | `custom` のときの画像 URL |
 | bannerImageAlt | string / `''` | 代替テキスト。空ならパターン既定 |
@@ -260,6 +262,15 @@
 - カードは行内で等高、中身は上下中央寄せ（Figma の justify-center）
 - マスタに無い／非公開の店舗はスキップ。0 件なら `''` を返す。`id="phone-cta"` は記事内最初のブロックのみ付与（固定フッターの汎用リンク先）。「最初」の判定は投稿 ID 単位（REST の一覧レスポンスでは複数投稿が同一リクエストで描画されるため）。固定フッターの「1 記事 1 つ」も同様
 - 列数クラスは出力件数から `--cols-1/2/3`
+
+**PC の押下時モーダル**（Figma: 電話CTA押下時モーダル `14065-33436`）
+
+- PC は `tel:` を押せないため、電話ボタンを押すと番号・受付時間・QR（スマホで読み取る用）のモーダルを出す。SP はボタンが `tel:` リンクのままで発信する
+- **SPA には view.js が届かないため JS を使わない。** 隠しチェックボックス（`.phone-cta__modal-toggle`）＋ `<label>` で開閉し、`:checked ~ .phone-cta__modal` で表示する。閉じるのは右上の × と背景（どちらも同じ `for` の label）
+- ボタンは同じ中身を 2 つ出し、CSS で出し分ける: PC は `<label class="…--modal">`、SP は `<a class="…--tel" href="tel:…">`
+- QR は API の `numbers[].qr_svg` をそのまま差し込む。`madoguchi_blocks_phone_cta_qr_svg()` で svg/g/path/rect の許可リストを通し、スクリプトを含む場合は出さない
+- ブロックにバナーを設定している場合はモーダル下部にも同じバナーを出す（Figma と同じ）
+- `showPcModal` を false にすると PC でも `tel:` リンクのままになる
 
 **CSS** `scss/phone-cta/_block.scss`
 - グリッドで各カード等高。SP（既存ミックスイン `mq-max`＝896px 以下）は 1 列、それ以上は `--cols-n` で n 列

@@ -35,6 +35,51 @@ function madoguchi_blocks_phone_cta_once( $key ) {
 }
 
 /**
+ * API から受け取った QR の SVG を安全な要素・属性だけに絞って返す。
+ * 自社 API の出力だが、記事 HTML に生で差し込むため許可リストを通す。
+ * SVG でない・スクリプトを含む場合は空文字（＝QR を出さない）。
+ */
+function madoguchi_blocks_phone_cta_qr_svg( $svg ) {
+	$svg = trim( (string) $svg );
+	if ( '' === $svg || 0 !== strpos( $svg, '<svg' ) ) {
+		return '';
+	}
+	if ( preg_match( '/<script|javascript:|\son[a-z]+\s*=/i', $svg ) ) {
+		return '';
+	}
+	$shape = array(
+		'd'               => array(),
+		'x'               => array(),
+		'y'               => array(),
+		'width'           => array(),
+		'height'          => array(),
+		'fill'            => array(),
+		'stroke'          => array(),
+		'stroke-width'    => array(),
+		'transform'       => array(),
+		'shape-rendering' => array(),
+	);
+	return wp_kses( $svg, array(
+		'svg'  => array(
+			'xmlns'           => array(),
+			'xmlns:xlink'     => array(),
+			'version'         => array(),
+			'viewbox'         => array(),
+			'class'           => array(),
+			'role'            => array(),
+			'aria-label'      => array(),
+			'width'           => array(),
+			'height'          => array(),
+			'shape-rendering' => array(),
+			'fill'            => array(),
+		),
+		'g'    => $shape,
+		'path' => $shape,
+		'rect' => $shape,
+	) );
+}
+
+/**
  * 表示テキスト用の許可リスト（RichText のインライン書式を活かす）。
  */
 function madoguchi_blocks_phone_cta_kses( $html ) {

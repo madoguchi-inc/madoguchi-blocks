@@ -18,6 +18,7 @@ $repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
 $now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
 $texts = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service );
 $show_campaign = ! empty( $attributes['showCampaign'] ); // 既定は非表示（Figma のカードにキャンペーン枠は無い）
+$show_pc_modal = ! isset( $attributes['showPcModal'] ) || $attributes['showPcModal']; // PC は tel: が押せないので番号と QR のモーダルを出す
 
 $cards = array();
 foreach ( $items as $item ) {
@@ -145,18 +146,74 @@ $banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes );
 							<span class="phone-cta__chevron" aria-hidden="true"></span>
 						</a>
 					<?php else : ?>
-						<a class="phone-cta__button<?php echo 'tel' === $c['mode'] ? ' phone-cta__button--balloon' : ''; ?>" href="<?php echo esc_url( $c['tel_href'] ); ?>">
-							<?php if ( 'tel' === $c['mode'] ) : ?>
-								<span class="phone-cta__balloon"><?php echo esc_html( $texts['balloon'] ); ?></span>
-							<?php endif; ?>
-							<span class="phone-cta__free"><?php echo esc_html( $texts['free_tag'] ); ?></span>
-							<span class="phone-cta__button-body">
-								<?php echo madoguchi_blocks_phone_cta_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-								<?php // 2 片の間に空白文字が入らないよう 1 行で出す ?>
-								<span class="phone-cta__button-label"><?php if ( '' !== $c['label_parts'][0] ) : ?><span class="phone-cta__button-shop"><?php echo esc_html( $c['label_parts'][0] ); ?></span><?php endif; ?><span class="phone-cta__button-rest"><?php echo esc_html( $c['label_parts'][1] ); ?></span></span>
-							</span>
-							<span class="phone-cta__chevron" aria-hidden="true"></span>
+						<?php
+						// ボタンの中身は SP の tel: リンクと PC のモーダル起点で同じものを使う
+						$button_inner = ( 'tel' === $c['mode'] ? '<span class="phone-cta__balloon">' . esc_html( $texts['balloon'] ) . '</span>' : '' )
+							. '<span class="phone-cta__free">' . esc_html( $texts['free_tag'] ) . '</span>'
+							. '<span class="phone-cta__button-body">'
+							. madoguchi_blocks_phone_cta_icon( 'phone' )
+							. '<span class="phone-cta__button-label">'
+							. ( '' !== $c['label_parts'][0] ? '<span class="phone-cta__button-shop">' . esc_html( $c['label_parts'][0] ) . '</span>' : '' )
+							. '<span class="phone-cta__button-rest">' . esc_html( $c['label_parts'][1] ) . '</span>'
+							. '</span></span>'
+							. '<span class="phone-cta__chevron" aria-hidden="true"></span>';
+						$button_class = 'phone-cta__button' . ( 'tel' === $c['mode'] ? ' phone-cta__button--balloon' : '' );
+						$qr_svg       = madoguchi_blocks_phone_cta_qr_svg( $c['qr_svg'] );
+						$use_modal    = $show_pc_modal && '' !== $c['tel_display'];
+						$modal_id     = 'phone-cta-modal-' . (int) get_the_ID() . '-' . sanitize_html_class( $c['uuid'] );
+						?>
+						<?php if ( $use_modal ) : ?>
+							<?php // PC 用: チェックボックスでモーダルを開く（SPA では view.js が動かないため JS を使わない） ?>
+							<input class="phone-cta__modal-toggle" type="checkbox" id="<?php echo esc_attr( $modal_id ); ?>">
+							<label class="<?php echo esc_attr( $button_class . ' phone-cta__button--modal' ); ?>" for="<?php echo esc_attr( $modal_id ); ?>">
+								<?php echo $button_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							</label>
+						<?php endif; ?>
+						<a class="<?php echo esc_attr( $button_class . ( $use_modal ? ' phone-cta__button--tel' : '' ) ); ?>" href="<?php echo esc_url( $c['tel_href'] ); ?>">
+							<?php echo $button_inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</a>
+						<?php if ( $use_modal ) : ?>
+							<div class="phone-cta__modal" role="dialog" aria-modal="true" aria-label="<?php echo esc_attr( sprintf( __( '%s の電話番号', 'madoguchi-blocks' ), $c['name'] ) ); ?>">
+								<label class="phone-cta__modal-backdrop" for="<?php echo esc_attr( $modal_id ); ?>" aria-hidden="true"></label>
+								<div class="phone-cta__modal-panel">
+									<label class="phone-cta__modal-close" for="<?php echo esc_attr( $modal_id ); ?>"><span class="screen-reader-text"><?php esc_html_e( '閉じる', 'madoguchi-blocks' ); ?></span></label>
+									<div class="phone-cta__modal-head">
+										<div class="phone-cta__modal-logo">
+											<?php if ( '' !== $c['logo_url'] ) : ?>
+												<img src="<?php echo esc_url( $c['logo_url'] ); ?>" alt="<?php echo esc_attr( $c['name'] ); ?>" loading="lazy">
+											<?php endif; ?>
+										</div>
+										<div class="phone-cta__modal-titles">
+											<p class="phone-cta__modal-name"><?php echo esc_html( $c['name'] ); ?></p>
+											<?php if ( '' !== trim( wp_strip_all_tags( $c['lead'] ) ) ) : ?>
+												<p class="phone-cta__modal-lead"><?php echo madoguchi_blocks_phone_cta_kses( $c['lead'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+											<?php endif; ?>
+										</div>
+									</div>
+									<div class="phone-cta__modal-tel">
+										<span class="phone-cta__modal-tel-icon"><?php echo madoguchi_blocks_phone_cta_icon( 'phone' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+										<div class="phone-cta__modal-tel-body">
+											<p class="phone-cta__modal-number"><?php echo esc_html( $c['tel_display'] ); ?></p>
+											<?php if ( '' !== $c['reception_text'] ) : ?>
+												<p class="phone-cta__modal-hours">
+													<span class="phone-cta__modal-hours-label"><?php esc_html_e( '受付時間', 'madoguchi-blocks' ); ?></span>
+													<span class="phone-cta__modal-hours-value"><?php echo esc_html( $c['reception_text'] ); ?></span>
+												</p>
+											<?php endif; ?>
+										</div>
+										<?php if ( '' !== $qr_svg ) : ?>
+											<div class="phone-cta__modal-qr">
+												<span class="phone-cta__modal-qr-hint"><?php esc_html_e( 'スマホで電話番号を読み取る', 'madoguchi-blocks' ); ?></span>
+												<span class="phone-cta__modal-qr-image"><?php echo $qr_svg; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+											</div>
+										<?php endif; ?>
+									</div>
+									<?php if ( null !== $banner ) : ?>
+										<div class="phone-cta__modal-banner"><?php echo $banner_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
+									<?php endif; ?>
+								</div>
+							</div>
+						<?php endif; ?>
 					<?php endif; ?>
 
 					<?php if ( 'tel_closed' === $c['mode'] ) : ?>

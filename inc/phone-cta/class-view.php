@@ -132,6 +132,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'label_parts'    => self::label_parts( $shop, $service ),
 			'tel_href'       => '' !== $phone_number ? Madoguchi_Blocks_Phone_Cta_Tel::to_href( $phone_number ) : '',
 			'tel_display'    => $phone_number,
+			'qr_svg'         => isset( $number['qr_svg'] ) ? (string) $number['qr_svg'] : '',
 			'is_toll_free'   => ! isset( $number['is_toll_free'] ) || (bool) $number['is_toll_free'],
 			'reception_text' => isset( $shop['reception_text'] ) ? (string) $shop['reception_text'] : '',
 			'fallback_url'   => $fallback,
