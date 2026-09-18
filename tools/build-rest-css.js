@@ -52,6 +52,12 @@ const ROOTS = [
 // !important を付与しない（インライン style を優先させる）セレクタ×プロパティ
 // sel はセレクタの部分一致、selEnds はカンマ区切りセレクタのいずれかが末尾一致。
 // props が null ならマッチしたセレクタの全宣言を除外する。
+// アニメーションで動かすプロパティは !important を付けない。
+// CSS のカスケードでは important 宣言がアニメーションより優先されるため、付けると動かなくなる。
+const ANIMATED_GUARDS = [
+	{ sel: '.phone-cta__button::after', props: [ 'background-position' ] }
+];
+
 const INLINE_GUARDS = [
 	{ sel: '.cta-button', props: null },
 	{ sel: '__stars-fill', props: [ 'width' ] },
@@ -117,7 +123,8 @@ function boostSpecificity( selector ) {
 }
 
 function isGuarded( selector, prop ) {
-	return INLINE_GUARDS.some( ( g ) => {
+	const lists = INLINE_GUARDS.concat( ANIMATED_GUARDS );
+	return lists.some( ( g ) => {
 		if ( g.sel && ! selector.includes( g.sel ) ) {
 			return false;
 		}
@@ -180,6 +187,17 @@ const root = postcss.parse( css );
 let converted = 0;
 let importantified = 0;
 
+// @keyframes の中は !important も特異性の底上げもしない
+// （キーフレーム内の !important は仕様上そのプロパティが無視され、アニメーションが効かなくなる）
+function isInsideKeyframes( node ) {
+	for ( let p = node.parent; p; p = p.parent ) {
+		if ( p.type === 'atrule' && /keyframes$/i.test( p.name ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 root.walkDecls( ( decl ) => {
 	if ( /rem\b/.test( decl.value ) ) {
 		decl.value = remToPx( decl.value );
@@ -187,6 +205,9 @@ root.walkDecls( ( decl ) => {
 	}
 	// カスタムプロパティはインライン style（style="--md-brand:..."）を優先させる
 	if ( decl.prop.startsWith( '--' ) ) {
+		return;
+	}
+	if ( isInsideKeyframes( decl ) ) {
 		return;
 	}
 	const selector = decl.parent && decl.parent.selector ? decl.parent.selector : '';
@@ -201,6 +222,9 @@ root.walkDecls( ( decl ) => {
 
 // 全ルールのセレクタ特異性を底上げ（配信先テーマの「クラス+要素」セレクタに !important 同士で負けないように）
 root.walkRules( ( rule ) => {
+	if ( isInsideKeyframes( rule ) ) {
+		return; // 0% / from / to はセレクタではないので触らない
+	}
 	rule.selector = boostSpecificity( rule.selector );
 });
 

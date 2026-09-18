@@ -42,6 +42,13 @@
   当てたページで `style.css`（before）と `style-rest.css`（after）を比較し、after でブロック内が意図どおり、
   かつブロック外の段落が配信先スタイルのままであることを確認する。
 
+## アニメーションを入れるとき
+
+- `@keyframes` の中の宣言に `!important` が付くと、仕様上そのプロパティが無視されアニメーションが効かなくなる。
+  `tools/build-rest-css.js` は `@keyframes` 配下を `!important` 化・特異性の底上げの対象から外している
+- アニメーションで動かすプロパティ（例: `background-position`）は `ANIMATED_GUARDS` に登録して
+  `!important` を付けない。important 宣言はアニメーションより優先されるため、付けると動かなくなる
+
 ## エディタ用CSS（rem→px）も併せて更新する
 
 `tools/build-editor-css.js` が `build/style-editor.css`（rem→px 変換のみ）を生成する。

@@ -289,6 +289,13 @@
 
 - ロゴ枠は `box-sizing: border-box` ＋内側余白（PC・SP 6/8px、モーダル 6px）で、どんな縦横比・大きさのロゴでも枠に触れないようにする。はみ出す場合は `object-fit: contain` で収める
 
+- ボタンには光沢アニメーション（`@keyframes phone-cta-shine`）を入れる。疑似要素をボタンと同じ位置に固定し、
+  中のグラデーションの位置だけ動かす（SP の吹き出しがはみ出すため `overflow: hidden` は使えない）。
+  受付時間外のグレーのボタンと `prefers-reduced-motion: reduce` の環境では光らせない
+  - REST 配信用 CSS は `@keyframes` 内に `!important` を付けない（付くとキーフレームが無視される）。
+    アニメーションで動かすプロパティも `ANIMATED_GUARDS` で `!important` から除外する
+    （important 宣言はアニメーションより優先されるため、付けると動かなくなる）
+
 **CSS** `scss/phone-cta/_block.scss`
 - グリッドで各カード等高。SP（既存ミックスイン `mq-max`＝896px 以下）は 1 列、それ以上は `--cols-n` で n 列
 - 色は Figma のトークンを直接持つ（`--md-brand` は使わない。買取のブランドカラーがそのままデザイン指定のため）

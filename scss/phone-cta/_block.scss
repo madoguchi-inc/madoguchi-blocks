@@ -240,6 +240,37 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		margin-top: 1.6rem;
 	}
 
+	// ボタンを光の反射のように定期的に光らせる。
+	// 疑似要素はボタンと同じ領域に固定し、中のグラデーションの位置だけ動かすので
+	// SP の吹き出し（ボタンの外にはみ出す）を overflow で切ってしまう心配がない。
+	&__button::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		border-radius: inherit;
+		background-image: linear-gradient(
+			115deg,
+			rgba(255, 255, 255, 0) 40%,
+			rgba(255, 255, 255, 0.45) 50%,
+			rgba(255, 255, 255, 0) 60%
+		);
+		background-repeat: no-repeat;
+		background-size: 250% 100%;
+		background-position: 150% 0;
+		pointer-events: none;
+		animation: phone-cta-shine 3.6s ease-in-out infinite;
+	}
+
+	// 中身は光沢より前面に置く
+	&__balloon,
+	&__free,
+	&__button-body,
+	&__chevron {
+		position: relative;
+		z-index: 1;
+	}
+
 	&__button-body {
 		display: flex;
 		align-items: center;
@@ -341,10 +372,12 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		color: #b7791f;
 	}
 
-	// 受付時間外で WEB 誘導先が無い店舗：電話ボタンをグレーに落とす
+	// 受付時間外で WEB 誘導先が無い店舗：電話ボタンをグレーに落とし、光沢も止める
 	&__card.is-closed &__button:not(&__button--web) {
 		background: linear-gradient(90deg, #8f9297 0%, #adb0b5 100%);
 		box-shadow: none;
+
+		&::after { animation: none; background-image: none; }
 	}
 
 	/* ---- PC の電話番号モーダル（Figma: 電話CTA押下時モーダル 14065-33436） ----
@@ -821,5 +854,19 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 
 		&__campaign { flex-direction: column; gap: 0.8rem; }
 		&__campaign-image { flex-basis: auto; width: 100%; }
+	}
+}
+
+// 光の反射（右上から左下へ流れ、しばらく間を置いて繰り返す）
+@keyframes phone-cta-shine {
+	0% { background-position: 150% 0; }
+	35% { background-position: -50% 0; }
+	100% { background-position: -50% 0; }
+}
+
+// 動きを減らす設定の環境では光らせない
+@media (prefers-reduced-motion: reduce) {
+	.phone-cta__button::after {
+		animation: none;
 	}
 }
