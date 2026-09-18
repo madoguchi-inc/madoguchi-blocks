@@ -214,7 +214,6 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		margin: 0;
 		padding: 0.8rem 1.4rem;
 		border-radius: 0.4rem;
 		background: $pc-orange-grad;
@@ -232,8 +231,8 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 			box-shadow: 0 0 3px rgba(235, 70, 20, 0.4);
 		}
 
-		// 吹き出し付き（受付時間内の電話ボタン）は上に吹き出し分の余白を取る
-		&--balloon { margin-top: 1.6rem; }
+		// 吹き出し分の余白は全ボタンに取る（受付時間外の WEB ボタンだけ上にずれないように）
+		margin-top: 1.6rem;
 	}
 
 	&__button-body {
@@ -515,10 +514,9 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 			justify-content: space-between;
 			gap: 0;
 			min-height: 6.8rem;
+			margin-top: 1.4rem;
 			padding: 0 1.6rem 0 0;
 			box-shadow: 0 0 12px rgba(235, 70, 20, 0.4);
-
-			&--balloon { margin-top: 1.4rem; }
 		}
 
 		&__free {
