@@ -378,10 +378,12 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		@supports (grid-template-rows: subgrid) {
 			&__card {
 				display: grid;
+				grid-template-columns: minmax(0, 1fr); // 列は常にカード内幅いっぱい（内容基準で縮ませない）
 				grid-template-rows: subgrid;
 				grid-row: span 3;
 				row-gap: 0;
 				align-items: start;
+				justify-items: stretch;
 			}
 
 			// ラッパーを消して、ロゴ枠と紹介文をカードの行に直接並べる
@@ -389,12 +391,19 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 
 			&__logo-box {
 				grid-row: 1;
+				justify-self: center;
 				align-self: end;
 			}
 
 			&__lead {
 				grid-row: 2;
+				width: auto;
+				justify-self: stretch;
 				align-self: stretch;
+			}
+
+			&__action {
+				justify-self: stretch;
 			}
 
 			&__action {
