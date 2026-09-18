@@ -3,6 +3,7 @@
 $pcf-gold        : #c4ab46;
 $pcf-black       : #18191e;
 $pcf-orange-from : #eb4614;
+$pcf-icon        : #e04b2d; // Figma のアイコンの塗り色
 $pcf-orange-to   : #f78b08;
 $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 100%);
 
@@ -118,7 +119,7 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 			background: #fff;
 			color: $pcf-black;
 
-			svg { display: block; width: 1.6rem; height: 1.6rem; }
+			svg { display: block; width: 70.6%; height: 70.6%; }
 		}
 	}
 
@@ -177,9 +178,9 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 			height: 2.4rem;
 			border-radius: 50%;
 			background: #fff;
-			color: $pcf-orange-from;
+			color: $pcf-icon;
 
-			svg { display: block; width: 1.7rem; height: 1.7rem; }
+			svg { display: block; width: 70.6%; height: 70.6%; }
 		}
 	}
 
@@ -234,8 +235,6 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 			.phone-cta__icon {
 				width: 3rem;
 				height: 3rem;
-
-				svg { width: 2.1rem; height: 2.1rem; }
 			}
 		}
 
@@ -269,8 +268,6 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 			.phone-cta__icon {
 				width: 3rem;
 				height: 3rem;
-
-				svg { width: 2.1rem; height: 2.1rem; }
 			}
 		}
 

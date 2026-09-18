@@ -8,6 +8,7 @@ $pc-lead-bg     : #f7f7f7;
 $pc-orange-from : #eb4614;
 $pc-orange-to   : #f78b08;
 $pc-free-tab    : #f39072;
+$pc-icon        : #e04b2d; // Figma のアイコン（phone-filled / touch）の塗り色
 $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%);
 
 .phone-cta {
@@ -253,6 +254,7 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	&__button-head { display: block; }
 	&__button-tail { display: inline-block; }
 
+	// 白丸＋中のアイコン。グリフは Figma と同じ比率（22.588 / 32 = 70.6%）で丸に対して相対指定する
 	&__icon {
 		display: flex;
 		flex: 0 0 auto;
@@ -262,12 +264,12 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		height: 3.2rem;
 		border-radius: 50%;
 		background: #fff;
-		color: $pc-orange-from;
+		color: $pc-icon;
 
 		svg {
 			display: block;
-			width: 2.2rem;
-			height: 2.2rem;
+			width: 70.6%;
+			height: 70.6%;
 		}
 	}
 
@@ -495,8 +497,9 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 			width: 3.2rem;
 			height: 3.2rem;
 			background: none;
+			color: $pc-icon;
 
-			svg { width: 3.2rem; height: 3.2rem; }
+			svg { width: 100%; height: 100%; } // Figma: 64px の丸に 32px のグリフ
 		}
 	}
 
@@ -787,8 +790,6 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		&__icon {
 			width: 4rem;
 			height: 4rem;
-
-			svg { width: 2.8rem; height: 2.8rem; }
 		}
 
 		// SP の WEB 誘導ボタンは Figma 上アイコン無し

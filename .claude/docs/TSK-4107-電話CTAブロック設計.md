@@ -260,7 +260,7 @@
 - ボタン文言は 2 片に分けて出す（前半 `phone-cta__button-head` を block にして常に同じ位置で改行）
   - 電話: `View::label_parts()` で「店名＋助詞」と「残り」→「おたからやに／電話で査定額を聞く」
   - WEB: `default_texts` の `web_label_parts`「WEBでカンタン」「無料査定はこちら」（回収・清掃は「無料見積もりはこちら」）
-- アイコンは `inc/phone-cta/render-helpers.php` と `src/phone-cta/icons.js` の 2 か所に同じ図形を持つ（塗りベース・`currentColor` 追従）。変更時は必ず両方を同期する
+- アイコンは Figma の書き出し（`phone-filled` / `touch`）をそのまま `inc/phone-cta/render-helpers.php` と `src/phone-cta/icons.js` の 2 か所に持つ（塗りベース・`currentColor` 追従）。変更時は必ず両方を同期する。白丸は CSS 側で描き、グリフは丸に対して 70.6%（Figma の 22.588 / 32）。色は `#e04b2d`
 
 - 出し分け（リクエスト時 JST、`Reception::is_open`）
 
