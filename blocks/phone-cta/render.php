@@ -60,8 +60,32 @@ $wrapper = get_block_wrapper_attributes( $extra );
 
 $has_heading     = '' !== trim( wp_strip_all_tags( $heading ) );
 $has_description = '' !== trim( wp_strip_all_tags( $description ) );
+
+// ブロック先頭のバナー（同梱パターン／カスタム画像。既定はなし）
+$banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes );
 ?>
 <section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<?php if ( null !== $banner ) : ?>
+		<?php
+		$banner_img = sprintf(
+			'<img class="phone-cta__banner-image" src="%1$s"%2$s alt="%3$s"%4$s%5$s loading="lazy" decoding="async">',
+			esc_url( $banner['src'] ),
+			'' !== $banner['srcset'] ? ' srcset="' . esc_attr( $banner['srcset'] ) . '"' : '',
+			esc_attr( $banner['alt'] ),
+			$banner['width'] > 0 ? ' width="' . (int) $banner['width'] . '"' : '',
+			$banner['height'] > 0 ? ' height="' . (int) $banner['height'] . '"' : ''
+		);
+		?>
+		<div class="phone-cta__banner">
+			<?php if ( '' !== $banner['link'] ) : ?>
+				<a class="phone-cta__banner-link" href="<?php echo esc_url( $banner['link'] ); ?>">
+					<?php echo $banner_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</a>
+			<?php else : ?>
+				<?php echo $banner_img; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php endif; ?>
+		</div>
+	<?php endif; ?>
 	<?php if ( $has_heading || $has_description || ! empty( $points ) ) : ?>
 		<header class="phone-cta__header">
 			<?php if ( $has_heading || $has_description ) : ?>

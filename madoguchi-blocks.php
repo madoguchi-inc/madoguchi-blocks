@@ -34,6 +34,7 @@ require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-services.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-reception.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-tel.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-view.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-banners.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-store.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-repository.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/render-helpers.php';
@@ -111,15 +112,16 @@ function madoguchi_blocks_register() {
 		true
 	);
 
-	// 著者テンプレートをエディタへ供給する（著者情報ブロックのテンプレート選択用）。
+	// エディタへ供給するデータ（著者テンプレート＝著者情報ブロック / 電話CTAのバナーパターン）。
+	$editor_data = array();
 	if ( function_exists( 'madoguchi_blocks_author_templates' ) ) {
-		wp_localize_script(
-			'madoguchi-blocks-editor',
-			'madoguchiBlocksData',
-			array(
-				'authorTemplates' => array_values( madoguchi_blocks_author_templates() ),
-			)
-		);
+		$editor_data['authorTemplates'] = array_values( madoguchi_blocks_author_templates() );
+	}
+	if ( class_exists( 'Madoguchi_Blocks_Phone_Cta_Banners' ) ) {
+		$editor_data['phoneCtaBanners'] = Madoguchi_Blocks_Phone_Cta_Banners::options();
+	}
+	if ( ! empty( $editor_data ) ) {
+		wp_localize_script( 'madoguchi-blocks-editor', 'madoguchiBlocksData', $editor_data );
 	}
 
 	// フロント＋エディタ共通スタイル

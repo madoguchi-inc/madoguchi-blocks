@@ -35,6 +35,10 @@
 				}
 			}
 		},
+		"bannerPreset": { "type": "string", "default": "" },
+		"bannerImageUrl": { "type": "string", "default": "" },
+		"bannerImageAlt": { "type": "string", "default": "" },
+		"bannerLinkUrl": { "type": "string", "default": "" },
 		"showCampaign": { "type": "boolean", "default": false },
 		"isVisible": { "type": "boolean", "default": true }
 	}

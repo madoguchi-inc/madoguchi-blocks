@@ -186,19 +186,27 @@
 | heading | string / 「今すぐ電話でかんたん無料査定」 | RichText。見出し（黒・24px） |
 | description | string / 「複数の買取店で査定してもらうことが高く売るコツ！」 | RichText。見出しの**上**に出る小見出し（ゴールド・13px） |
 | points | string[] / 「強引な営業なし」「個人情報必要なし」「相談だけでもOK」 | POINT1〜3 のバッジ文言。空文字は出さない |
+| bannerPreset | string / `''` | ブロック先頭のバナー。`''`（なし）／同梱パターンのキー（例 `amazon-gift-12000`）／`custom`（メディアから選ぶ） |
+| bannerImageUrl | string / `''` | `custom` のときの画像 URL |
+| bannerImageAlt | string / `''` | 代替テキスト。空ならパターン既定 |
+| bannerLinkUrl | string / `''` | バナーのリンク先。空ならリンクなし |
 | shops | array / `[]` | `{ uuid, numberId, leadText }` × 1〜3。numberId null なら既定番号。leadText 空ならマスタ値。ボタン文言は上書き不可 |
 | showCampaign | bool / **false** | true のときマスタのキャンペーンをカード一覧の**下**に店名付きで出す（Figma のカードに枠が無いため既定はオフ） |
 | isVisible | bool / true | false なら何も出力しない |
 
 **エディタ（edit.js）**
 - キャンバス: heading / description は RichText。カードは中継 REST の店舗データで描画（受付時間内の見た目、注記「表示側は受付時間で自動切替」）
-- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、ボタン文言上書き、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ POINT バッジ（3 つのテキスト）→ トグル（キャンペーン表示 / このブロックを表示）
+- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ 先頭のバナー（パターン選択／カスタム画像／代替テキスト／リンク先）→ POINT バッジ（3 つのテキスト）→ トグル（キャンペーン表示 / このブロックを表示）
 - API URL 未設定・取得失敗・店舗がマスタに無い場合は黄色の Notice を出し、保存は妨げない
 
 **出力（render.php）**
 
 ```html
 <section class="phone-cta phone-cta--cols-3" id="phone-cta" data-phone-cta data-service="kaitori">
+  <div class="phone-cta__banner">                   <!-- bannerPreset があるときだけ。リンク指定時は <a> で包む -->
+    <img class="phone-cta__banner-image" src="…/assets/img/phone-cta/banner-amazon-gift-12000.png"
+         srcset="… 1x, …@2x.png 2x" alt="…" width="760" height="101" loading="lazy" decoding="async">
+  </div>
   <header class="phone-cta__header">              <!-- PC: 左に小見出し＋見出し、右に POINT、下にゴールド罫線＋▼ -->
     <div class="phone-cta__titles">
       <p class="phone-cta__description">複数の買取店で査定してもらうことが高く売るコツ！</p>
@@ -235,6 +243,7 @@
 ```
 
 - 見た目は Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC 14065-29201 / コラム_SP 14065-30761 / 電話査定受付時間外 14065-33169）に合わせる。ゴールド `#c4ab46`、黒 `#18191e`、オレンジグラデ `#eb4614→#f78b08`、カード罫線 `#ddd`、紹介文背景 `#f7f7f7`、SP「査定無料」タブ `#f39072`
+- 先頭のバナーは `inc/phone-cta/class-banners.php` の `PATTERNS`（同梱画像＋既定 alt＋サイズ）から選ぶ。`@2x` が同梱されていれば srcset を付ける。パターンを増やすときは画像を `assets/img/phone-cta/` に置いて `PATTERNS` に 1 件足す（エディタの選択肢は `madoguchiBlocksData.phoneCtaBanners` 経由で自動反映）
 - ボタン文言は店名以外**サービスごとに固定**（買取「{shop}に電話で査定額を聞く」／回収・清掃「{shop}に電話で見積もりを聞く」。`default_texts` の `shop_label`）。店舗マスタ・ブロック属性からの上書きは無い
 - ボタン文言は `View::label_parts()` で「店名＋助詞」「残り」に分け、各片を inline-block にして「おたからやに｜電話で査定額を聞く」で折り返す（語の途中で折らない）
 
