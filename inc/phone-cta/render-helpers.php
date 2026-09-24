@@ -44,6 +44,20 @@ function madoguchi_blocks_phone_cta_once( $key ) {
 }
 
 /**
+ * 1 リクエスト内で通し番号を振る。同じ id の要素を二度出さないために使う。
+ *
+ * 記事に電話CTAブロックを複数置いた場合や、1 つのブロックで同じ店舗を 2 回選んだ場合、
+ * 投稿ID＋店舗UUID だけではモーダルのチェックボックス id が衝突する。CSS の兄弟セレクタで
+ * 開く仕組みなので、衝突すると別のカードのモーダルが開いてしまう。
+ *
+ * @return int 0 から始まる通し番号
+ */
+function madoguchi_blocks_phone_cta_seq() {
+	static $seq = 0;
+	return $seq++;
+}
+
+/**
  * API から受け取った QR の SVG を安全な要素・属性だけに絞って返す。
  * 自社 API の出力だが、記事 HTML に生で差し込むため許可リストを通す。
  * SVG でない・スクリプトを含む場合は空文字（＝QR を出さない）。

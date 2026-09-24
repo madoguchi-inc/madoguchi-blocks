@@ -58,10 +58,41 @@ class RepositoryTest extends TestCase {
 		$this->assertSame( array(), $repo->list( 'nope' ) );
 	}
 
-	public function test_list_does_not_cache_malformed_json(): void {
+	public function test_list_does_not_cache_malformed_json_as_success(): void {
 		list( $repo, $store ) = $this->repo( array( '/v1/phone_ctas' => array( 'code' => 200, 'body' => 'not json' ) ) );
 		$this->assertSame( array(), $repo->list( 'kaitori' ) );
-		$this->assertArrayNotHasKey( 'madoguchi_phone_cta_list_kaitori', $store->transients );
+		// 成功としては残さない（失敗マーカーでバックオフする）
+		$this->assertSame( Madoguchi_Blocks_Phone_Cta_Repository::FAILED, $store->transients['madoguchi_phone_cta_list_kaitori'] );
+	}
+
+	public function test_list_backs_off_after_failure(): void {
+		list( $repo, $store ) = $this->repo( array( '/v1/phone_ctas' => array( 'code' => 500, 'body' => '' ) ) );
+		$this->assertSame( array(), $repo->list( 'kaitori' ) );
+		$this->assertSame( Madoguchi_Blocks_Phone_Cta_Repository::FAILED, $store->transients['madoguchi_phone_cta_list_kaitori'] );
+		// マーカーが残っている間は API を叩き直さない（編集画面で店舗ごとに呼ばれるため）
+		$before = count( $this->calls );
+		$this->assertSame( array(), $repo->list( 'kaitori' ) );
+		$this->assertCount( $before, $this->calls );
+	}
+
+	public function test_refresh_deletes_shop_transients_even_without_prefix_listing(): void {
+		$store = new Fake_Store_No_Prefix_Listing();
+		list( $repo ) = $this->repo( array( '/v1/phone_ctas/u1' => array( 'code' => 200, 'body' => '{"uuid":"u1","name":"大吉","numbers":[]}' ) ), $store );
+		$repo->find( 'kaitori', 'u1' );
+		$this->assertArrayHasKey( 'madoguchi_phone_cta_kaitori_u1', $store->transients );
+
+		$repo->refresh( 'kaitori' );
+		$this->assertArrayNotHasKey( 'madoguchi_phone_cta_kaitori_u1', $store->transients );
+		// last-good は残す（API が落ちている間の描画に使う）
+		$this->assertArrayHasKey( 'madoguchi_phone_cta_last_kaitori_u1', $store->options );
+	}
+
+	public function test_refresh_of_other_service_keeps_shop_transient(): void {
+		$store = new Fake_Store_No_Prefix_Listing();
+		list( $repo ) = $this->repo( array( '/v1/phone_ctas/u1' => array( 'code' => 200, 'body' => '{"uuid":"u1","name":"大吉","numbers":[]}' ) ), $store );
+		$repo->find( 'kaitori', 'u1' );
+		$repo->refresh( 'fuyouhin' );
+		$this->assertArrayHasKey( 'madoguchi_phone_cta_kaitori_u1', $store->transients );
 	}
 
 	public function test_find_fetches_and_saves_last_good(): void {

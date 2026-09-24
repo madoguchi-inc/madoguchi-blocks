@@ -174,7 +174,8 @@ $modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal
 						$button_class = 'phone-cta__button' . ( 'tel' === $c['mode'] ? ' phone-cta__button--balloon' : '' );
 						$qr_svg       = madoguchi_blocks_phone_cta_qr_svg( $c['qr_svg'] );
 						$use_modal    = $show_pc_modal && '' !== $c['tel_display'];
-						$modal_id     = 'phone-cta-modal-' . (int) get_the_ID() . '-' . sanitize_html_class( $c['uuid'] );
+						// 同じ店舗を 2 回選んだ場合やブロックを複数置いた場合に id が衝突しないよう通し番号を混ぜる
+						$modal_id     = 'phone-cta-modal-' . (int) get_the_ID() . '-' . sanitize_html_class( $c['uuid'] ) . '-' . madoguchi_blocks_phone_cta_seq();
 						?>
 						<?php if ( $use_modal ) : ?>
 							<?php // PC 用: チェックボックスでモーダルを開く（SPA では view.js が動かないため JS を使わない） ?>

@@ -111,7 +111,10 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		if ( null === $number ) {
 			return null;
 		}
-		$is_open = Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
+		$phone_number = isset( $number['phone_number'] ) ? (string) $number['phone_number'] : '';
+		// 番号が空のマスタ行は発信できない。href="" のボタン（押すと記事が再読み込みされるだけ）に
+		// ならないよう、WEB 査定があればそちらへ、無ければカードごと出さない
+		$is_open = '' !== $phone_number && Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
 		// WEB 査定のリンク先は記事のカード単位の指定を優先し、空ならマスタの値を使う
 		$fallback = isset( $item['webUrl'] ) && '' !== trim( (string) $item['webUrl'] )
 			? trim( (string) $item['webUrl'] )
@@ -120,11 +123,12 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			$mode = 'tel';
 		} elseif ( '' !== $fallback ) {
 			$mode = 'web';
+		} elseif ( '' === $phone_number ) {
+			return null;
 		} else {
 			$mode = 'tel_closed';
 		}
 		$lead = isset( $item['leadText'] ) && '' !== trim( (string) $item['leadText'] ) ? (string) $item['leadText'] : ( isset( $shop['lead_text'] ) ? (string) $shop['lead_text'] : '' );
-		$phone_number = isset( $number['phone_number'] ) ? (string) $number['phone_number'] : '';
 
 		return array(
 			'mode'           => $mode,
@@ -171,7 +175,8 @@ class Madoguchi_Blocks_Phone_Cta_View {
 
 		$number       = self::pick_number( $shop, isset( $attrs['numberId'] ) ? $attrs['numberId'] : null );
 		$phone_number = isset( $number['phone_number'] ) ? (string) $number['phone_number'] : '';
-		$is_open      = null !== $number && Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
+		// 番号が空なら発信できないので受付中とは扱わない（href="" のボタンを出さないため）
+		$is_open      = '' !== $phone_number && Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
 		$fallback     = isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '';
 		if ( $is_open ) {
 			$mode = 'tel';

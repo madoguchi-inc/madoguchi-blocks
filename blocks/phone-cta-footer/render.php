@@ -50,7 +50,9 @@ $wrapper = get_block_wrapper_attributes( array(
 if ( 'web' === $state['mode'] ) {
 	$tel_href = $state['fallback_url'];
 } elseif ( 'generic' === $state['mode'] ) {
-	$tel_href = '#phone-cta';
+	// 店舗未選択のときは記事内の電話CTAブロックへ飛ばす。そのブロックが記事に無ければ
+	// アンカー先が存在せず押しても何も起きないので、WEB ボタンと同じ遷移先にする
+	$tel_href = has_block( 'madoguchi/phone-cta', get_the_ID() ) ? '#phone-cta' : $web_url;
 } else {
 	$tel_href = $state['tel_href'];
 }
