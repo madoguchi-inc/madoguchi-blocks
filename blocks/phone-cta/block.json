@@ -42,7 +42,6 @@
 		"bannerImageAlt": { "type": "string", "default": "" },
 		"bannerLinkUrl": { "type": "string", "default": "" },
 		"showPcModal": { "type": "boolean", "default": true },
-		"showCampaign": { "type": "boolean", "default": false },
 		"isVisible": { "type": "boolean", "default": true }
 	}
 }

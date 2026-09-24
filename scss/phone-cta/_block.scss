@@ -622,42 +622,6 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		img { display: block; width: 100%; height: auto; }
 	}
 
-	/* ---- キャンペーン（カードの外、一覧の下。showCampaign=true のときだけ） ---- */
-	&__campaigns {
-		display: flex;
-		flex-direction: column;
-		gap: 0.8rem;
-		margin: 0.8rem 0 0;
-		padding: 0;
-		list-style: none;
-	}
-
-	&__campaign {
-		display: flex;
-		gap: 1.2rem;
-		align-items: flex-start;
-		margin: 0;
-		padding: 1rem 1.2rem;
-		border: 1px dashed $pc-orange-to;
-		background: #fff7ee;
-		text-align: left;
-
-		&-image { display: block; flex: 0 0 12rem; width: 12rem; height: auto; }
-		&-text { flex: 1 1 auto; min-width: 0; }
-		&-name { margin: 0 0 0.2rem; font-size: 1.3rem; font-weight: 700; line-height: 1.4; color: $pc-black; }
-		&-shop {
-			display: inline-block;
-			margin-right: 0.6rem;
-			padding: 0 0.6rem;
-			background: $pc-orange-from;
-			font-size: 1.1rem;
-			line-height: 1.8;
-			color: #fff;
-		}
-		&-body { margin: 0; font-size: 1.2rem; line-height: $line_height; color: $pc-black; }
-		&-terms { margin: 0.4rem 0 0; font-size: 1rem; line-height: 1.4; color: $font_color_light; }
-	}
-
 	/* ================= PC（897px〜）: 横並びカードの行高さを揃える ================= */
 	// カードを「ロゴ／紹介文／ボタン部」の 3 行の subgrid にして、行の高さを横のカード同士で共有する。
 	// これで紹介文ボックス（詳細コメント）の高さが揃い、ボタンの位置も一直線になる。
@@ -851,9 +815,6 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		&__button--modal { display: none; }
 		&__button--tel { display: flex; }
 		&__modal { display: none !important; }
-
-		&__campaign { flex-direction: column; gap: 0.8rem; }
-		&__campaign-image { flex-basis: auto; width: 100%; }
 	}
 }
 

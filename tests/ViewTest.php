@@ -21,7 +21,6 @@ class ViewTest extends TestCase {
 				array( 'id' => 1, 'label' => '標準', 'phone_number' => '0120-000-000', 'is_toll_free' => true, 'is_default' => false ),
 				array( 'id' => 2, 'label' => '高単価', 'phone_number' => '050-1111-2222', 'is_toll_free' => false, 'is_default' => true ),
 			),
-			'campaign'         => null,
 		), $over );
 	}
 

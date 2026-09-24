@@ -156,7 +156,6 @@ export default function Edit( { attributes, setAttributes } ) {
 		bannerImageUrl,
 		bannerImageAlt,
 		bannerLinkUrl,
-		showCampaign,
 		isVisible,
 	} = attributes;
 	const { services, loading: servicesLoading } = useServices();
@@ -431,17 +430,6 @@ export default function Edit( { attributes, setAttributes } ) {
 						checked={ showPcModal }
 						onChange={ ( v ) =>
 							setAttributes( { showPcModal: v } )
-						}
-					/>
-					<ToggleControl
-						label={ __( 'キャンペーンを表示', 'madoguchi-blocks' ) }
-						help={ __(
-							'オンにするとマスタのキャンペーンをカード一覧の下に店名付きで出します（既定はオフ）。',
-							'madoguchi-blocks'
-						) }
-						checked={ showCampaign }
-						onChange={ ( v ) =>
-							setAttributes( { showCampaign: v } )
 						}
 					/>
 					<ToggleControl

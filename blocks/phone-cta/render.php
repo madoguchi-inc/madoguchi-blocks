@@ -17,7 +17,6 @@ if ( empty( $items ) ) {
 $repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
 $now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
 $texts = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service );
-$show_campaign = ! empty( $attributes['showCampaign'] ); // 既定は非表示（Figma のカードにキャンペーン枠は無い）
 $show_pc_modal = ! isset( $attributes['showPcModal'] ) || $attributes['showPcModal']; // PC は tel: が押せないので番号と QR のモーダルを出す
 
 $cards = array();
@@ -264,41 +263,4 @@ $modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal
 			</li>
 		<?php endforeach; ?>
 	</ul>
-
-	<?php
-	// キャンペーンは Figma のカードに無いので、カードの外（一覧の下）に店名付きでまとめて出す。既定は非表示。
-	$campaigns = array();
-	if ( $show_campaign ) {
-		foreach ( $cards as $c ) {
-			if ( is_array( $c['campaign'] ) ) {
-				$campaigns[] = $c;
-			}
-		}
-	}
-	?>
-	<?php if ( ! empty( $campaigns ) ) : ?>
-		<ul class="phone-cta__campaigns">
-			<?php foreach ( $campaigns as $c ) : $cp = $c['campaign']; ?>
-				<li class="phone-cta__campaign">
-					<?php if ( ! empty( $cp['image_url'] ) ) : ?>
-						<img class="phone-cta__campaign-image" src="<?php echo esc_url( $cp['image_url'] ); ?>" alt="<?php echo esc_attr( isset( $cp['name'] ) ? $cp['name'] : '' ); ?>" loading="lazy">
-					<?php endif; ?>
-					<div class="phone-cta__campaign-text">
-						<p class="phone-cta__campaign-name">
-							<span class="phone-cta__campaign-shop"><?php echo esc_html( $c['name'] ); ?></span>
-							<?php if ( ! empty( $cp['name'] ) ) : ?>
-								<?php echo esc_html( $cp['name'] ); ?>
-							<?php endif; ?>
-						</p>
-						<?php if ( ! empty( $cp['body'] ) ) : ?>
-							<p class="phone-cta__campaign-body"><?php echo nl2br( esc_html( $cp['body'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-						<?php endif; ?>
-						<?php if ( ! empty( $cp['terms'] ) ) : ?>
-							<p class="phone-cta__campaign-terms"><?php echo nl2br( esc_html( $cp['terms'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
-						<?php endif; ?>
-					</div>
-				</li>
-			<?php endforeach; ?>
-		</ul>
-	<?php endif; ?>
 </section>

@@ -141,7 +141,6 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'is_toll_free'   => ! isset( $number['is_toll_free'] ) || (bool) $number['is_toll_free'],
 			'reception_text' => isset( $shop['reception_text'] ) ? (string) $shop['reception_text'] : '',
 			'fallback_url'   => $fallback,
-			'campaign'       => isset( $shop['campaign'] ) && is_array( $shop['campaign'] ) ? $shop['campaign'] : null,
 		);
 	}
 

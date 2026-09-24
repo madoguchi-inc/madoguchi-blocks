@@ -62,10 +62,6 @@
 | reception_text | string | 受付時間の表示文。空なら hours から自動生成 |
 | lead_text | string | カードの紹介文 |
 | web_fallback_url | string | 時間外の遷移先。空なら時間外でも電話ボタン＋注記 |
-| has_campaign | boolean, default false | |
-| campaign_name / campaign_body / campaign_terms | string / text / text | |
-| campaign_image | string（CarrierWave） | |
-| campaign_starts_on / campaign_ends_on | date | 期間。API 側で期間外は `null` にする |
 
 **company_shop_phone_cta_hours**（曜日別、親ごとに wday unique）
 
@@ -134,15 +130,12 @@
   "numbers": [
     { "id": 12, "label": "標準", "phone_number": "0120-000-000", "is_toll_free": true, "is_default": true,
       "qr_svg": "<svg …>" }
-  ],
-  "campaign": { "name": "…", "body": "…", "image_url": "…", "terms": "…" }
+  ]
 }
 ```
 
 - `numbers[].qr_svg` は PC モーダルの QR（`tel:` URL を rqrcode で SVG 化。生成失敗時は `null`）
 - **発信リンク（`tel:`）は API に出さない。** 表示用のリンクは WordPress 側（`Madoguchi_Blocks_Phone_Cta_Tel`）が表示番号から組み立てる。estima 側の同等メソッドは QR に載せる文字列を作るためだけの内部用
-- `campaign` に期間（`starts_on` / `ends_on`）は含めない。掲載期間の判定は estima 側で済ませ、期間外は `campaign` ごと `null` にする
-- `campaign` は has_campaign=false または期間外なら `null`
 - `is_always_open` が true のとき `hours` は `[]`。`hours` の `end <= start` は日跨ぎ（`start == end` は禁止していないので WP 側は日跨ぎ扱いになる）
 - 3 事業とも estima エンジン側の 1 実装を各ホストがそのまま提供する
 
@@ -195,12 +188,11 @@
 | bannerImageAlt | string / `''` | 代替テキスト。空ならパターン既定 |
 | bannerLinkUrl | string / `''` | バナーのリンク先。空ならリンクなし |
 | shops | array / `[]` | `{ uuid, numberId, leadText, webUrl }` × 1〜3。numberId null なら既定番号。leadText / webUrl 空ならマスタ値。ボタン文言は上書き不可 |
-| showCampaign | bool / **false** | true のときマスタのキャンペーンをカード一覧の**下**に店名付きで出す（Figma のカードに枠が無いため既定はオフ） |
 | isVisible | bool / true | false なら何も出力しない |
 
 **エディタ（edit.js）**
 - キャンバス: heading / description は RichText。カードは中継 REST の店舗データで描画（受付時間内の見た目、注記「表示側は受付時間で自動切替」）
-- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、WEB査定のリンク上書き、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ 先頭のバナー（パターン選択／カスタム画像／代替テキスト／リンク先）→ POINT バッジ（3 つのテキスト）→ トグル（キャンペーン表示 / このブロックを表示）
+- サイドバー: サービス選択 → 店舗リスト（店舗プルダウン、番号プルダウン、WEB査定のリンク上書き、紹介文上書き、上へ/下へ/削除。4 件目は追加不可）→ 先頭のバナー（パターン選択／カスタム画像／代替テキスト／リンク先）→ POINT バッジ（3 つのテキスト）→ トグル（PC モーダル / このブロックを表示）
 - API URL 未設定・取得失敗・店舗がマスタに無い場合は黄色の Notice を出し、保存は妨げない
 
 **出力（render.php）**
@@ -242,7 +234,6 @@
       </div>
     </li>
   </ul>
-  <ul class="phone-cta__campaigns"><li class="phone-cta__campaign">…</li></ul>   <!-- showCampaign=true のときだけ -->
 </section>
 ```
 
@@ -275,7 +266,6 @@
 - WEB 査定のリンク先は **記事のカード単位の `webUrl` を優先**し、空なら店舗マスタの `web_fallback_url` を使う（記事ごとに専用 LP へ送りたい場合に使う）。固定フッターはマスタの値のみ
 
 - カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」
-- `showCampaign=true` かつ `campaign` non-null の店舗があれば、カード一覧の下に `phone-cta__campaigns`（店名バッジ・画像・名称・内容・注意事項）。カード内には出さない
 - カードは行内で等高、中身は上下中央寄せ（Figma の justify-center）
 - マスタに無い／非公開の店舗はスキップ。0 件なら `''` を返す。`id="phone-cta"` は記事内最初のブロックのみ付与（固定フッターの汎用リンク先）。「最初」の判定は投稿 ID 単位（REST の一覧レスポンスでは複数投稿が同一リクエストで描画されるため）。固定フッターの「1 記事 1 つ」も同様
 - 列数クラスは出力件数から `--cols-1/2/3`
@@ -373,7 +363,7 @@
 - [ ] マイグレーションが `estima/test/dummy` で通る。hours の wday unique、numbers の is_default 単一制約
 - [ ] 管理画面: 電話CTAタブで本体・hours 7 行・numbers を保存でき、`is_public` を切り替えられる。権限のない管理者は 403
 - [ ] `GET /v1/phone_ctas`: uuid と name だけの配列、非公開店舗が出ない
-- [ ] `GET /v1/phone_ctas/:uuid`: campaign が期間外で null、logo_url が既存 API と同じ URL 形式、電話番号は numbers のもののみ、非公開・不在 uuid で 404、両アクションで `Cache-Control` ヘッダーが付く
+- [ ] `GET /v1/phone_ctas/:uuid`: logo_url が既存 API と同じ URL 形式、電話番号は numbers のもののみ、非公開・不在 uuid で 404、両アクションで `Cache-Control` ヘッダーが付く
 - [ ] `reception_text` 自動生成: 全曜日同じ／平日と土日で異なる／定休日あり の 3 パターン
 - [ ] 管理画面で保存後、API の Rails.cache が破棄される
 
