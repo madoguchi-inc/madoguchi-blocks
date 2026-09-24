@@ -133,13 +133,15 @@
   "hours": [{ "wday": 1, "start": "10:00", "end": "20:00" }],
   "numbers": [
     { "id": 12, "label": "標準", "phone_number": "0120-000-000", "is_toll_free": true, "is_default": true,
-      "tel_href": "tel:+81120000000", "qr_svg": "<svg …>" }
+      "qr_svg": "<svg …>" }
   ],
-  "campaign": { "name": "…", "body": "…", "image_url": "…", "starts_on": "2026-09-01", "ends_on": "2026-09-30", "terms": "…" }
+  "campaign": { "name": "…", "body": "…", "image_url": "…", "terms": "…" }
 }
 ```
 
-- `numbers[].tel_href` は数字以外を除き先頭 0 を `+81` に（国番号付き入力は `+` を保持）。`qr_svg` は `tel_href` を rqrcode で SVG 化したもの（PC モーダルの QR。生成失敗時は `null`）
+- `numbers[].qr_svg` は PC モーダルの QR（`tel:` URL を rqrcode で SVG 化。生成失敗時は `null`）
+- **発信リンク（`tel:`）は API に出さない。** 表示用のリンクは WordPress 側（`Madoguchi_Blocks_Phone_Cta_Tel`）が表示番号から組み立てる。estima 側の同等メソッドは QR に載せる文字列を作るためだけの内部用
+- `campaign` に期間（`starts_on` / `ends_on`）は含めない。掲載期間の判定は estima 側で済ませ、期間外は `campaign` ごと `null` にする
 - `campaign` は has_campaign=false または期間外なら `null`
 - `is_always_open` が true のとき `hours` は `[]`。`hours` の `end <= start` は日跨ぎ（`start == end` は禁止していないので WP 側は日跨ぎ扱いになる）
 - 3 事業とも estima エンジン側の 1 実装を各ホストがそのまま提供する
