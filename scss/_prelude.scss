@@ -17,3 +17,10 @@ $transition_duration: 0.2s;
 		@content;
 	}
 }
+
+// mq-max(md) の逆（897px 以上＝PC）。PC だけに当てたい指定に使う
+@mixin mq-min($breakpoint) {
+	@media screen and (min-width: 897px) {
+		@content;
+	}
+}

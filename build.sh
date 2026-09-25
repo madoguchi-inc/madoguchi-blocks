@@ -17,6 +17,9 @@ npx sass scss/style.scss build/style.css --style=compressed --no-source-map
 echo "==> REST配信用CSS（rem→px・!important化・スコープ付きリセット）"
 node tools/build-rest-css.js
 
+echo "==> エディタ用CSS（rem→px のみ。キャンバスの root=16px でも崩れないように）"
+node tools/build-editor-css.js
+
 echo "==> view.js コピー"
 cp src/view.js build/view.js
 
