@@ -8,7 +8,7 @@
 if ( empty( $attributes['isVisible'] ) ) {
 	return;
 }
-$service = isset( $attributes['service'] ) && Madoguchi_Blocks_Phone_Cta_Services::is_valid( $attributes['service'] ) ? $attributes['service'] : 'kaitori';
+$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attributes['service'] ) ? $attributes['service'] : null );
 $texts   = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service );
 $now     = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
 

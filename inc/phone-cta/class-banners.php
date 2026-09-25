@@ -84,10 +84,9 @@ class Madoguchi_Blocks_Phone_Cta_Banners {
 	 * @return array{src:string,srcset:string,alt:string,width:int,height:int,link:string}|null
 	 */
 	public static function resolve( array $attributes, string $variant = 'pc' ): ?array {
-		// service は render.php と同じ既定値に寄せる（不正な値でバナーだけ消えないように）
-		$service = isset( $attributes['service'] ) && Madoguchi_Blocks_Phone_Cta_Services::is_valid( $attributes['service'] )
-			? (string) $attributes['service']
-			: 'kaitori';
+		// service は render.php と同じ既定値に寄せる（不正な値でバナーだけ消えないように）。
+		// バナーはブロック単位なので、カードごとの上書きは見ない
+		$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attributes['service'] ) ? $attributes['service'] : null );
 		$preset  = isset( $attributes['bannerPreset'] ) ? (string) $attributes['bannerPreset'] : self::NONE;
 		$link    = isset( $attributes['bannerLinkUrl'] ) ? trim( (string) $attributes['bannerLinkUrl'] ) : '';
 

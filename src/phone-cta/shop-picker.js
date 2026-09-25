@@ -1,10 +1,11 @@
 /**
  * 電話CTAブロック — 1 店舗分の選択 UI（店舗 → 番号 → 文言上書き）。
  * サイドバー（Task 9）とフッター（Task 10）の両方から使う共通コンポーネント。
- * item: { uuid, numberId, leadText, webUrl }（ボタン文言は店名以外サービスごとに固定なので上書き項目は無い）
+ * item: { service, uuid, numberId, leadText, webUrl }（ボタン文言は店名以外サービスごとに固定なので上書き項目は無い）
+ * service は空なら「ブロックに従う」。入れるとそのカードだけ別サービスのマスタから店舗を引く。
  */
 
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	Flex,
@@ -15,7 +16,7 @@ import {
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
-import { useShopList, useShopDetail } from './use-shops';
+import { useShopList, useShopDetail, useServices } from './use-shops';
 
 export default function ShopPicker( {
 	service,
@@ -28,13 +29,32 @@ export default function ShopPicker( {
 	canMoveDown,
 	showLead = true,
 	showWebUrl = true,
+	showService = true,
 } ) {
-	const { shops, loading: listLoading } = useShopList( service );
+	// カードが自分でサービスを持っていればそれを使い、空ならブロックのサービスに従う
+	const cardService = item.service || service;
+	const { services } = useServices();
+	const { shops, loading: listLoading } = useShopList( cardService );
 	const {
 		shop,
 		loading: detailLoading,
 		error,
-	} = useShopDetail( service, item.uuid );
+	} = useShopDetail( cardService, item.uuid );
+
+	const serviceOptions = [
+		{
+			label: sprintf(
+				/* translators: %s: ブロックで選択中のサービス名 */
+				__( 'ブロックに従う（%s）', 'madoguchi-blocks' ),
+				services[ service ] || service
+			),
+			value: '',
+		},
+		...Object.entries( services ).map( ( [ value, label ] ) => ( {
+			label,
+			value,
+		} ) ),
+	];
 
 	const shopOptions = [
 		{ label: __( '店舗を選択…', 'madoguchi-blocks' ), value: '' },
@@ -94,6 +114,25 @@ export default function ShopPicker( {
 					) }
 				</FlexItem>
 			</Flex>
+			{ showService && (
+				<SelectControl
+					label={ __( 'サービス', 'madoguchi-blocks' ) }
+					value={ item.service || '' }
+					options={ serviceOptions }
+					onChange={ ( next ) =>
+						onChange( {
+							...item,
+							service: next,
+							uuid: '',
+							numberId: null,
+						} )
+					}
+					help={ __(
+						'このカードだけ別のサービスの店舗を出したいときに変えます。変えると店舗の選択はリセットされます。',
+						'madoguchi-blocks'
+					) }
+				/>
+			) }
 			{ listLoading && <Spinner /> }
 			<SelectControl
 				label={ __( '店舗', 'madoguchi-blocks' ) }

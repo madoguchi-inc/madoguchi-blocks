@@ -30,6 +30,7 @@
 			"items": {
 				"type": "object",
 				"properties": {
+					"service": { "type": "string" },
 					"uuid": { "type": "string" },
 					"numberId": { "type": ["number", "string", "null"] },
 					"leadText": { "type": "string" },

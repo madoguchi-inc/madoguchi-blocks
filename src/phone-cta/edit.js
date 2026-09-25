@@ -46,11 +46,24 @@ function bannerPatternsFor( service ) {
 function bannerPatternOf( service, preset ) {
 	return bannerPatternsFor( service ).find( ( p ) => p.value === preset );
 }
+
+/**
+ * カードの実効サービス。カード側が空なら（＝「ブロックに従う」）ブロックのサービスを使う。
+ * render.php の Madoguchi_Blocks_Phone_Cta_Services::resolve と同じ決め方にする。
+ *
+ * @param {Object} item         shops[] の 1 要素。
+ * @param {string} blockService ブロックの既定サービス。
+ * @return {string} 実際に使うサービスキー。
+ */
+export function cardServiceOf( item, blockService ) {
+	return item && item.service ? item.service : blockService;
+}
 const MAX_POINTS = 3;
 
 function CardPreview( { service, item } ) {
-	const texts = textsFor( service );
-	const { shop, loading, error } = useShopDetail( service, item.uuid );
+	const cardService = cardServiceOf( item, service );
+	const texts = textsFor( cardService );
+	const { shop, loading, error } = useShopDetail( cardService, item.uuid );
 	if ( ! item.uuid ) {
 		return (
 			<li className="phone-cta__card">
@@ -190,7 +203,13 @@ export default function Edit( { attributes, setAttributes } ) {
 		setAttributes( {
 			shops: [
 				...shops,
-				{ uuid: '', numberId: null, leadText: '', webUrl: '' },
+				{
+					service: '',
+					uuid: '',
+					numberId: null,
+					leadText: '',
+					webUrl: '',
+				},
 			],
 		} );
 	const updatePoint = ( i, value ) => {
@@ -207,7 +226,14 @@ export default function Edit( { attributes, setAttributes } ) {
 	const changeService = ( next ) => {
 		const prevTexts = textsFor( service );
 		const nextTexts = textsFor( next );
-		const patch = { service: next, shops: [] };
+		// サービスを明示しているカードは別マスタなのでそのまま残し、
+		// 「ブロックに従う」カードだけ店舗の選択をリセットする（引く先が変わるため）
+		const patch = {
+			service: next,
+			shops: shops.map( ( item ) =>
+				item.service ? item : { ...item, uuid: '', numberId: null }
+			),
+		};
 		// 切替後のサービスに無いバナーパターンは「なし」に戻す（カスタム画像はそのまま使える）
 		if (
 			bannerPreset &&

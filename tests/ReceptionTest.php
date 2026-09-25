@@ -64,4 +64,17 @@ class ReceptionTest extends TestCase {
 		$this->assertTrue( Madoguchi_Blocks_Phone_Cta_Services::is_valid( 'kaitori' ) );
 		$this->assertFalse( Madoguchi_Blocks_Phone_Cta_Services::is_valid( 'foo' ) );
 	}
+
+	public function test_services_resolve_falls_back(): void {
+		// ブロックの既定サービス（第 2 引数の既定は kaitori）
+		$this->assertSame( 'fuyouhin', Madoguchi_Blocks_Phone_Cta_Services::resolve( 'fuyouhin' ) );
+		$this->assertSame( 'kaitori', Madoguchi_Blocks_Phone_Cta_Services::resolve( 'foo' ) );
+		$this->assertSame( 'kaitori', Madoguchi_Blocks_Phone_Cta_Services::resolve( null ) );
+
+		// カードごとの上書き。空・不正ならブロックのサービスに従う
+		$this->assertSame( 'osouji', Madoguchi_Blocks_Phone_Cta_Services::resolve( 'osouji', 'fuyouhin' ) );
+		$this->assertSame( 'fuyouhin', Madoguchi_Blocks_Phone_Cta_Services::resolve( '', 'fuyouhin' ) );
+		$this->assertSame( 'fuyouhin', Madoguchi_Blocks_Phone_Cta_Services::resolve( null, 'fuyouhin' ) );
+		$this->assertSame( 'fuyouhin', Madoguchi_Blocks_Phone_Cta_Services::resolve( array( 'osouji' ), 'fuyouhin' ) );
+	}
 }

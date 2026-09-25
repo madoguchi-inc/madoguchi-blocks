@@ -114,6 +114,7 @@ export default function Edit( { attributes, setAttributes } ) {
 								onRemove={ () =>
 									setAttributes( { shop: null } )
 								}
+								showService={ false }
 								showLead={ false }
 								showWebUrl={ false }
 							/>

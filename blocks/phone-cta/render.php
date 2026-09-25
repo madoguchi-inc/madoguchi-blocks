@@ -8,7 +8,7 @@
 if ( empty( $attributes['isVisible'] ) ) {
 	return;
 }
-$service = isset( $attributes['service'] ) && Madoguchi_Blocks_Phone_Cta_Services::is_valid( $attributes['service'] ) ? $attributes['service'] : 'kaitori';
+$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attributes['service'] ) ? $attributes['service'] : null );
 $items   = isset( $attributes['shops'] ) && is_array( $attributes['shops'] ) ? array_slice( $attributes['shops'], 0, 3 ) : array();
 if ( empty( $items ) ) {
 	return;
@@ -24,11 +24,13 @@ foreach ( $items as $item ) {
 	if ( ! is_array( $item ) || empty( $item['uuid'] ) ) {
 		continue;
 	}
-	$shop = $repo->find( $service, (string) $item['uuid'] );
+	// カードごとにサービスを変えられる（空ならブロックのサービス）。引く先のマスタとボタン文言が変わる
+	$card_service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $item['service'] ) ? $item['service'] : null, $service );
+	$shop         = $repo->find( $card_service, (string) $item['uuid'] );
 	if ( null === $shop ) {
 		continue; // マスタに無い／非公開の店舗は出さない
 	}
-	$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $service );
+	$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $card_service );
 	if ( null !== $state ) {
 		$cards[] = $state;
 	}
