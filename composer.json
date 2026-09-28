@@ -1,0 +1,18 @@
+{
+	"name": "madoguchi-inc/madoguchi-blocks",
+	"description": "madoguchi-blocks の PHP 純粋ロジック用テスト環境（配布 zip には含めない）",
+	"type": "wordpress-plugin",
+	"license": "proprietary",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^9.6"
+	},
+	"scripts": {
+		"test": "phpunit"
+	},
+	"config": {
+		"sort-packages": true
+	}
+}

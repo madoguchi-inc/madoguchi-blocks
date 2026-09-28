@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Madoguchi Blocks（記事内コンテンツブロック集）
  * Description:        記事内に設置できるカスタムブロック集。チェックリスト型CTA・条件別カードリンク・買取業者比較テーブル・著者情報・口コミ。テーマ非依存で動作し、REST API 経由でもCSSを同梱して同一デザインを再現します。
- * Version:           1.9.1
+ * Version:           1.10.0
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Madoguchi Inc.
@@ -30,6 +30,15 @@ require_once MADOGUCHI_BLOCKS_DIR . 'inc/color.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/settings.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/class-style-inliner.php';
 require_once MADOGUCHI_BLOCKS_DIR . 'inc/review-avatars.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-services.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-reception.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-tel.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-view.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-banners.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-store.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-repository.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/render-helpers.php';
+require_once MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/class-rest.php';
 
 /**
  * GitHub リリースを更新元とした自動更新を有効化する。
@@ -103,15 +112,16 @@ function madoguchi_blocks_register() {
 		true
 	);
 
-	// 著者テンプレートをエディタへ供給する（著者情報ブロックのテンプレート選択用）。
+	// エディタへ供給するデータ（著者テンプレート＝著者情報ブロック / 電話CTAのバナーパターン）。
+	$editor_data = array();
 	if ( function_exists( 'madoguchi_blocks_author_templates' ) ) {
-		wp_localize_script(
-			'madoguchi-blocks-editor',
-			'madoguchiBlocksData',
-			array(
-				'authorTemplates' => array_values( madoguchi_blocks_author_templates() ),
-			)
-		);
+		$editor_data['authorTemplates'] = array_values( madoguchi_blocks_author_templates() );
+	}
+	if ( class_exists( 'Madoguchi_Blocks_Phone_Cta_Banners' ) ) {
+		$editor_data['phoneCtaBanners'] = Madoguchi_Blocks_Phone_Cta_Banners::options();
+	}
+	if ( ! empty( $editor_data ) ) {
+		wp_localize_script( 'madoguchi-blocks-editor', 'madoguchiBlocksData', $editor_data );
 	}
 
 	// フロント＋エディタ共通スタイル
@@ -124,6 +134,19 @@ function madoguchi_blocks_register() {
 		array(),
 		$style_ver
 	);
+
+	// ブロックエディタ用スタイル（rem→px 変換済み）。
+	// エディタのキャンバスは root が 16px のため、rem 前提の style.css だけだと 1.6 倍になり崩れる。
+	// block.json の editorStyle から参照し、style.css の後に読み込ませて px 値で上書きする。
+	$editor_style_file = MADOGUCHI_BLOCKS_DIR . 'build/style-editor.css';
+	if ( file_exists( $editor_style_file ) ) {
+		wp_register_style(
+			'madoguchi-blocks-editor-style',
+			MADOGUCHI_BLOCKS_URL . 'build/style-editor.css',
+			array( 'madoguchi-blocks-style' ),
+			(string) filemtime( $editor_style_file )
+		);
+	}
 
 	// ブランドカラーをカスタムプロパティとして通常フロント/エディタへ供給する。
 	// （REST API 経由の場合は class-style-inliner.php 側でインライン注入する）
@@ -155,6 +178,8 @@ function madoguchi_blocks_register() {
 		'comparison-table',
 		'cta-button',
 		'recommend-card',
+		'phone-cta',
+		'phone-cta-footer',
 	);
 	foreach ( $blocks as $block ) {
 		$dir = MADOGUCHI_BLOCKS_DIR . 'blocks/' . $block;
@@ -174,3 +199,12 @@ function madoguchi_blocks_boot_style_inliner() {
 	$inliner->init();
 }
 add_action( 'init', 'madoguchi_blocks_boot_style_inliner' );
+
+/**
+ * 電話CTA: エディタ向け中継 REST を登録する。
+ */
+function madoguchi_blocks_boot_phone_cta_rest() {
+	$rest = new Madoguchi_Blocks_Phone_Cta_Rest();
+	$rest->init();
+}
+add_action( 'init', 'madoguchi_blocks_boot_phone_cta_rest' );

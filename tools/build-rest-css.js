@@ -31,6 +31,7 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const postcss = require( 'postcss' );
+const selectorParser = require( 'postcss-selector-parser' );
 
 const SRC = path.resolve( __dirname, '../build/style.css' );
 const DEST = path.resolve( __dirname, '../build/style-rest.css' );
@@ -43,12 +44,20 @@ const ROOTS = [
 	'.author-box',
 	'.review-section',
 	'.comparison-table',
-	'.recommend-card'
+	'.recommend-card',
+	'.phone-cta',
+	'.phone-cta-footer'
 ];
 
 // !important を付与しない（インライン style を優先させる）セレクタ×プロパティ
 // sel はセレクタの部分一致、selEnds はカンマ区切りセレクタのいずれかが末尾一致。
 // props が null ならマッチしたセレクタの全宣言を除外する。
+// アニメーションで動かすプロパティは !important を付けない。
+// CSS のカスケードでは important 宣言がアニメーションより優先されるため、付けると動かなくなる。
+const ANIMATED_GUARDS = [
+	{ sel: '.phone-cta__button::after', props: [ 'background-position' ] }
+];
+
 const INLINE_GUARDS = [
 	{ sel: '.cta-button', props: null },
 	{ sel: '__stars-fill', props: [ 'width' ] },
@@ -71,8 +80,51 @@ const INLINE_GUARDS = [
 // ルートクラスを3連結して特異性を上げる（class="checklist-cta" に .a.a.a はマッチする）
 const triple = ( root ) => root.repeat( 3 );
 
+/**
+ * 個々の宣言のセレクタ特異性を底上げする。
+ *
+ * `.phone-cta__description` のような単一クラスのセレクタ（特異性 0,1,0）は、
+ * 配信先テーマの `.entry-content p{color:red !important}`（クラス+要素で 0,1,1）に
+ * !important 同士で負けてしまう（要素セレクタ1つ分、相手の方が特異性が高いため）。
+ * セレクタ中の各クラスと単純な擬似クラス（`:hover` 等）を1つずつ複製する
+ * （マッチ対象は変わらない）。クラス1個・擬似クラス1個の複製で特異性を (0,2,0) まで
+ * 底上げでき、これは `.entry-content p !important`（0,1,1）には勝てるが、
+ * (0,2,1) 以上のセレクタにはまだ負ける。ルート要素は別途3連結（`triple()`）で
+ * さらに高い特異性を確保する。
+ *
+ * 擬似クラスの複製は `:hover` `:first-child` のような引数を持たない単純な擬似クラスのみを
+ * 対象にする。`:not(...)` `:is(...)` `:where(...)` のようにセレクタリストを引数に持つコンテナ
+ * 自体は複製しない（意味が変わる／無意味に肥大化するため）。内側のクラスは walkClasses が
+ * 別途処理する。
+ */
+function boostSpecificity( selector ) {
+	return selectorParser( ( selectors ) => {
+		selectors.each( ( sel ) => {
+			const classNodes = [];
+			sel.walkClasses( ( classNode ) => {
+				classNodes.push( classNode );
+			});
+			classNodes.forEach( ( classNode ) => {
+				classNode.parent.insertAfter( classNode, classNode.clone() );
+			});
+			const pseudoNodes = [];
+			sel.walkPseudos( ( pseudoNode ) => {
+				// ::before 等の擬似要素、:not() 等の引数持ちコンテナは除外し、
+				// :hover / :first-child のような単純な擬似クラスだけを複製する。
+				if ( ! pseudoNode.value.startsWith( '::' ) && ! pseudoNode.nodes.length ) {
+					pseudoNodes.push( pseudoNode );
+				}
+			});
+			pseudoNodes.forEach( ( pseudoNode ) => {
+				pseudoNode.parent.insertAfter( pseudoNode, pseudoNode.clone() );
+			});
+		});
+	}).processSync( selector );
+}
+
 function isGuarded( selector, prop ) {
-	return INLINE_GUARDS.some( ( g ) => {
+	const lists = INLINE_GUARDS.concat( ANIMATED_GUARDS );
+	return lists.some( ( g ) => {
 		if ( g.sel && ! selector.includes( g.sel ) ) {
 			return false;
 		}
@@ -135,6 +187,17 @@ const root = postcss.parse( css );
 let converted = 0;
 let importantified = 0;
 
+// @keyframes の中は !important も特異性の底上げもしない
+// （キーフレーム内の !important は仕様上そのプロパティが無視され、アニメーションが効かなくなる）
+function isInsideKeyframes( node ) {
+	for ( let p = node.parent; p; p = p.parent ) {
+		if ( p.type === 'atrule' && /keyframes$/i.test( p.name ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 root.walkDecls( ( decl ) => {
 	if ( /rem\b/.test( decl.value ) ) {
 		decl.value = remToPx( decl.value );
@@ -142,6 +205,9 @@ root.walkDecls( ( decl ) => {
 	}
 	// カスタムプロパティはインライン style（style="--md-brand:..."）を優先させる
 	if ( decl.prop.startsWith( '--' ) ) {
+		return;
+	}
+	if ( isInsideKeyframes( decl ) ) {
 		return;
 	}
 	const selector = decl.parent && decl.parent.selector ? decl.parent.selector : '';
@@ -152,6 +218,14 @@ root.walkDecls( ( decl ) => {
 		decl.important = true;
 	}
 	importantified++;
+});
+
+// 全ルールのセレクタ特異性を底上げ（配信先テーマの「クラス+要素」セレクタに !important 同士で負けないように）
+root.walkRules( ( rule ) => {
+	if ( isInsideKeyframes( rule ) ) {
+		return; // 0% / from / to はセレクタではないので触らない
+	}
+	rule.selector = boostSpecificity( rule.selector );
 });
 
 const banner = '/*! madoguchi-blocks REST用（自動生成: tools/build-rest-css.js — 直接編集しない） */';

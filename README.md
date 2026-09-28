@@ -9,6 +9,14 @@
 - **比較テーブル** … 項目を一覧で比較できるテーブル。1列目の見出し・列・行を記事ごとに編集でき、列に「グループ見出し」を付けると2段ヘッダーになる。列種別はテキスト／記号（◎✓△✕＋補足）／口コミ（数値＋★）／検証スコア。各行のCTA列にCTAボタンを配置可。スマホは横スクロール（1列目固定）。買取業者・サービス・商品などの比較に使えます
 - **著者情報** … 名前・肩書き・プロフィール・アイコン・CTA を文中に挿入。`schema.org/Person` の構造化データ（JSON-LD）を同梱（SEO/LLMO対応）。**著者テンプレート**（設定画面で登録した著者プロフィール）を選ぶだけで反映でき、テンプレートを編集すると使用中の全記事へ一括反映されます
 - **口コミ・レビュー** … 吹き出し＋人物アイコンのレビュー。`schema.org/Review` の構造化データ（JSON-LD）を同梱（SEO/LLMO対応）
+- **電話CTA（店舗別）** `madoguchi/phone-cta` … 店舗マスタ（estima API）から選んだ買取店 1〜3 社の電話CTAカード。受付時間外は WEB 査定ボタンに自動切替
+- **電話CTA 固定フッター** `madoguchi/phone-cta-footer` … 画面下固定の電話CTAバー。店舗指定で店名入り文言。1 記事 1 つ
+
+### 電話CTA のデータの流れ
+
+店舗情報は estima の公開 API（`GET /v1/phone_ctas`、`GET /v1/phone_ctas/:uuid`）から取得し、店舗ごとに transient で 10 分キャッシュします。
+受付時間内/外の判定はキャッシュせず、リクエスト時の JST で `render.php` がそのつど行います（電話番号 or WEB査定ボタンの出し分け）。
+固定フッター（`madoguchi/phone-cta-footer`）は 1 記事につき 1 つの設置を想定しています。
 
 ### REST API でも同一デザイン（style 埋め込み・配信先CSSから隔離）
 
@@ -48,6 +56,13 @@ REST 用には**配信先サイトのテーマCSSの影響を受けない専用C
 - テンプレートを使わず、従来どおり記事ごとに手入力することもできます（「テンプレートを使わない」を選択）
 - テンプレートを削除した場合、そのブロックは記事側の手入力値（または記事の投稿者情報）にフォールバックします
 
+### 電話CTA（店舗マスタ API）
+
+管理画面 > **設定 > Madoguchi Blocks > 電話CTA（店舗マスタ API）** で以下を設定します:
+
+- **電話CTA: サービス別 API ベース URL（買取 / 回収 / 清掃）** … 記事内の電話CTAブロックが店舗情報を取得する estima 側 API のベース URL。使うサービスだけ入れれば OK で、未設定のサービスはブロック側の選択肢に出ません
+- **店舗データを今すぐ更新** … 上記 API から取得済みの店舗キャッシュ（transient）を破棄し、次回表示時に最新データを再取得させるボタン
+
 ## インストール（ぶちこめば動く）
 
 1. この `madoguchi-blocks` フォルダごと、対象サイトの `wp-content/plugins/` に置く
@@ -73,6 +88,7 @@ REST 用には**配信先サイトのテーマCSSの影響を受けない専用C
 madoguchi-blocks/
   madoguchi-blocks.php     … プラグイン本体（ブロック登録・アセット読み込み・自動更新）
   inc/                    … 設定画面・スタイルインライナ・レビューアバター
+  inc/phone-cta/          … 電話CTA用ロジック（Services / Reception / Tel / View / Store / Repository / Rest / render-helpers）
   blocks/                 … 各ブロックの block.json / render.php（サーバー登録・動的描画用）
   build/                  … 配布用ビルド成果物（index.js / style.css / style-rest.css / view.js）★これが実行に必要
   assets/img/             … アイコンSVG（CSSが参照）
@@ -80,13 +96,14 @@ madoguchi-blocks/
   src/                    … エディタJS（edit/save）ソース ※再ビルド用
   scss/                   … スタイルのソース ※再ビルド用
   tools/                  … REST配信用CSS生成スクリプト（build-rest-css.js）※再ビルド用
+  tests/                  … PHPUnit（`php composer.phar test`）※配布 zip には含めない
   build.sh                … 一括ビルド ※開発用
   package.sh              … 配布zip生成・リリース ※開発用
   .github/workflows/      … main への push で自動リリースする GitHub Actions ※開発用
 ```
 
 実行時に必要なのは `madoguchi-blocks.php` / `inc/` / `blocks/` / `build/` / `assets/` / `lib/` です。
-`src/` `scss/` `tools/` `*.sh` は開発用で、配布だけなら無くても動きます（`package.sh` はこの区別で zip を作ります）。
+`src/` `scss/` `tools/` `tests/` `*.sh` は開発用で、配布だけなら無くても動きます（`package.sh` はこの区別で zip を作ります）。
 
 ## 注意
 
