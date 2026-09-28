@@ -85,7 +85,7 @@
 | position | integer | 並び順 |
 
 **導出**
-- 店舗名: `CompanyShopDisplayContent#shop_name` があればそれ、なければ `company_shops.name`
+- 店舗名: `company_shops.name`（加盟店名）。掲載情報の「店舗名（表示用）」は会社名が入っていることがあり、ボタンが「株式会社◯◯に電話で…」になるため参照しない
 - ロゴ: `company_shops.logo` の CloudFront URL（既存の `to_api_data` と同じ組み方）
 - `reception_text` 自動生成: 全曜日同じなら `10:00〜20:00`、違えば同一時間帯の曜日をまとめて `月〜金 10:00〜20:00 / 土日 10:00〜18:00 / 水曜定休`
 
