@@ -186,7 +186,7 @@
 | bannerPreset | string / `''` | バナーのパターン。`''`（なし）／**選択中サービスの**同梱パターンのキー（例 `amazon-gift-12000`）／`custom`（メディアから選ぶ）。サービスを切り替えると、そのサービスに無いパターンは「なし」に戻る |
 | bannerImageUrl | string / `''` | `custom` のときの画像 URL |
 | bannerImageAlt | string / `''` | 代替テキスト。空ならパターン既定 |
-| bannerLinkUrl | string / `''` | バナーのリンク先。空ならリンクなし |
+| bannerLinkUrl | string / `''` | バナーのリンク先。空ならパターンの既定（`PATTERNS[...]['link']`）。どちらも無ければリンクなし |
 | shops | array / `[]` | `{ service, uuid, numberId, leadText, webUrl }` × 1〜3。service 空ならブロックの値（「ブロックに従う」）。numberId null なら既定番号。leadText / webUrl 空ならマスタ値。ボタン文言は上書き不可 |
 | isVisible | bool / true | false なら何も出力しない |
 
@@ -238,6 +238,11 @@
 ```
 
 - 見た目は Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC 14065-29201 / コラム_SP 14065-30761 / 電話査定受付時間外 14065-33169）に合わせる。ゴールド `#c4ab46`、黒 `#18191e`、オレンジグラデ `#eb4614→#f78b08`、カード罫線 `#ddd`、紹介文背景 `#f7f7f7`、SP「査定無料」タブ `#f39072`
+- バナーのリンクには、**描画した店舗を `?s=<uuid>[:<numberId>],...` として自動で付ける**（`View::shops_param()` → `add_query_arg`）。
+  遷移先のキャンペーンLP（ekaitori.com の `/campaign/amazon-gift-12000`）が、記事と同じ買取店を STEP 01〜03 として出すために使う。
+  記事本文の HTML は閲覧者によらず同じなので、描画時に確定するこの値を URL に焼き込める。
+  numberId は実際に使った番号を載せる（付けないと LP 側が既定番号に落ちて記事と違う番号が出る）。
+  編集画面では店名しか見えないため、人が uuid を入れる運用にはしない
 - バナーは `inc/phone-cta/class-banners.php` の `PATTERNS` から選ぶ。**サービス（事業）ごとに別セット**で、1 パターンが PC・SP・PC モーダルの 3 枚を持つ
 
 | 用途 | 例（買取） | サイズ | 出し方 |
