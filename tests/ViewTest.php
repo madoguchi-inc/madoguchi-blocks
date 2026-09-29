@@ -41,6 +41,12 @@ class ViewTest extends TestCase {
 		$this->assertNull( Madoguchi_Blocks_Phone_Cta_View::pick_number( array( 'numbers' => array( 'garbage', 'also garbage' ) ), null ) );
 	}
 
+	public function test_card_state_exposes_number_id_for_the_banner_link(): void {
+		$shop  = $this->shop();
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, array( 'numberId' => 1 ), $this->now( '2026-09-16 12:00' ) );
+		$this->assertSame( '1', $state['number_id'] );
+	}
+
 	public function test_card_state_handles_missing_phone_number_without_error(): void {
 		$shop  = $this->shop( array( 'numbers' => array( array( 'id' => 1 ) ) ) ); // phone_number キー欠落
 		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, array(), $this->now( '2026-09-16 12:00' ) );
