@@ -25,6 +25,7 @@ class Madoguchi_Blocks_Phone_Cta_Banners {
 			'amazon-gift-12000' => array(
 				'label' => 'Amazonギフト券 12,000円分プレゼント中！',
 				'alt'   => 'みんなの買取限定キャンペーン Amazonギフト券12,000円分プレゼント中！',
+				'link'  => '/campaign/amazon-gift-12000',
 				'pc'    => array( 'file' => 'banner-amazon-gift-12000.png', 'width' => 760, 'height' => 101 ),
 				'sp'    => array( 'file' => 'banner-amazon-gift-12000-sp.png', 'width' => 381, 'height' => 143 ),
 				'modal' => array( 'file' => 'banner-amazon-gift-12000-modal.png', 'width' => 650, 'height' => 106 ),
@@ -113,6 +114,9 @@ class Madoguchi_Blocks_Phone_Cta_Banners {
 
 		$p     = $patterns[ $preset ];
 		$image = isset( $p[ $variant ] ) ? $p[ $variant ] : $p['pc'];
+		if ( '' === $link && isset( $p['link'] ) ) {
+			$link = (string) $p['link']; // 編集画面の「リンク先URL」が空ならパターンの既定へ
+		}
 
 		$src    = self::image_url( $service, $image['file'] );
 		$retina = self::retina_file( $service, $image['file'] );

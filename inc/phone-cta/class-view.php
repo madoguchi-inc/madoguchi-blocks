@@ -134,6 +134,8 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'mode'           => $mode,
 			'is_open'        => $is_open,
 			'uuid'           => isset( $shop['uuid'] ) ? (string) $shop['uuid'] : '',
+			// バナーのリンクに「この記事で出している店舗」を載せるのに使う
+			'number_id'      => isset( $number['id'] ) ? (string) $number['id'] : '',
 			'name'           => isset( $shop['name'] ) ? (string) $shop['name'] : '',
 			'logo_url'       => isset( $shop['logo_url'] ) ? (string) $shop['logo_url'] : '',
 			'lead'           => $lead,
@@ -146,6 +148,32 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'reception_text' => isset( $shop['reception_text'] ) ? (string) $shop['reception_text'] : '',
 			'fallback_url'   => $fallback,
 		);
+	}
+
+	/**
+	 * バナーのリンクに載せる店舗の指定を組み立てる。
+	 *
+	 * 遷移先のキャンペーンLPは、記事で見ていた買取店をそのまま並べて見せる。
+	 * 記事本文の HTML は閲覧者によらず同じなので、描画時に確定するこの値を URL に焼き込める。
+	 *
+	 *   "<uuid>[:<numberId>],<uuid>,..."  並び順はカードの順（＝LP の STEP の順）
+	 *
+	 * numberId は「記事で実際に使った番号」を付ける。付けないと LP 側が既定番号に
+	 * 落ちてしまい、記事と違う番号が出る（番号ごとの送客先が変わってしまう）。
+	 *
+	 * @param array $cards card_state() の配列
+	 * @return string 載せるものが無ければ空文字
+	 */
+	public static function shops_param( array $cards ): string {
+		$parts = array();
+		foreach ( $cards as $card ) {
+			if ( empty( $card['uuid'] ) ) {
+				continue;
+			}
+			$number_id = isset( $card['number_id'] ) ? (string) $card['number_id'] : '';
+			$parts[]   = '' !== $number_id ? $card['uuid'] . ':' . $number_id : $card['uuid'];
+		}
+		return implode( ',', $parts );
 	}
 
 	/**
