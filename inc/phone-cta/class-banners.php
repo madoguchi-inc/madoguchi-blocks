@@ -24,7 +24,7 @@ class Madoguchi_Blocks_Phone_Cta_Banners {
 		'kaitori'  => array(
 			'amazon-gift-12000' => array(
 				'label' => 'Amazonギフト券 12,000円分プレゼント中！',
-				'alt'   => 'みんなの買取を利用していただいた方限定 Amazonギフト券12,000円分プレゼント中！',
+				'alt'   => 'みんなの買取限定キャンペーン Amazonギフト券12,000円分プレゼント中！',
 				'link'  => '/campaign/amazon-gift-12000',
 				'pc'    => array( 'file' => 'banner-amazon-gift-12000.png', 'width' => 760, 'height' => 101 ),
 				'sp'    => array( 'file' => 'banner-amazon-gift-12000-sp.png', 'width' => 381, 'height' => 143 ),
