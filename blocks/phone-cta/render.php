@@ -67,6 +67,18 @@ $has_description = '' !== trim( wp_strip_all_tags( $description ) );
 $banner       = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'pc' );
 $banner_sp    = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'sp' );
 $modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal' );
+
+// 遷移先のキャンペーンLPで同じ店舗を出せるよう、実際に描画した店舗をリンクに載せる。
+// 編集画面で utm 付きの URL を入れていても壊さないよう add_query_arg で連結する
+$shops_param = Madoguchi_Blocks_Phone_Cta_View::shops_param( $cards );
+if ( '' !== $shops_param ) {
+	if ( null !== $banner && '' !== $banner['link'] ) {
+		$banner['link'] = add_query_arg( 's', $shops_param, $banner['link'] );
+	}
+	if ( null !== $modal_banner && '' !== $modal_banner['link'] ) {
+		$modal_banner['link'] = add_query_arg( 's', $shops_param, $modal_banner['link'] );
+	}
+}
 ?>
 <section <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( null !== $banner ) : ?>
