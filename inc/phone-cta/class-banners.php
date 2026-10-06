@@ -31,8 +31,17 @@ class Madoguchi_Blocks_Phone_Cta_Banners {
 				'modal' => array( 'file' => 'banner-amazon-gift-12000-modal.png', 'width' => 650, 'height' => 106 ),
 			),
 		),
-		// 回収・清掃は画像が用意できたら同じ形で追加する（それまでは「なし」とカスタム画像のみ）
-		'fuyouhin' => array(),
+		'fuyouhin' => array(
+			'amazon-gift-2000' => array(
+				'label' => 'Amazonギフト券 最大2,000円分プレゼント中！',
+				'alt'   => '不用品回収の窓口で作業をご依頼いただいた方限定 Amazonギフト券最大2,000円分プレゼント中！',
+				'link'  => '/campaign/amazon-gift-2000',
+				'pc'    => array( 'file' => 'banner-amazon-gift-2000.png', 'width' => 720, 'height' => 102 ),
+				'sp'    => array( 'file' => 'banner-amazon-gift-2000-sp.png', 'width' => 398, 'height' => 141 ),
+				'modal' => array( 'file' => 'banner-amazon-gift-2000-modal.png', 'width' => 650, 'height' => 106 ),
+			),
+		),
+		// 清掃は画像が用意できたら同じ形で追加する（それまでは「なし」とカスタム画像のみ）
 		'osouji'   => array(),
 	);
 
