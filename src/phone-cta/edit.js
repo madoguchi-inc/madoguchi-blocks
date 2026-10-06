@@ -21,6 +21,7 @@ import {
 	Button,
 	Notice,
 } from '@wordpress/components';
+import { useEffect } from '@wordpress/element';
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import PhoneCtaIcon from './icons';
@@ -256,6 +257,23 @@ export default function Edit( { attributes, setAttributes } ) {
 		}
 		setAttributes( patch );
 	};
+
+	// 挿入直後だけ、サイトの主サービスに寄せる。block.json の既定値は買取のままなので
+	// （既定値を変えると買取の既存記事の保存内容と食い違う）、回収のサイトで置いたときに
+	// 見出しが「無料査定」で始まってしまうのを避ける。
+	// 店舗を選び始めたブロックには触らない（編集中の内容を勝手に変えないため）。
+	useEffect( () => {
+		if (
+			PRIMARY_SERVICE &&
+			service !== PRIMARY_SERVICE &&
+			shops.length === 0 &&
+			heading === textsFor( service, PRIMARY_SERVICE ).heading
+		) {
+			changeService( PRIMARY_SERVICE );
+		}
+		// 挿入直後の 1 回だけ見たいので依存は空にする
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	// プレビューに出すバナー（カスタムは選択済み画像、パターンは同梱画像）
 	const bannerPatterns = bannerPatternsFor( service );
