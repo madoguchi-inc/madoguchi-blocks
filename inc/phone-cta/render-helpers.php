@@ -195,13 +195,15 @@ function madoguchi_blocks_phone_cta_walk_blocks( array $blocks, array &$found ) 
 /**
  * 店舗カード 1 枚の HTML。記事内のブロックとキャンペーンLP が同じものを使う。
  *
- * @param array $card           card_state() の戻り値
- * @param bool  $show_pc_modal  PC で番号と QR のモーダルを出すか
+ * @param array      $card          card_state() の戻り値
+ * @param bool       $show_pc_modal PC で番号と QR のモーダルを出すか
+ * @param array|null $modal_banner  モーダルの下に出すキャンペーンバナー
  * @return string
  */
-function madoguchi_blocks_phone_cta_card_html( array $card, $show_pc_modal = true ) {
+function madoguchi_blocks_phone_cta_card_html( array $card, $show_pc_modal = true, $modal_banner = null ) {
 	$c             = $card;
 	$show_pc_modal = (bool) $show_pc_modal;
+	$modal_banner  = is_array( $modal_banner ) ? $modal_banner : null;
 	ob_start();
 	include MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/card.php';
 	return ob_get_clean();

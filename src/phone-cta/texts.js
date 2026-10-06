@@ -45,6 +45,7 @@ export const DEFAULT_TEXTS = {
 				shopLabel: '{shop}に買取できるか相談する',
 				webLabel: 'WEB無料査定はこちら',
 				balloon: '',
+				freeTag: '',
 			},
 		},
 	},

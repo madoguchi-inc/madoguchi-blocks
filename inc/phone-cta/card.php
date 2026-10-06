@@ -8,13 +8,15 @@
  * PC のモーダルは隠しチェックボックスと label で開く（JS を使わない）。
  * 記事本文が REST 経由で配信される先では view.js が動かないため。
  *
- * @var array $c             card_state() の戻り値
- * @var bool  $show_pc_modal PC で番号と QR のモーダルを出すか
+ * @var array      $c             card_state() の戻り値
+ * @var bool       $show_pc_modal PC で番号と QR のモーダルを出すか
+ * @var array|null $modal_banner  モーダルの下に出すキャンペーンバナー（無ければ null）
  */
 if ( ! isset( $c ) || ! is_array( $c ) ) {
 	return;
 }
 $show_pc_modal = isset( $show_pc_modal ) ? (bool) $show_pc_modal : true;
+$modal_banner  = isset( $modal_banner ) && is_array( $modal_banner ) ? $modal_banner : null;
 ?>
 <li class="phone-cta__card <?php echo $c['is_open'] ? 'is-open' : 'is-closed'; ?>"
 	data-service="<?php echo esc_attr( $c['service'] ); ?>"

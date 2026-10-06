@@ -150,7 +150,7 @@ if ( '' !== $shops_param ) {
 	<?php endif; ?>
 	<ul class="phone-cta__list">
 		<?php foreach ( $cards as $c ) : ?>
-			<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal, $modal_banner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?php endforeach; ?>
 	</ul>
 </section>

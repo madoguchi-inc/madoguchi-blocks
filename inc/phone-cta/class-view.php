@@ -73,6 +73,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 					'web_label'       => 'WEB無料査定はこちら',
 					'web_shop_label'  => '{shop}のWEB無料査定はこちら',
 					'balloon'         => '',
+					'free_tag'        => '', // Figma のクロスセルのカードに縦書きタブは無い
 				),
 			),
 		);

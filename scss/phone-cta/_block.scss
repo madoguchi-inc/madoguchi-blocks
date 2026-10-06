@@ -14,6 +14,159 @@ $pc-free-tab    : var(--pc-free-tab, #f39072);
 $pc-icon        : var(--pc-icon, #e04b2d); // Figma のアイコン（phone-filled / touch）の塗り色
 $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb4614) 0%, var(--pc-btn-to, #f78b08) 100%));
 
+// SP（〜896px）のレイアウト。キャンペーンLPのように画面幅によらず 430px 幅で
+// 使う場所（.phone-cta--sp）でも同じ見た目にできるよう mixin にしている。
+@mixin phone-cta-sp-layout {
+	.phone-cta__banner { margin-bottom: 0.8rem; }
+
+	.phone-cta__header {
+		flex-direction: column;
+		align-items: center;
+		gap: 0.8rem;
+		margin-bottom: 0.8rem;
+		padding: 0;
+		border-bottom: 0;
+
+		&::after { display: none; }
+	}
+
+	.phone-cta__titles {
+		align-items: center;
+		gap: 0.2rem;
+		text-align: center;
+	}
+
+	.phone-cta__description { font-size: 1.2rem; }
+
+	// 「▼ 今すぐ電話でかんたん無料査定 ▼」
+	.phone-cta__heading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		font-size: 2rem;
+
+		&::before,
+		&::after {
+			content: "";
+			display: block;
+			flex: 0 0 auto;
+			width: 0;
+			height: 0;
+			border-left: 0.8rem solid transparent;
+			border-right: 0.8rem solid transparent;
+			border-top: 1.2rem solid $pc-gold;
+		}
+	}
+
+	.phone-cta__points {
+		width: 100%;
+		justify-content: space-between;
+		gap: 0.4rem;
+	}
+
+	.phone-cta__point { flex: 1 1 0; min-width: 0; }
+	.phone-cta__point-label { padding: 0.1rem 0.4rem 0.2rem; font-size: 0.9rem; }
+	.phone-cta__point-text { padding: 0.4rem 0.2rem; font-size: 1.2rem; letter-spacing: -0.02em; white-space: nowrap; }
+
+	.phone-cta--cols-2 .phone-cta__list,
+	.phone-cta--cols-3 .phone-cta__list { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+	.phone-cta--cols-1 .phone-cta__list { max-width: none; }
+
+	.phone-cta__card { gap: 1.2rem; }
+
+	// ロゴ左・リード右
+	.phone-cta__intro {
+		flex-direction: row;
+		align-items: stretch;
+		gap: 1.6rem;
+	}
+
+	.phone-cta__logo-box {
+		flex: 0 0 35%;
+		width: auto;
+		height: auto;
+		min-height: 7.5rem;
+		margin: 0;
+		padding: 0.6rem 0.8rem;
+	}
+
+	.phone-cta__logo { max-height: 6.3rem; } // 枠 7.5rem から上下の余白 0.6rem×2 を引いた高さ
+	.phone-cta__name { font-size: 1.6rem; }
+
+	.phone-cta__lead {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		justify-content: center;
+		min-width: 0;
+	}
+
+	.phone-cta__lead-text { font-size: 1.3rem; }
+
+	// 左に縦書き「査定無料」、中央にアイコン＋文言、右に矢印
+	// overflow: hidden は吹き出しが切れるので使わず、タブ側の左角を丸める
+	// 高さは Figma の 68px（電話）に合わせる。縦書きタブが押し上げないよう余白と字間を詰める
+	.phone-cta__button {
+		justify-content: space-between;
+		gap: 0;
+		min-height: 6.8rem;
+		margin-top: 1.4rem;
+		padding: 0 1.6rem 0 0;
+		box-shadow: var(--pc-btn-shadow-sp, 0 0 12px rgba(235, 70, 20, 0.4));
+	}
+
+	.phone-cta__free {
+		display: flex;
+		flex: 0 0 auto;
+		align-self: stretch;
+		align-items: center;
+		justify-content: center;
+		padding: 0.2rem 0.6rem;
+		border-radius: 0.4rem 0 0 0.4rem;
+		background: $pc-free-tab;
+		font-size: 1.4rem;
+		font-weight: 700;
+		line-height: 1.1;
+		letter-spacing: 0.04em;
+		writing-mode: vertical-rl;
+		text-orientation: upright;
+		color: #fff;
+	}
+
+	.phone-cta__button-body {
+		flex: 1 1 auto;
+		gap: 1.6rem;
+		padding: 0.8rem;
+		font-size: 1.7rem;
+	}
+
+	.phone-cta__icon {
+		width: 4rem;
+		height: 4rem;
+	}
+
+	.phone-cta__chevron {
+		display: block;
+		flex: 0 0 auto;
+		width: 1rem;
+		height: 1rem;
+		margin-left: 0.4rem;
+		border-right: 2px solid #fff;
+		border-bottom: 2px solid #fff;
+		transform: rotate(-45deg);
+	}
+
+	.phone-cta__balloon { top: -1.6rem; }
+
+	.phone-cta__hours { font-size: 1.1rem; }
+
+	// SP はボタン自体が tel: リンク。モーダルは出さない
+	.phone-cta__button--modal { display: none; }
+	.phone-cta__button--tel { display: flex; }
+	.phone-cta__modal { display: none !important; }
+}
+
 .phone-cta {
 	margin: 3.2rem 0;
 	color: $pc-black;
@@ -631,8 +784,9 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	// これで紹介文ボックス（詳細コメント）の高さが揃い、ボタンの位置も一直線になる。
 	// subgrid 非対応ブラウザは @supports で除外され、従来どおりカード内で上下中央寄せになる。
 	@include mq-min(md) {
+		// --sp（LP など常に 430px 幅で使う場所）は画面幅が広くても SP レイアウトのままにする
 		@supports (grid-template-rows: subgrid) {
-			&__card {
+			&:not(.phone-cta--sp) .phone-cta__card {
 				display: grid;
 				grid-template-columns: minmax(0, 1fr); // 列は常にカード内幅いっぱい（内容基準で縮ませない）
 				grid-template-rows: subgrid;
@@ -643,26 +797,26 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 			}
 
 			// ラッパーを消して、ロゴ枠と紹介文をカードの行に直接並べる
-			&__intro { display: contents; }
+			&:not(.phone-cta--sp) .phone-cta__intro { display: contents; }
 
-			&__logo-box {
+			&:not(.phone-cta--sp) .phone-cta__logo-box {
 				grid-row: 1;
 				justify-self: center;
 				align-self: end;
 			}
 
-			&__lead {
+			&:not(.phone-cta--sp) .phone-cta__lead {
 				grid-row: 2;
 				width: auto;
 				justify-self: stretch;
 				align-self: stretch;
 			}
 
-			&__action {
+			&:not(.phone-cta--sp) .phone-cta__action {
 				justify-self: stretch;
 			}
 
-			&__action {
+			&:not(.phone-cta--sp) .phone-cta__action {
 				grid-row: 3;
 				margin-top: 2.4rem;
 			}
@@ -671,155 +825,14 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 
 	/* ================= SP（〜896px） ================= */
 	@include mq-max(md) {
-		&__banner { margin-bottom: 0.8rem; }
-
-		&__header {
-			flex-direction: column;
-			align-items: center;
-			gap: 0.8rem;
-			margin-bottom: 0.8rem;
-			padding: 0;
-			border-bottom: 0;
-
-			&::after { display: none; }
-		}
-
-		&__titles {
-			align-items: center;
-			gap: 0.2rem;
-			text-align: center;
-		}
-
-		&__description { font-size: 1.2rem; }
-
-		// 「▼ 今すぐ電話でかんたん無料査定 ▼」
-		&__heading {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 0.4rem;
-			font-size: 2rem;
-
-			&::before,
-			&::after {
-				content: "";
-				display: block;
-				flex: 0 0 auto;
-				width: 0;
-				height: 0;
-				border-left: 0.8rem solid transparent;
-				border-right: 0.8rem solid transparent;
-				border-top: 1.2rem solid $pc-gold;
-			}
-		}
-
-		&__points {
-			width: 100%;
-			justify-content: space-between;
-			gap: 0.4rem;
-		}
-
-		&__point { flex: 1 1 0; min-width: 0; }
-		&__point-label { padding: 0.1rem 0.4rem 0.2rem; font-size: 0.9rem; }
-		&__point-text { padding: 0.4rem 0.2rem; font-size: 1.2rem; letter-spacing: -0.02em; white-space: nowrap; }
-
-		&--cols-2 &__list,
-		&--cols-3 &__list { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-		&--cols-1 &__list { max-width: none; }
-
-		&__card { gap: 1.2rem; }
-
-		// ロゴ左・リード右
-		&__intro {
-			flex-direction: row;
-			align-items: stretch;
-			gap: 1.6rem;
-		}
-
-		&__logo-box {
-			flex: 0 0 35%;
-			width: auto;
-			height: auto;
-			min-height: 7.5rem;
-			margin: 0;
-			padding: 0.6rem 0.8rem;
-		}
-
-		&__logo { max-height: 6.3rem; } // 枠 7.5rem から上下の余白 0.6rem×2 を引いた高さ
-		&__name { font-size: 1.6rem; }
-
-		&__lead {
-			display: flex;
-			flex: 1 1 auto;
-			flex-direction: column;
-			justify-content: center;
-			min-width: 0;
-		}
-
-		&__lead-text { font-size: 1.3rem; }
-
-		// 左に縦書き「査定無料」、中央にアイコン＋文言、右に矢印
-		// overflow: hidden は吹き出しが切れるので使わず、タブ側の左角を丸める
-		// 高さは Figma の 68px（電話）に合わせる。縦書きタブが押し上げないよう余白と字間を詰める
-		&__button {
-			justify-content: space-between;
-			gap: 0;
-			min-height: 6.8rem;
-			margin-top: 1.4rem;
-			padding: 0 1.6rem 0 0;
-			box-shadow: var(--pc-btn-shadow-sp, 0 0 12px rgba(235, 70, 20, 0.4));
-		}
-
-		&__free {
-			display: flex;
-			flex: 0 0 auto;
-			align-self: stretch;
-			align-items: center;
-			justify-content: center;
-			padding: 0.2rem 0.6rem;
-			border-radius: 0.4rem 0 0 0.4rem;
-			background: $pc-free-tab;
-			font-size: 1.4rem;
-			font-weight: 700;
-			line-height: 1.1;
-			letter-spacing: 0.04em;
-			writing-mode: vertical-rl;
-			text-orientation: upright;
-			color: #fff;
-		}
-
-		&__button-body {
-			flex: 1 1 auto;
-			gap: 1.6rem;
-			padding: 0.8rem;
-			font-size: 1.7rem;
-		}
-
-		&__icon {
-			width: 4rem;
-			height: 4rem;
-		}
-
-		&__chevron {
-			display: block;
-			flex: 0 0 auto;
-			width: 1rem;
-			height: 1rem;
-			margin-left: 0.4rem;
-			border-right: 2px solid #fff;
-			border-bottom: 2px solid #fff;
-			transform: rotate(-45deg);
-		}
-
-		&__balloon { top: -1.6rem; }
-
-		&__hours { font-size: 1.1rem; }
-
-		// SP はボタン自体が tel: リンク。モーダルは出さない
-		&__button--modal { display: none; }
-		&__button--tel { display: flex; }
-		&__modal { display: none !important; }
+		@include phone-cta-sp-layout;
 	}
+}
+
+// キャンペーンLPのように、画面幅によらず 430px 幅で使う場所。
+// 記事内の電話CTAブロックと同じカードを、PC でも SP の見た目のまま出す
+.phone-cta--sp {
+	@include phone-cta-sp-layout;
 }
 
 // 光の反射（右上から左下へ流れ、しばらく間を置いて繰り返す）
