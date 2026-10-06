@@ -35,6 +35,12 @@ const BANNER_PATTERNS_BY_SERVICE =
 	( typeof window !== 'undefined' &&
 		window.madoguchiBlocksData?.phoneCtaBanners ) ||
 	{};
+// サイトの主サービス（設定 > Madoguchi Blocks）。これと違うサービスのカードは
+// クロスセル用の文言になる。例: 回収の記事に出す買取店は「買取できるか相談する」
+const PRIMARY_SERVICE =
+	( typeof window !== 'undefined' &&
+		window.madoguchiBlocksData?.primaryService ) ||
+	'';
 const BANNER_FALLBACK = [
 	{ value: '', label: 'バナーなし', url: '', alt: '' },
 ];
@@ -62,7 +68,7 @@ const MAX_POINTS = 3;
 
 function CardPreview( { service, item } ) {
 	const cardService = cardServiceOf( item, service );
-	const texts = textsFor( cardService );
+	const texts = textsFor( cardService, PRIMARY_SERVICE );
 	const { shop, loading, error } = useShopDetail( cardService, item.uuid );
 	if ( ! item.uuid ) {
 		return (
@@ -224,8 +230,8 @@ export default function Edit( { attributes, setAttributes } ) {
 	// サービス切替時、見出し／説明が「切替前サービスの既定文言のまま」なら新サービスの既定文言に
 	// 差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。
 	const changeService = ( next ) => {
-		const prevTexts = textsFor( service );
-		const nextTexts = textsFor( next );
+		const prevTexts = textsFor( service, PRIMARY_SERVICE );
+		const nextTexts = textsFor( next, PRIMARY_SERVICE );
 		// サービスを明示しているカードは別マスタなのでそのまま残し、
 		// 「ブロックに従う」カードだけ店舗の選択をリセットする（引く先が変わるため）
 		const patch = {

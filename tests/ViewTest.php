@@ -97,7 +97,7 @@ class ViewTest extends TestCase {
 		$this->assertSame( '独自リード', $state['lead'] );
 		$this->assertSame( '買取大吉に電話で査定額を聞く', $state['label'] ); // 旧属性 buttonLabel が残っていても無視
 		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array(), $this->now( '2026-09-16 12:00' ), 'fuyouhin' );
-		$this->assertSame( '買取大吉に電話で見積もりを聞く', $state['label'] );
+		$this->assertSame( '買取大吉に電話で相談する', $state['label'] );
 	}
 
 	public function test_card_state_prefers_item_web_url(): void {
@@ -141,14 +141,16 @@ class ViewTest extends TestCase {
 		$this->assertSame( '電話で査定額を聞く', $s['label'] );
 
 		$s = Madoguchi_Blocks_Phone_Cta_View::footer_state( null, $attrs, $open, 'fuyouhin' );
-		$this->assertSame( '電話で見積もりを聞く', $s['label'] );
+		$this->assertSame( '電話で相談する', $s['label'] );
 	}
 
 	public function test_label_parts_splits_after_particle(): void {
 		$shop = $this->shop();
 		// 店名＋「に」で切れる（買取 / 回収・清掃）
 		$this->assertSame( array( '買取大吉に', '電話で査定額を聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'kaitori' ) );
-		$this->assertSame( array( '買取大吉に', '電話で見積もりを聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'fuyouhin' ) );
+		$this->assertSame( array( '買取大吉に', '電話で相談する' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'fuyouhin' ) );
+		// 文言セットを持たないサービスは『other』に落ちる
+		$this->assertSame( array( '買取大吉に', '電話で見積もりを聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'osouji' ) );
 		// 店名が無ければ助詞だけが前半
 		$this->assertSame( array( 'に', '電話で査定額を聞く' ), Madoguchi_Blocks_Phone_Cta_View::label_parts( array(), 'kaitori' ) );
 		// button_label と label_parts の結合は一致する
@@ -158,5 +160,61 @@ class ViewTest extends TestCase {
 	public function test_default_texts_by_service(): void {
 		$this->assertSame( '今すぐ電話でかんたん無料査定', Madoguchi_Blocks_Phone_Cta_View::default_texts( 'kaitori' )['heading'] );
 		$this->assertSame( '今すぐ電話でかんたん無料見積もり', Madoguchi_Blocks_Phone_Cta_View::default_texts( 'osouji' )['heading'] );
+	}
+
+	public function test_fuyouhin_has_its_own_texts(): void {
+		$texts = Madoguchi_Blocks_Phone_Cta_View::default_texts( 'fuyouhin' );
+		$this->assertSame( '{shop}に電話で相談する', $texts['shop_label'] );
+		$this->assertSame( 'その場でかんたん見積もり！', $texts['balloon'] );
+		// 回収の Figma に POINT バッジと「査定無料」の縦書きタブは無い
+		$this->assertSame( array(), $texts['points'] );
+		$this->assertSame( '', $texts['free_tag'] );
+	}
+
+	public function test_cross_sell_texts_apply_only_on_the_host_site(): void {
+		$shop = array( 'name' => 'おたからや' );
+
+		// 回収のサイトに置いた買取カードは「買取できるか相談する」になる
+		$this->assertSame(
+			array( 'おたからやに', '買取できるか相談する' ),
+			Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'kaitori', 'fuyouhin' )
+		);
+		// 買取のサイト（主サービス未設定）は従来どおり
+		$this->assertSame(
+			array( 'おたからやに', '電話で査定額を聞く' ),
+			Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'kaitori' )
+		);
+		// 同じサービス同士ならクロスセルの上書きは効かない
+		$this->assertSame(
+			array( 'おたからやに', '電話で相談する' ),
+			Madoguchi_Blocks_Phone_Cta_View::label_parts( $shop, 'fuyouhin', 'fuyouhin' )
+		);
+	}
+
+	public function test_web_label_takes_shop_name_only_when_template_has_one(): void {
+		$shop = array( 'name' => 'おたからや' );
+		// クロスセルの WEB ボタンだけ店名が入る（Figma「[買取業者名] の WEB無料査定はこちら」）
+		$this->assertSame(
+			array( 'おたからやの', 'WEB無料査定はこちら' ),
+			Madoguchi_Blocks_Phone_Cta_View::web_label_parts( $shop, 'kaitori', 'fuyouhin' )
+		);
+		// 通常は店名を含まない固定文言
+		$this->assertSame(
+			array( 'WEBでカンタン', '無料査定はこちら' ),
+			Madoguchi_Blocks_Phone_Cta_View::web_label_parts( $shop, 'kaitori' )
+		);
+		$this->assertSame(
+			array( 'WEBでカンタン', '無料お見積もりはこちら' ),
+			Madoguchi_Blocks_Phone_Cta_View::web_label_parts( $shop, 'fuyouhin' )
+		);
+	}
+
+	public function test_card_state_carries_service_and_card_texts(): void {
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array(), $this->now( '2026-09-16 12:00' ), 'kaitori', 'fuyouhin' );
+		// カードごとに色と文言を変えるので、サービスと文言は state に乗せて render へ渡す
+		$this->assertSame( 'kaitori', $state['service'] );
+		$this->assertSame( '買取大吉に買取できるか相談する', $state['label'] );
+		// クロスセルのカードに吹き出しは出さない
+		$this->assertSame( '', $state['balloon'] );
 	}
 }

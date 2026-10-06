@@ -183,6 +183,23 @@ function madoguchi_blocks_register_settings() {
 		'madoguchi-blocks',
 		'madoguchi_blocks_phone_cta'
 	);
+
+	register_setting(
+		'madoguchi_blocks',
+		'madoguchi_blocks_primary_service',
+		array(
+			'type'              => 'string',
+			'sanitize_callback' => 'madoguchi_blocks_sanitize_primary_service',
+			'default'           => '',
+		)
+	);
+	add_settings_field(
+		'madoguchi_blocks_primary_service',
+		__( 'このサイトの主サービス', 'madoguchi-blocks' ),
+		'madoguchi_blocks_primary_service_field',
+		'madoguchi-blocks',
+		'madoguchi_blocks_phone_cta'
+	);
 }
 add_action( 'admin_init', 'madoguchi_blocks_register_settings' );
 
@@ -413,6 +430,38 @@ function madoguchi_blocks_phone_cta_enabled_services() {
 
 function madoguchi_blocks_phone_cta_section_intro() {
 	echo '<p>' . esc_html__( '記事内の電話CTAブロックが店舗情報を取得する estima の API です。使うサービスだけ URL を入れてください(例: https://api.ekaitori.com)。店舗情報は 10 分キャッシュされます。', 'madoguchi-blocks' ) . '</p>';
+}
+
+/**
+ * 主サービスを検証する。定義済みのサービスキーか空文字だけ通す。
+ */
+function madoguchi_blocks_sanitize_primary_service( $value ) {
+	$value = is_string( $value ) ? trim( $value ) : '';
+	return Madoguchi_Blocks_Phone_Cta_Services::is_valid( $value ) ? $value : '';
+}
+
+/**
+ * 主サービスの選択フィールドを描画する。
+ */
+function madoguchi_blocks_primary_service_field() {
+	$current = get_option( 'madoguchi_blocks_primary_service', '' );
+	printf(
+		'<select name="madoguchi_blocks_primary_service"><option value="">%s</option>',
+		esc_html__( '指定しない', 'madoguchi-blocks' )
+	);
+	foreach ( Madoguchi_Blocks_Phone_Cta_Services::KEYS as $key => $label ) {
+		printf(
+			'<option value="%1$s"%2$s>%3$s</option>',
+			esc_attr( $key ),
+			selected( $current, $key, false ),
+			esc_html( $label )
+		);
+	}
+	echo '</select>';
+	echo '<p class="description">' . esc_html__(
+		'このサイトが扱う事業です。ここと違うサービスのカードを記事に混ぜたとき（例: 回収の記事に買取店を出すクロスセル）、そのカードだけ文言と色が切り替わります。1 事業しか扱わないサイトは「指定しない」のままで構いません。',
+		'madoguchi-blocks'
+	) . '</p>';
 }
 
 function madoguchi_blocks_phone_cta_api_urls_field() {

@@ -16,7 +16,9 @@ if ( empty( $items ) ) {
 
 $repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
 $now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
-$texts = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service );
+// サイトの主サービスと違うブロック（回収の記事に置く買取カードなど）は文言と色が変わる
+$host_service = madoguchi_blocks_phone_cta_primary_service();
+$texts        = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service, $host_service );
 $show_pc_modal = ! isset( $attributes['showPcModal'] ) || $attributes['showPcModal']; // PC は tel: が押せないので番号と QR のモーダルを出す
 
 $cards = array();
@@ -30,7 +32,7 @@ foreach ( $items as $item ) {
 	if ( null === $shop ) {
 		continue; // マスタに無い／非公開の店舗は出さない
 	}
-	$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $card_service );
+	$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $card_service, $host_service );
 	if ( null !== $state ) {
 		$cards[] = $state;
 	}
@@ -54,6 +56,8 @@ $extra = array(
 	'class'          => 'phone-cta phone-cta--cols-' . count( $cards ),
 	'data-phone-cta' => '',
 	'data-service'   => $service,
+	// サイトの主サービス。これと違うサービスのカードはクロスセル用の配色になる
+	'data-host-service' => $host_service,
 );
 if ( madoguchi_blocks_phone_cta_once( 'first-block:' . (int) get_the_ID() ) ) {
 	$extra['id'] = 'phone-cta';
@@ -68,9 +72,15 @@ $banner       = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'pc' )
 $banner_sp    = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'sp' );
 $modal_banner = Madoguchi_Blocks_Phone_Cta_Banners::resolve( $attributes, 'modal' );
 
-// 遷移先のキャンペーンLPで同じ店舗を出せるよう、実際に描画した店舗をリンクに載せる。
+// 遷移先のキャンペーンLPで同じ店舗を出せるよう、記事で出している店舗をリンクに載せる。
+// 記事に電話CTAブロックを複数置く構成（回収のカード群＋クロスセルの買取カード）があるので、
+// このブロックのカードだけでなく本文全体から集める。1 つしか置いていなければ結果は同じ。
 // 編集画面で utm 付きの URL を入れていても壊さないよう add_query_arg で連結する
-$shops_param = Madoguchi_Blocks_Phone_Cta_View::shops_param( $cards );
+$post_shops  = madoguchi_blocks_phone_cta_post_shops( get_the_ID() );
+$shops_param = Madoguchi_Blocks_Phone_Cta_View::shops_param(
+	! empty( $post_shops ) ? $post_shops : $cards,
+	$service
+);
 if ( '' !== $shops_param ) {
 	if ( null !== $banner && '' !== $banner['link'] ) {
 		$banner['link'] = add_query_arg( 's', $shops_param, $banner['link'] );
@@ -141,6 +151,7 @@ if ( '' !== $shops_param ) {
 	<ul class="phone-cta__list">
 		<?php foreach ( $cards as $c ) : ?>
 			<li class="phone-cta__card <?php echo $c['is_open'] ? 'is-open' : 'is-closed'; ?>"
+				data-service="<?php echo esc_attr( $c['service'] ); ?>"
 				data-shop-uuid="<?php echo esc_attr( $c['uuid'] ); ?>"
 				data-shop-name="<?php echo esc_attr( $c['name'] ); ?>"
 				data-tel="<?php echo esc_attr( $c['tel_href'] ); ?>"
@@ -165,19 +176,20 @@ if ( '' !== $shops_param ) {
 				<div class="phone-cta__action">
 					<?php if ( 'web' === $c['mode'] ) : ?>
 						<a class="phone-cta__button phone-cta__button--web" href="<?php echo esc_url( $c['fallback_url'] ); ?>" target="_blank" rel="noopener">
-							<span class="phone-cta__free"><?php echo esc_html( $texts['free_tag'] ); ?></span>
+							<?php if ( '' !== $c['free_tag'] ) : ?><span class="phone-cta__free"><?php echo esc_html( $c['free_tag'] ); ?></span><?php endif; ?>
 							<span class="phone-cta__button-body">
 								<?php echo madoguchi_blocks_phone_cta_icon( 'touch' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 								<?php // 2 片の間に空白文字が入らないよう 1 行で出す ?>
-								<span class="phone-cta__button-label"><span class="phone-cta__button-head"><?php echo esc_html( $texts['web_label_parts'][0] ); ?></span><span class="phone-cta__button-tail"><?php echo esc_html( $texts['web_label_parts'][1] ); ?></span></span>
+								<span class="phone-cta__button-label"><?php if ( '' !== $c['web_label_parts'][0] ) : ?><span class="phone-cta__button-head"><?php echo esc_html( $c['web_label_parts'][0] ); ?></span><?php endif; ?><span class="phone-cta__button-tail"><?php echo esc_html( $c['web_label_parts'][1] ); ?></span></span>
 							</span>
 							<span class="phone-cta__chevron" aria-hidden="true"></span>
 						</a>
 					<?php else : ?>
 						<?php
 						// ボタンの中身は SP の tel: リンクと PC のモーダル起点で同じものを使う
-						$button_inner = ( 'tel' === $c['mode'] ? '<span class="phone-cta__balloon">' . esc_html( $texts['balloon'] ) . '</span>' : '' )
-							. '<span class="phone-cta__free">' . esc_html( $texts['free_tag'] ) . '</span>'
+						$has_balloon  = 'tel' === $c['mode'] && '' !== $c['balloon'];
+						$button_inner = ( $has_balloon ? '<span class="phone-cta__balloon">' . esc_html( $c['balloon'] ) . '</span>' : '' )
+							. ( '' !== $c['free_tag'] ? '<span class="phone-cta__free">' . esc_html( $c['free_tag'] ) . '</span>' : '' )
 							. '<span class="phone-cta__button-body">'
 							. madoguchi_blocks_phone_cta_icon( 'phone' )
 							. '<span class="phone-cta__button-label">'
@@ -185,7 +197,7 @@ if ( '' !== $shops_param ) {
 							. '<span class="phone-cta__button-tail">' . esc_html( $c['label_parts'][1] ) . '</span>'
 							. '</span></span>'
 							. '<span class="phone-cta__chevron" aria-hidden="true"></span>';
-						$button_class = 'phone-cta__button' . ( 'tel' === $c['mode'] ? ' phone-cta__button--balloon' : '' );
+						$button_class = 'phone-cta__button' . ( $has_balloon ? ' phone-cta__button--balloon' : '' );
 						$qr_svg       = madoguchi_blocks_phone_cta_qr_svg( $c['qr_svg'] );
 						$use_modal    = $show_pc_modal && '' !== $c['tel_display'];
 						// 同じ店舗を 2 回選んだ場合やブロックを複数置いた場合に id が衝突しないよう通し番号を混ぜる

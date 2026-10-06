@@ -23,6 +23,31 @@ export const DEFAULT_TEXTS = {
 		webButtonSp: 'オンライン一括査定',
 		shopLabel: '{shop}に電話で査定額を聞く',
 	},
+	// 回収。Figma「不用品回収の窓口 サイトデザイン」コラム内テーブル・CTAデザイン。
+	// 買取と違い POINT バッジと「査定無料」の縦書きタブを持たない
+	fuyouhin: {
+		description: '「いくらかかる？」「これも回収できる？」',
+		heading: '不用品回収のお悩みを相談できる業者をご紹介します！',
+		points: [],
+		freeTag: '',
+		balloon: 'その場でかんたん見積もり！',
+		footerCatchBadge: '完全無料',
+		footerCatch: '複数社で比較して1番安く済ませよう',
+		genericLabel: '電話で相談する',
+		webLabel: 'WEBでカンタン無料お見積もりはこちら',
+		webButtonSub: '24時間年中無休で受付中！',
+		webButton: 'オンライン無料一括見積もり',
+		webButtonSp: 'オンライン一括見積もり',
+		shopLabel: '{shop}に電話で相談する',
+		// 回収の記事に載せる買取店（「回収予定の不用品、実は買取できるかも」の導線）
+		cross: {
+			kaitori: {
+				shopLabel: '{shop}に買取できるか相談する',
+				webLabel: 'WEB無料査定はこちら',
+				balloon: '',
+			},
+		},
+	},
 	other: {
 		description: '複数の業者に見積もりを取ることが安く済ませるコツ！',
 		heading: '今すぐ電話でかんたん無料見積もり',
@@ -63,11 +88,19 @@ export function splitLabel( template, name ) {
 }
 
 /**
- * サービスキーから既定文言セットを引く。'kaitori' 以外はすべて 'other' と同じ文言。
+ * サービスキーから既定文言セットを引く。文言セットを持たないサービスは 'other' に落ちる。
  *
- * @param {string} service サービスキー（'kaitori' | 'fuyouhin' | 'osouji' 等）。
- * @return {Object} DEFAULT_TEXTS の該当エントリ。
+ * @param {string} service     サービスキー（'kaitori' | 'fuyouhin' | 'osouji' 等）。
+ * @param {string} hostService サイトの主サービス。service と違えばクロスセル用の上書きを当てる。
+ * @return {Object} DEFAULT_TEXTS の該当エントリ（cross は除く）。
  */
-export function textsFor( service ) {
-	return 'kaitori' === service ? DEFAULT_TEXTS.kaitori : DEFAULT_TEXTS.other;
+export function textsFor( service, hostService = '' ) {
+	const base = DEFAULT_TEXTS[ service ] || DEFAULT_TEXTS.other;
+	const host = DEFAULT_TEXTS[ hostService ];
+	const cross =
+		hostService && hostService !== service && host && host.cross
+			? host.cross[ service ]
+			: null;
+	const { cross: _omit, ...texts } = { ...base, ...( cross || {} ) };
+	return texts;
 }

@@ -120,6 +120,10 @@ function madoguchi_blocks_register() {
 	if ( class_exists( 'Madoguchi_Blocks_Phone_Cta_Banners' ) ) {
 		$editor_data['phoneCtaBanners'] = Madoguchi_Blocks_Phone_Cta_Banners::options();
 	}
+	// 主サービスと違うサービスのカードは文言が変わる（クロスセル）。編集画面でも同じ文言を出す
+	if ( function_exists( 'madoguchi_blocks_phone_cta_primary_service' ) ) {
+		$editor_data['primaryService'] = madoguchi_blocks_phone_cta_primary_service();
+	}
 	if ( ! empty( $editor_data ) ) {
 		wp_localize_script( 'madoguchi-blocks-editor', 'madoguchiBlocksData', $editor_data );
 	}
