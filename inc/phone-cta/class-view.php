@@ -6,6 +6,13 @@
 class Madoguchi_Blocks_Phone_Cta_View {
 
 	/**
+	 * バナーのリンクに店舗を載せるクエリのキー。
+	 * `s` は WordPress の検索クエリの予約語で、固定ページに付けると検索結果（404）に
+	 * 飛ばされてしまうため使えない。
+	 */
+	const SHOPS_QUERY_KEY = 'shops';
+
+	/**
 	 * サービス別の既定文言。
 	 * Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC / コラム_SP / 固定フッター）の文言を既定とする。
 	 * src/phone-cta/texts.js の DEFAULT_TEXTS と必ず一致させる。

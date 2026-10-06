@@ -83,10 +83,10 @@ $shops_param = Madoguchi_Blocks_Phone_Cta_View::shops_param(
 );
 if ( '' !== $shops_param ) {
 	if ( null !== $banner && '' !== $banner['link'] ) {
-		$banner['link'] = add_query_arg( 's', $shops_param, $banner['link'] );
+		$banner['link'] = add_query_arg( Madoguchi_Blocks_Phone_Cta_View::SHOPS_QUERY_KEY, $shops_param, $banner['link'] );
 	}
 	if ( null !== $modal_banner && '' !== $modal_banner['link'] ) {
-		$modal_banner['link'] = add_query_arg( 's', $shops_param, $modal_banner['link'] );
+		$modal_banner['link'] = add_query_arg( Madoguchi_Blocks_Phone_Cta_View::SHOPS_QUERY_KEY, $shops_param, $modal_banner['link'] );
 	}
 }
 ?>
