@@ -191,3 +191,65 @@ function madoguchi_blocks_phone_cta_walk_blocks( array $blocks, array &$found ) 
 		}
 	}
 }
+
+/**
+ * 店舗カード 1 枚の HTML。記事内のブロックとキャンペーンLP が同じものを使う。
+ *
+ * @param array $card           card_state() の戻り値
+ * @param bool  $show_pc_modal  PC で番号と QR のモーダルを出すか
+ * @return string
+ */
+function madoguchi_blocks_phone_cta_card_html( array $card, $show_pc_modal = true ) {
+	$c             = $card;
+	$show_pc_modal = (bool) $show_pc_modal;
+	ob_start();
+	include MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/card.php';
+	return ob_get_clean();
+}
+
+/**
+ * `?s=` の値から、カードの表示状態を本文と同じ並びで作る。キャンペーンLP が使う。
+ *
+ * 記事の電話CTAブロックはバナーのリンクに `?s=<uuid>[:<numberId>][@<service>],...` を付ける。
+ * LP はそれを読み、同じ店舗を同じ順で出す。引けなかった店舗（削除済み・非公開・
+ * 番号なし）は黙って落とすので、呼び出し側は戻り値の件数で出し分ける。
+ *
+ * @param string $param           クエリ `s` の値
+ * @param string $default_service `@service` が無い要素に使うサービス。空ならサイトの主サービス
+ * @param int    $max             最大件数
+ * @return array<int,array> card_state() の配列
+ */
+function madoguchi_blocks_phone_cta_cards_from_param( $param, $default_service = '', $max = 3 ) {
+	if ( ! class_exists( 'Madoguchi_Blocks_Phone_Cta_View' ) ) {
+		return array();
+	}
+	$param = is_string( $param ) ? $param : '';
+	if ( '' === trim( $param ) ) {
+		return array();
+	}
+	$host    = madoguchi_blocks_phone_cta_primary_service();
+	$default = Madoguchi_Blocks_Phone_Cta_Services::is_valid( (string) $default_service )
+		? (string) $default_service
+		: ( '' !== $host ? $host : 'kaitori' );
+
+	$picks = Madoguchi_Blocks_Phone_Cta_View::parse_shops_param( $param, $default, (int) $max );
+	if ( empty( $picks ) ) {
+		return array();
+	}
+
+	$repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
+	$now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
+	$cards = array();
+	foreach ( $picks as $pick ) {
+		$shop = $repo->find( $pick['service'], $pick['uuid'] );
+		if ( null === $shop ) {
+			continue;
+		}
+		$item  = '' !== $pick['number_id'] ? array( 'numberId' => $pick['number_id'] ) : array();
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $pick['service'], $host );
+		if ( null !== $state ) {
+			$cards[] = $state;
+		}
+	}
+	return $cards;
+}
