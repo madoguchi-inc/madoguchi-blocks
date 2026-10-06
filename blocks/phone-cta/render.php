@@ -8,7 +8,13 @@
 if ( empty( $attributes['isVisible'] ) ) {
 	return;
 }
-$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attributes['service'] ) ? $attributes['service'] : null );
+// サイトの主サービスと違うブロック（回収の記事に置く買取カードなど）は文言と色が変わる
+$host_service = madoguchi_blocks_phone_cta_primary_service();
+// サービス未指定のブロックはサイトの主サービス。設定が無ければ従来どおり買取
+$service = Madoguchi_Blocks_Phone_Cta_Services::resolve(
+	isset( $attributes['service'] ) ? $attributes['service'] : null,
+	'' !== $host_service ? $host_service : 'kaitori'
+);
 $items   = isset( $attributes['shops'] ) && is_array( $attributes['shops'] ) ? array_slice( $attributes['shops'], 0, 3 ) : array();
 if ( empty( $items ) ) {
 	return;
@@ -16,9 +22,7 @@ if ( empty( $items ) ) {
 
 $repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
 $now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
-// サイトの主サービスと違うブロック（回収の記事に置く買取カードなど）は文言と色が変わる
-$host_service = madoguchi_blocks_phone_cta_primary_service();
-$texts        = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service, $host_service );
+$texts = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service, $host_service );
 $show_pc_modal = ! isset( $attributes['showPcModal'] ) || $attributes['showPcModal']; // PC は tel: が押せないので番号と QR のモーダルを出す
 
 $cards = array();

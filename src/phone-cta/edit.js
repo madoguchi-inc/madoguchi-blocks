@@ -21,7 +21,6 @@ import {
 	Button,
 	Notice,
 } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import PhoneCtaIcon from './icons';
@@ -166,10 +165,10 @@ function CardPreview( { service, item } ) {
 
 export default function Edit( { attributes, setAttributes } ) {
 	const {
-		service,
-		heading,
-		description,
-		points,
+		service: savedService,
+		heading: savedHeading,
+		description: savedDescription,
+		points: savedPoints,
 		shops,
 		showPcModal,
 		bannerPreset,
@@ -178,6 +177,14 @@ export default function Edit( { attributes, setAttributes } ) {
 		bannerLinkUrl,
 		isVisible,
 	} = attributes;
+	// block.json に既定値を置かず、未設定ならサービス別の文言に落とす。
+	// 既定値を買取で固定すると、回収のサイトに置いたときに「無料査定」で始まってしまう
+	const service = savedService || PRIMARY_SERVICE || 'kaitori';
+	const texts = textsFor( service, PRIMARY_SERVICE );
+	const heading = savedHeading ?? texts.heading;
+	const description = savedDescription ?? texts.description;
+	const points = savedPoints ?? texts.points;
+
 	const { services, loading: servicesLoading } = useServices();
 	const serviceOptions = Object.entries( services ).map(
 		( [ value, label ] ) => ( {
@@ -249,10 +256,11 @@ export default function Edit( { attributes, setAttributes } ) {
 		) {
 			patch.bannerPreset = '';
 		}
-		if ( heading === prevTexts.heading ) {
+		// 未設定（＝既定文言のまま）か、切替前サービスの既定文言のままなら差し替える
+		if ( savedHeading === undefined || savedHeading === prevTexts.heading ) {
 			patch.heading = nextTexts.heading;
 		}
-		if ( description === prevTexts.description ) {
+		if ( savedDescription === undefined || savedDescription === prevTexts.description ) {
 			patch.description = nextTexts.description;
 		}
 		setAttributes( patch );
@@ -262,19 +270,6 @@ export default function Edit( { attributes, setAttributes } ) {
 	// （既定値を変えると買取の既存記事の保存内容と食い違う）、回収のサイトで置いたときに
 	// 見出しが「無料査定」で始まってしまうのを避ける。
 	// 店舗を選び始めたブロックには触らない（編集中の内容を勝手に変えないため）。
-	useEffect( () => {
-		if (
-			PRIMARY_SERVICE &&
-			service !== PRIMARY_SERVICE &&
-			shops.length === 0 &&
-			heading === textsFor( service, PRIMARY_SERVICE ).heading
-		) {
-			changeService( PRIMARY_SERVICE );
-		}
-		// 挿入直後の 1 回だけ見たいので依存は空にする
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
-
 	// プレビューに出すバナー（カスタムは選択済み画像、パターンは同梱画像）
 	const bannerPatterns = bannerPatternsFor( service );
 	const bannerPattern = bannerPatternOf( service, bannerPreset );

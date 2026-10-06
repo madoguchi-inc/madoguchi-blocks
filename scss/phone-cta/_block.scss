@@ -877,6 +877,22 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	padding: 2.4rem 1.6rem;
 	background: #fffeef;
 
+	// 見出しの左右の三角とヘッダの罫線は買取だけの装飾。回収の Figma には無い
+	.phone-cta__heading {
+		&::before,
+		&::after {
+			display: none;
+		}
+	}
+
+	.phone-cta__header {
+		border-bottom: 0;
+
+		&::after {
+			display: none;
+		}
+	}
+
 	// 小見出しは白地のピル。見出しの上に置く
 	.phone-cta__description {
 		display: inline-block;
