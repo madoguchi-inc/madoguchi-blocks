@@ -824,9 +824,11 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	}
 
 	/* ================= SP（〜896px） ================= */
-	@include mq-max(md) {
-		@include phone-cta-sp-layout;
-	}
+}
+
+/* ================= SP（〜896px） ================= */
+@include mq-max(md) {
+	@include phone-cta-sp-layout;
 }
 
 // キャンペーンLPのように、画面幅によらず 430px 幅で使う場所。
@@ -903,8 +905,22 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	}
 }
 
-// クロスセルのブロック自体は地色を敷かず、白のまま見出しだけ出す
+// クロスセルのブロック自体は地色を敷かず、白のまま見出しだけ出す。
+// Figma の見出しは1行の文だけなので、買取の装飾（ゴールドの三角と罫線）は出さない
 .phone-cta[data-host-service="fuyouhin"][data-service="kaitori"] {
 	padding: 0;
 	background: none;
+
+	.phone-cta__heading {
+		color: var(--pc-text, #18191e);
+
+		&::before,
+		&::after {
+			display: none;
+		}
+	}
+
+	.phone-cta__header::after {
+		display: none;
+	}
 }
