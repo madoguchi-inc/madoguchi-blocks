@@ -936,7 +936,11 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 		}
 	}
 
-	.phone-cta__header::after {
-		display: none;
+	.phone-cta__header {
+		border-bottom: 0;
+
+		&::after {
+			display: none;
+		}
 	}
 }

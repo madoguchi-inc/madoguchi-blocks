@@ -72,7 +72,7 @@ function CardPreview( { service, item } ) {
 	const { shop, loading, error } = useShopDetail( cardService, item.uuid );
 	if ( ! item.uuid ) {
 		return (
-			<li className="phone-cta__card">
+			<li className="phone-cta__card" data-service={ cardService }>
 				<div className="phone-cta__lead">
 					<p className="phone-cta__lead-text">
 						{ __( '店舗を選択してください', 'madoguchi-blocks' ) }
@@ -83,7 +83,7 @@ function CardPreview( { service, item } ) {
 	}
 	if ( loading ) {
 		return (
-			<li className="phone-cta__card">
+			<li className="phone-cta__card" data-service={ cardService }>
 				<div className="phone-cta__lead">
 					<p className="phone-cta__lead-text">
 						{ __( '読み込み中…', 'madoguchi-blocks' ) }
@@ -94,7 +94,7 @@ function CardPreview( { service, item } ) {
 	}
 	if ( error || ! shop ) {
 		return (
-			<li className="phone-cta__card is-closed">
+			<li className="phone-cta__card is-closed" data-service={ cardService }>
 				<p className="phone-cta__notice">
 					{ __( 'マスタに存在しません', 'madoguchi-blocks' ) }
 				</p>
@@ -111,7 +111,7 @@ function CardPreview( { service, item } ) {
 	const [ labelShop, labelRest ] = splitLabel( texts.shopLabel, shop.name );
 	const lead = item.leadText || shop.lead_text;
 	return (
-		<li className="phone-cta__card is-open">
+		<li className="phone-cta__card is-open" data-service={ cardService }>
 			<div className="phone-cta__intro">
 				<div className="phone-cta__logo-box">
 					{ shop.logo_url ? (
@@ -285,11 +285,15 @@ export default function Edit( { attributes, setAttributes } ) {
 			  }
 			: null;
 
+	// 表示側（render.php）と同じ data 属性を出す。これが無いとエディタのプレビューだけ
+	// 配色がサービスに追従しない（CSS が [data-service] で分岐しているため）
 	const blockProps = useBlockProps( {
 		className: `phone-cta phone-cta--cols-${ Math.max(
 			1,
 			Math.min( 3, shops.length )
 		) }`,
+		'data-service': service,
+		'data-host-service': PRIMARY_SERVICE,
 	} );
 
 	return (
