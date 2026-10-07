@@ -888,6 +888,15 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 // 色の出典: Figma「不用品回収の窓口 サイトデザイン」コラム内テーブル・CTAデザイン(1920-40520)、
 // 変数 Master/Key-color/FM-Blue = #4abfd7、不用品新TOP薄背景 = #fffeef。
 
+// 回収のカードは PC で最大 2 列。Figma のカード幅（374px）に近づける。
+// 記事本文を 3 分割すると 1 枚あたり 234px しかなく、ロゴも紹介文も詰まってしまう
+@include mq-min(md) {
+	.phone-cta[data-service="fuyouhin"] .phone-cta__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		max-width: none;
+	}
+}
+
 // 回収のカードは PC でもロゴ左・紹介文右（Figma「回収サービスの回収店舗カード」1920-40605）。
 // 買取の縦積み（subgrid の 3 行）とは組み方が違うので、サービスで分けて指定する。
 // 高さは grid の既定（align-items: stretch）で揃え、ボタンはカードの下端に寄せる
@@ -1050,6 +1059,13 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	padding: 2.4rem 1.6rem;
 	background: #fffeef;
 
+	// バナーはクリームの外（白地）に置く。Figma ではクリームはバナーの下から始まる
+	.phone-cta__banner {
+		margin: -2.4rem -1.6rem 1.6rem;
+		padding: 2.4rem 1.6rem 1.6rem;
+		background: #fff;
+	}
+
 	// 別サービスのカードは地色の外に出す（Figma では白地の別セクション）
 	.phone-cta__cross {
 		margin: 2.4rem -1.6rem -2.4rem;
@@ -1093,7 +1109,8 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 		padding: 0.7rem 2rem;
 		border-radius: 0.6rem;
 		background: #fff;
-		box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.05);
+		// クリームの地に対して輪郭が出るよう、黒ではなく暖色の影（Figma 実測に合わせる）
+		box-shadow: 0 0.2rem 0.8rem rgba(176, 160, 70, 0.35);
 		color: #6f6f6f;
 
 		&::after {
