@@ -113,3 +113,145 @@ function madoguchi_blocks_phone_cta_kses( $html ) {
 		'a'      => array( 'href' => array(), 'target' => array(), 'rel' => array() ),
 	) );
 }
+
+/**
+ * サイトの主サービス。回収のサイトに買取店のカードを載せる（クロスセル）ときの
+ * 文言と色を決めるのに使う。設定されていなければ空文字＝従来どおり。
+ */
+function madoguchi_blocks_phone_cta_primary_service() {
+	$value = get_option( 'madoguchi_blocks_primary_service', '' );
+	$value = is_string( $value ) ? $value : '';
+	return Madoguchi_Blocks_Phone_Cta_Services::is_valid( $value ) ? $value : '';
+}
+
+/**
+ * 記事内のすべての電話CTAブロックが出している店舗を、本文に現れる順で集める。
+ *
+ * キャンペーンLPは「記事で見ていた店舗をそのまま STEP に並べる」ので、バナーの
+ * リンクには記事全体の店舗を載せたい。ところがブロックは本文順に 1 つずつ描画され、
+ * バナーを持つブロックの時点では後続ブロック（クロスセルの買取店など）がまだ分からない。
+ * そこで描画結果ではなく本文の属性を直接読んで組み立てる。
+ *
+ * 番号は属性の numberId をそのまま載せる。空ならブロックと同じ既定選択ロジックが
+ * LP 側でも働くので、記事と同じ番号になる。
+ *
+ * @param int $post_id 投稿ID
+ * @return array<int,array{uuid:string,number_id:string,service:string}> shops_param() に渡せる形
+ */
+function madoguchi_blocks_phone_cta_post_shops( $post_id ) {
+	$post_id = (int) $post_id;
+	if ( $post_id <= 0 ) {
+		return array();
+	}
+	static $cache = array();
+	if ( isset( $cache[ $post_id ] ) ) {
+		return $cache[ $post_id ];
+	}
+
+	$content = get_post_field( 'post_content', $post_id );
+	$found   = array();
+	if ( is_string( $content ) && '' !== $content ) {
+		madoguchi_blocks_phone_cta_walk_blocks( parse_blocks( $content ), $found );
+	}
+
+	$cache[ $post_id ] = $found;
+	return $found;
+}
+
+/**
+ * parse_blocks() の結果を再帰で辿り、電話CTAブロックの店舗指定を $found に積む。
+ * 再利用ブロックやグループの中に入っていても拾えるよう innerBlocks まで見る。
+ *
+ * @param array $blocks parse_blocks() の結果
+ * @param array $found  参照渡しの収集先
+ */
+function madoguchi_blocks_phone_cta_walk_blocks( array $blocks, array &$found ) {
+	foreach ( $blocks as $block ) {
+		$name  = isset( $block['blockName'] ) ? $block['blockName'] : '';
+		$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+
+		if ( 'madoguchi/phone-cta' === $name && ( ! isset( $attrs['isVisible'] ) || $attrs['isVisible'] ) ) {
+			// 既定値は block.json と同じく買取。render.php の解決と揃える
+			$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attrs['service'] ) ? $attrs['service'] : null );
+			$shops   = isset( $attrs['shops'] ) && is_array( $attrs['shops'] ) ? array_slice( $attrs['shops'], 0, 3 ) : array();
+			foreach ( $shops as $item ) {
+				if ( ! is_array( $item ) || empty( $item['uuid'] ) ) {
+					continue;
+				}
+				$found[] = array(
+					'uuid'      => (string) $item['uuid'],
+					'number_id' => isset( $item['numberId'] ) && '' !== $item['numberId'] ? (string) $item['numberId'] : '',
+					'service'   => Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $item['service'] ) ? $item['service'] : null, $service ),
+				);
+			}
+		}
+
+		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+			madoguchi_blocks_phone_cta_walk_blocks( $block['innerBlocks'], $found );
+		}
+	}
+}
+
+/**
+ * 店舗カード 1 枚の HTML。記事内のブロックとキャンペーンLP が同じものを使う。
+ *
+ * @param array      $card          card_state() の戻り値
+ * @param bool       $show_pc_modal PC で番号と QR のモーダルを出すか
+ * @param array|null $modal_banner  モーダルの下に出すキャンペーンバナー
+ * @return string
+ */
+function madoguchi_blocks_phone_cta_card_html( array $card, $show_pc_modal = true, $modal_banner = null ) {
+	$c             = $card;
+	$show_pc_modal = (bool) $show_pc_modal;
+	$modal_banner  = is_array( $modal_banner ) ? $modal_banner : null;
+	ob_start();
+	include MADOGUCHI_BLOCKS_DIR . 'inc/phone-cta/card.php';
+	return ob_get_clean();
+}
+
+/**
+ * `?s=` の値から、カードの表示状態を本文と同じ並びで作る。キャンペーンLP が使う。
+ *
+ * 記事の電話CTAブロックはバナーのリンクに `?s=<uuid>[:<numberId>][@<service>],...` を付ける。
+ * LP はそれを読み、同じ店舗を同じ順で出す。引けなかった店舗（削除済み・非公開・
+ * 番号なし）は黙って落とすので、呼び出し側は戻り値の件数で出し分ける。
+ *
+ * @param string $param           クエリ `s` の値
+ * @param string $default_service `@service` が無い要素に使うサービス。空ならサイトの主サービス
+ * @param int    $max             最大件数
+ * @return array<int,array> card_state() の配列
+ */
+function madoguchi_blocks_phone_cta_cards_from_param( $param, $default_service = '', $max = 3 ) {
+	if ( ! class_exists( 'Madoguchi_Blocks_Phone_Cta_View' ) ) {
+		return array();
+	}
+	$param = is_string( $param ) ? $param : '';
+	if ( '' === trim( $param ) ) {
+		return array();
+	}
+	$host    = madoguchi_blocks_phone_cta_primary_service();
+	$default = Madoguchi_Blocks_Phone_Cta_Services::is_valid( (string) $default_service )
+		? (string) $default_service
+		: ( '' !== $host ? $host : 'kaitori' );
+
+	$picks = Madoguchi_Blocks_Phone_Cta_View::parse_shops_param( $param, $default, (int) $max );
+	if ( empty( $picks ) ) {
+		return array();
+	}
+
+	$repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
+	$now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
+	$cards = array();
+	foreach ( $picks as $pick ) {
+		$shop = $repo->find( $pick['service'], $pick['uuid'] );
+		if ( null === $shop ) {
+			continue;
+		}
+		$item  = '' !== $pick['number_id'] ? array( 'numberId' => $pick['number_id'] ) : array();
+		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $shop, $item, $now, $pick['service'], $host );
+		if ( null !== $state ) {
+			$cards[] = $state;
+		}
+	}
+	return $cards;
+}

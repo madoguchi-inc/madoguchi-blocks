@@ -24,7 +24,7 @@ import {
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import PhoneCtaIcon from './icons';
-import { textsFor, splitLabel } from './texts';
+import { textsFor, splitLabel, crossHeadingFor as crossHeadingText } from './texts';
 
 const MAX_SHOPS = 3;
 const CUSTOM_BANNER = 'custom';
@@ -35,6 +35,12 @@ const BANNER_PATTERNS_BY_SERVICE =
 	( typeof window !== 'undefined' &&
 		window.madoguchiBlocksData?.phoneCtaBanners ) ||
 	{};
+// サイトの主サービス（設定 > Madoguchi Blocks）。これと違うサービスのカードは
+// クロスセル用の文言になる。例: 回収の記事に出す買取店は「買取できるか相談する」
+const PRIMARY_SERVICE =
+	( typeof window !== 'undefined' &&
+		window.madoguchiBlocksData?.primaryService ) ||
+	'';
 const BANNER_FALLBACK = [
 	{ value: '', label: 'バナーなし', url: '', alt: '' },
 ];
@@ -62,11 +68,11 @@ const MAX_POINTS = 3;
 
 function CardPreview( { service, item } ) {
 	const cardService = cardServiceOf( item, service );
-	const texts = textsFor( cardService );
+	const texts = textsFor( cardService, PRIMARY_SERVICE );
 	const { shop, loading, error } = useShopDetail( cardService, item.uuid );
 	if ( ! item.uuid ) {
 		return (
-			<li className="phone-cta__card">
+			<li className="phone-cta__card" data-service={ cardService }>
 				<div className="phone-cta__lead">
 					<p className="phone-cta__lead-text">
 						{ __( '店舗を選択してください', 'madoguchi-blocks' ) }
@@ -77,7 +83,7 @@ function CardPreview( { service, item } ) {
 	}
 	if ( loading ) {
 		return (
-			<li className="phone-cta__card">
+			<li className="phone-cta__card" data-service={ cardService }>
 				<div className="phone-cta__lead">
 					<p className="phone-cta__lead-text">
 						{ __( '読み込み中…', 'madoguchi-blocks' ) }
@@ -88,7 +94,7 @@ function CardPreview( { service, item } ) {
 	}
 	if ( error || ! shop ) {
 		return (
-			<li className="phone-cta__card is-closed">
+			<li className="phone-cta__card is-closed" data-service={ cardService }>
 				<p className="phone-cta__notice">
 					{ __( 'マスタに存在しません', 'madoguchi-blocks' ) }
 				</p>
@@ -105,7 +111,7 @@ function CardPreview( { service, item } ) {
 	const [ labelShop, labelRest ] = splitLabel( texts.shopLabel, shop.name );
 	const lead = item.leadText || shop.lead_text;
 	return (
-		<li className="phone-cta__card is-open">
+		<li className="phone-cta__card is-open" data-service={ cardService }>
 			<div className="phone-cta__intro">
 				<div className="phone-cta__logo-box">
 					{ shop.logo_url ? (
@@ -159,10 +165,11 @@ function CardPreview( { service, item } ) {
 
 export default function Edit( { attributes, setAttributes } ) {
 	const {
-		service,
-		heading,
-		description,
-		points,
+		service: savedService,
+		heading: savedHeading,
+		description: savedDescription,
+		points: savedPoints,
+		crossHeading,
 		shops,
 		showPcModal,
 		bannerPreset,
@@ -171,6 +178,14 @@ export default function Edit( { attributes, setAttributes } ) {
 		bannerLinkUrl,
 		isVisible,
 	} = attributes;
+	// block.json に既定値を置かず、未設定ならサービス別の文言に落とす。
+	// 既定値を買取で固定すると、回収のサイトに置いたときに「無料査定」で始まってしまう
+	const service = savedService || PRIMARY_SERVICE || 'kaitori';
+	const texts = textsFor( service, PRIMARY_SERVICE );
+	const heading = savedHeading ?? texts.heading;
+	const description = savedDescription ?? texts.description;
+	const points = savedPoints ?? texts.points;
+
 	const { services, loading: servicesLoading } = useServices();
 	const serviceOptions = Object.entries( services ).map(
 		( [ value, label ] ) => ( {
@@ -224,8 +239,8 @@ export default function Edit( { attributes, setAttributes } ) {
 	// サービス切替時、見出し／説明が「切替前サービスの既定文言のまま」なら新サービスの既定文言に
 	// 差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。
 	const changeService = ( next ) => {
-		const prevTexts = textsFor( service );
-		const nextTexts = textsFor( next );
+		const prevTexts = textsFor( service, PRIMARY_SERVICE );
+		const nextTexts = textsFor( next, PRIMARY_SERVICE );
 		// サービスを明示しているカードは別マスタなのでそのまま残し、
 		// 「ブロックに従う」カードだけ店舗の選択をリセットする（引く先が変わるため）
 		const patch = {
@@ -242,14 +257,39 @@ export default function Edit( { attributes, setAttributes } ) {
 		) {
 			patch.bannerPreset = '';
 		}
-		if ( heading === prevTexts.heading ) {
+		// 未設定（＝既定文言のまま）か、切替前サービスの既定文言のままなら差し替える
+		if ( savedHeading === undefined || savedHeading === prevTexts.heading ) {
 			patch.heading = nextTexts.heading;
 		}
-		if ( description === prevTexts.description ) {
+		if ( savedDescription === undefined || savedDescription === prevTexts.description ) {
 			patch.description = nextTexts.description;
 		}
 		setAttributes( patch );
 	};
+
+	// 挿入直後だけ、サイトの主サービスに寄せる。block.json の既定値は買取のままなので
+	// （既定値を変えると買取の既存記事の保存内容と食い違う）、回収のサイトで置いたときに
+	// 見出しが「無料査定」で始まってしまうのを避ける。
+	// 店舗を選び始めたブロックには触らない（編集中の内容を勝手に変えないため）。
+	// 表示側と同じ振り分け。ブロックのサービスと違うカードは下の別枠にまとめる
+	const mainShops = shops.filter(
+		( item ) => cardServiceOf( item, service ) === service
+	);
+	const crossGroups = shops.reduce( ( acc, item ) => {
+		const cardService = cardServiceOf( item, service );
+		if ( cardService === service ) {
+			return acc;
+		}
+		if ( ! acc[ cardService ] ) {
+			acc[ cardService ] = [];
+		}
+		acc[ cardService ].push( item );
+		return acc;
+	}, {} );
+	const crossServices = Object.keys( crossGroups );
+	// 見出しは記事ごとに書き換えられる。未設定ならサービスの組み合わせの既定文言
+	const crossHeadingFor = ( cross ) =>
+		crossHeading ?? crossHeadingText( service, cross );
 
 	// プレビューに出すバナー（カスタムは選択済み画像、パターンは同梱画像）
 	const bannerPatterns = bannerPatternsFor( service );
@@ -266,11 +306,15 @@ export default function Edit( { attributes, setAttributes } ) {
 			  }
 			: null;
 
+	// 表示側（render.php）と同じ data 属性を出す。これが無いとエディタのプレビューだけ
+	// 配色がサービスに追従しない（CSS が [data-service] で分岐しているため）
 	const blockProps = useBlockProps( {
 		className: `phone-cta phone-cta--cols-${ Math.max(
 			1,
 			Math.min( 3, shops.length )
 		) }`,
+		'data-service': service,
+		'data-host-service': PRIMARY_SERVICE,
 	} );
 
 	return (
@@ -524,15 +568,52 @@ export default function Edit( { attributes, setAttributes } ) {
 						) }
 					</p>
 				) : (
-					<ul className="phone-cta__list">
-						{ shops.map( ( item, i ) => (
-							<CardPreview
-								key={ i }
-								service={ service }
-								item={ item }
-							/>
+					<>
+						{ mainShops.length > 0 && (
+							<ul className="phone-cta__list">
+								{ mainShops.map( ( item, i ) => (
+									<CardPreview
+										key={ `main-${ i }` }
+										service={ service }
+										item={ item }
+									/>
+								) ) }
+							</ul>
+						) }
+						{ crossServices.map( ( cross ) => (
+							<div
+								key={ cross }
+								className={ `phone-cta__cross phone-cta__cross--${ cross }` }
+							>
+								<RichText
+									tagName="p"
+									className="phone-cta__cross-heading"
+									value={ crossHeadingFor( cross ) }
+									onChange={ ( v ) =>
+										setAttributes( { crossHeading: v } )
+									}
+									placeholder={ __(
+										'別サービスのカードの見出し',
+										'madoguchi-blocks'
+									) }
+								/>
+								<ul
+									className={ `phone-cta__list phone-cta__list--cols-${ Math.min(
+										3,
+										crossGroups[ cross ].length
+									) }` }
+								>
+									{ crossGroups[ cross ].map( ( item, i ) => (
+										<CardPreview
+											key={ `${ cross }-${ i }` }
+											service={ service }
+											item={ item }
+										/>
+									) ) }
+								</ul>
+							</div>
 						) ) }
-					</ul>
+					</>
 				) }
 				<p className="phone-cta__note">
 					{ __(

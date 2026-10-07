@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Madoguchi Blocks（記事内コンテンツブロック集）
  * Description:        記事内に設置できるカスタムブロック集。チェックリスト型CTA・条件別カードリンク・買取業者比較テーブル・著者情報・口コミ。テーマ非依存で動作し、REST API 経由でもCSSを同梱して同一デザインを再現します。
- * Version:           1.10.1
+ * Version:           1.11.0
  * Requires at least: 6.6
  * Requires PHP:      7.4
  * Author:            Madoguchi Inc.
@@ -119,6 +119,10 @@ function madoguchi_blocks_register() {
 	}
 	if ( class_exists( 'Madoguchi_Blocks_Phone_Cta_Banners' ) ) {
 		$editor_data['phoneCtaBanners'] = Madoguchi_Blocks_Phone_Cta_Banners::options();
+	}
+	// 主サービスと違うサービスのカードは文言が変わる（クロスセル）。編集画面でも同じ文言を出す
+	if ( function_exists( 'madoguchi_blocks_phone_cta_primary_service' ) ) {
+		$editor_data['primaryService'] = madoguchi_blocks_phone_cta_primary_service();
 	}
 	if ( ! empty( $editor_data ) ) {
 		wp_localize_script( 'madoguchi-blocks-editor', 'madoguchiBlocksData', $editor_data );

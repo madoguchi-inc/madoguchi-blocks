@@ -25,6 +25,12 @@ import ShopPicker from '../phone-cta/shop-picker';
 import PhoneCtaIcon from '../phone-cta/icons';
 import { textsFor, splitLabel } from '../phone-cta/texts';
 
+// サイトの主サービス（設定 > Madoguchi Blocks）。これと違うサービスならクロスセル用の文言になる
+const PRIMARY_SERVICE =
+	( typeof window !== 'undefined' &&
+		window.madoguchiBlocksData?.primaryService ) ||
+	'';
+
 export default function Edit( { attributes, setAttributes } ) {
 	const {
 		service,
@@ -40,7 +46,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		( [ value, label ] ) => ( { label, value } )
 	);
 	const { shop: detail } = useShopDetail( service, shop?.uuid );
-	const texts = textsFor( service );
+	const texts = textsFor( service, PRIMARY_SERVICE );
 
 	const item = shop || {
 		uuid: '',
@@ -55,8 +61,8 @@ export default function Edit( { attributes, setAttributes } ) {
 	// サービス切替時、キャッチコピーが「切替前サービスの既定文言のまま」なら新サービスの
 	// 既定文言に差し替える。ユーザーが書き換え済みのカスタム文言は上書きしない。
 	const changeService = ( next ) => {
-		const prevTexts = textsFor( service );
-		const nextTexts = textsFor( next );
+		const prevTexts = textsFor( service, PRIMARY_SERVICE );
+		const nextTexts = textsFor( next, PRIMARY_SERVICE );
 		const patch = { service: next, shop: null };
 		if ( catchText === prevTexts.footerCatch ) {
 			patch.catchText = nextTexts.footerCatch;

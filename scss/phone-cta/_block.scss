@@ -1,15 +1,177 @@
 /*----- # 電話CTA（店舗別） -----*/
 // Figma「みんなの買取」202607_電話送客プロジェクト コラム_PC(14065-29201) / コラム_SP(14065-30761) / 電話査定受付時間外(14065-33169)
-$pc-gold        : #c4ab46;
-$pc-gold-dark   : #a28d3a;
-$pc-black       : #18191e;
-$pc-border      : #ddd;
-$pc-lead-bg     : #f7f7f7;
-$pc-orange-from : #eb4614;
-$pc-orange-to   : #f78b08;
-$pc-free-tab    : #f39072;
-$pc-icon        : #e04b2d; // Figma のアイコン（phone-filled / touch）の塗り色
-$pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%);
+// 色はカスタムプロパティ経由にして、サービスごとに差し替えられるようにする。
+// 既定値は買取（Figma「みんなの買取」）＝ここを変えない限り買取の見た目は一切変わらない。
+// 回収と、回収の記事に混ぜる買取カード（クロスセル）の上書きはファイル末尾にまとめている。
+$pc-gold        : var(--pc-key, #c4ab46);
+$pc-gold-dark   : var(--pc-key-dark, #a28d3a);
+$pc-black       : var(--pc-text, #18191e);
+$pc-border      : var(--pc-card-border, #ddd);
+$pc-lead-bg     : var(--pc-lead-bg, #f7f7f7);
+$pc-orange-from : var(--pc-btn-from, #eb4614);
+$pc-orange-to   : var(--pc-btn-to, #f78b08);
+$pc-free-tab    : var(--pc-free-tab, #f39072);
+$pc-icon        : var(--pc-icon, #e04b2d); // Figma のアイコン（phone-filled / touch）の塗り色
+$pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb4614) 0%, var(--pc-btn-to, #f78b08) 100%));
+
+// SP（〜896px）のレイアウト。キャンペーンLPのように画面幅によらず 430px 幅で
+// 使う場所（.phone-cta--sp）でも同じ見た目にできるよう mixin にしている。
+@mixin phone-cta-sp-layout {
+	.phone-cta__banner { margin-bottom: 0.8rem; }
+
+	.phone-cta__header {
+		flex-direction: column;
+		align-items: center;
+		gap: 0.8rem;
+		margin-bottom: 0.8rem;
+		padding: 0;
+		border-bottom: 0;
+
+		&::after { display: none; }
+	}
+
+	.phone-cta__titles {
+		align-items: center;
+		gap: 0.2rem;
+		text-align: center;
+	}
+
+	.phone-cta__description { font-size: 1.2rem; }
+
+	// 「▼ 今すぐ電話でかんたん無料査定 ▼」
+	.phone-cta__heading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		font-size: 2rem;
+
+		&::before,
+		&::after {
+			content: "";
+			display: block;
+			flex: 0 0 auto;
+			width: 0;
+			height: 0;
+			border-left: 0.8rem solid transparent;
+			border-right: 0.8rem solid transparent;
+			border-top: 1.2rem solid $pc-gold;
+		}
+	}
+
+	.phone-cta__points {
+		width: 100%;
+		justify-content: space-between;
+		gap: 0.4rem;
+	}
+
+	.phone-cta__point { flex: 1 1 0; min-width: 0; }
+	.phone-cta__point-label { padding: 0.1rem 0.4rem 0.2rem; font-size: 0.9rem; }
+	.phone-cta__point-text { padding: 0.4rem 0.2rem; font-size: 1.2rem; letter-spacing: -0.02em; white-space: nowrap; }
+
+	.phone-cta--cols-2 .phone-cta__list,
+	.phone-cta--cols-3 .phone-cta__list { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+	.phone-cta--cols-1 .phone-cta__list { max-width: none; }
+
+	.phone-cta__cross .phone-cta__list--cols-2,
+	.phone-cta__cross .phone-cta__list--cols-3 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+	.phone-cta__cross .phone-cta__list--cols-1 { max-width: none; }
+
+	.phone-cta__cross-heading { font-size: 1.6rem; }
+
+	.phone-cta__card { gap: 1.2rem; }
+
+	// ロゴ左・リード右
+	.phone-cta__intro {
+		flex-direction: row;
+		align-items: stretch;
+		gap: 1.6rem;
+	}
+
+	.phone-cta__logo-box {
+		flex: 0 0 35%;
+		width: auto;
+		height: auto;
+		min-height: 7.5rem;
+		margin: 0;
+		padding: 0.6rem 0.8rem;
+	}
+
+	.phone-cta__logo { max-height: 6.3rem; } // 枠 7.5rem から上下の余白 0.6rem×2 を引いた高さ
+	.phone-cta__name { font-size: 1.6rem; }
+
+	.phone-cta__lead {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		justify-content: center;
+		min-width: 0;
+	}
+
+	.phone-cta__lead-text { font-size: 1.3rem; }
+
+	// 左に縦書き「査定無料」、中央にアイコン＋文言、右に矢印
+	// overflow: hidden は吹き出しが切れるので使わず、タブ側の左角を丸める
+	// 高さは Figma の 68px（電話）に合わせる。縦書きタブが押し上げないよう余白と字間を詰める
+	.phone-cta__button {
+		justify-content: space-between;
+		gap: 0;
+		min-height: 6.8rem;
+		margin-top: 1.4rem;
+		padding: 0 1.6rem 0 0;
+		box-shadow: var(--pc-btn-shadow-sp, 0 0 12px rgba(235, 70, 20, 0.4));
+	}
+
+	.phone-cta__free {
+		display: flex;
+		flex: 0 0 auto;
+		align-self: stretch;
+		align-items: center;
+		justify-content: center;
+		padding: 0.2rem 0.6rem;
+		border-radius: 0.4rem 0 0 0.4rem;
+		background: $pc-free-tab;
+		font-size: 1.4rem;
+		font-weight: 700;
+		line-height: 1.1;
+		letter-spacing: 0.04em;
+		writing-mode: vertical-rl;
+		text-orientation: upright;
+		color: #fff;
+	}
+
+	.phone-cta__button-body {
+		flex: 1 1 auto;
+		gap: 1.6rem;
+		padding: 0.8rem;
+		font-size: 1.7rem;
+	}
+
+	.phone-cta__icon {
+		width: 4rem;
+		height: 4rem;
+	}
+
+	.phone-cta__chevron {
+		display: block;
+		flex: 0 0 auto;
+		width: 1rem;
+		height: 1rem;
+		margin-left: 0.4rem;
+		border-right: 2px solid #fff;
+		border-bottom: 2px solid #fff;
+		transform: rotate(-45deg);
+	}
+
+	.phone-cta__balloon { top: -1.6rem; }
+
+	.phone-cta__hours { font-size: 1.1rem; }
+
+	// SP はボタン自体が tel: リンク。モーダルは出さない
+	.phone-cta__button--modal { display: none; }
+	.phone-cta__button--tel { display: flex; }
+	.phone-cta__modal { display: none !important; }
+}
 
 .phone-cta {
 	margin: 3.2rem 0;
@@ -140,6 +302,32 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	&--cols-3 &__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	&--cols-1 &__list { max-width: 36rem; margin: 0 auto; }
 
+	// 別サービスのカードをまとめた下の枠。列数はブロックではなくその枠の件数で決める。
+	// ブロックの `--cols-N .phone-cta__list` と同じ詳細度にしてから後ろに置く
+	&__cross &__list--cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	&__cross &__list--cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	&__cross &__list--cols-1 {
+		grid-template-columns: minmax(0, 1fr);
+		max-width: 36rem;
+		margin: 0 auto;
+	}
+
+	// 「▼ 回収予定の不用品、実は買取できるかも ▼」のように、別サービスのカードを
+	// ブロックの地から切り離して置く枠
+	&__cross {
+		margin-top: 2.4rem;
+		padding: 2.4rem 0 0;
+	}
+
+	&__cross-heading {
+		margin: 0 0 1.6rem;
+		font-size: 1.8rem;
+		font-weight: 700;
+		line-height: 1.5;
+		text-align: center;
+		color: $pc-black;
+	}
+
 	// Figma: 内容は上下中央寄せ（items-start justify-center）。カードは行内で等高、中身は中央に集まる
 	&__card {
 		display: flex;
@@ -220,20 +408,21 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 		justify-content: center;
 		width: 100%;
 		padding: 0.8rem 1.4rem;
+		border: var(--pc-btn-border, 0);
 		border-radius: 0.4rem;
 		background: $pc-orange-grad;
-		box-shadow: 0 0 6px rgba(235, 70, 20, 0.4);
+		box-shadow: var(--pc-btn-shadow, 0 0 6px rgba(235, 70, 20, 0.4));
 		font-size: 1.4rem;
 		font-weight: 700;
 		line-height: 1.3;
 		text-align: center;
 		text-decoration: none !important;
-		color: #fff !important;
+		color: var(--pc-btn-text, #fff) !important;
 		transition: transform $transition_duration, box-shadow $transition_duration;
 
 		&:hover {
 			transform: translateY(1px);
-			box-shadow: 0 0 3px rgba(235, 70, 20, 0.4);
+			box-shadow: var(--pc-btn-shadow-hover, 0 0 3px rgba(235, 70, 20, 0.4));
 		}
 
 		// 吹き出し分の余白は全ボタンに取る（受付時間外の WEB ボタンだけ上にずれないように）
@@ -627,8 +816,9 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	// これで紹介文ボックス（詳細コメント）の高さが揃い、ボタンの位置も一直線になる。
 	// subgrid 非対応ブラウザは @supports で除外され、従来どおりカード内で上下中央寄せになる。
 	@include mq-min(md) {
+		// --sp（LP など常に 430px 幅で使う場所）は画面幅が広くても SP レイアウトのままにする
 		@supports (grid-template-rows: subgrid) {
-			&__card {
+			&:not(.phone-cta--sp) .phone-cta__card {
 				display: grid;
 				grid-template-columns: minmax(0, 1fr); // 列は常にカード内幅いっぱい（内容基準で縮ませない）
 				grid-template-rows: subgrid;
@@ -639,26 +829,26 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 			}
 
 			// ラッパーを消して、ロゴ枠と紹介文をカードの行に直接並べる
-			&__intro { display: contents; }
+			&:not(.phone-cta--sp) .phone-cta__intro { display: contents; }
 
-			&__logo-box {
+			&:not(.phone-cta--sp) .phone-cta__logo-box {
 				grid-row: 1;
 				justify-self: center;
 				align-self: end;
 			}
 
-			&__lead {
+			&:not(.phone-cta--sp) .phone-cta__lead {
 				grid-row: 2;
 				width: auto;
 				justify-self: stretch;
 				align-self: stretch;
 			}
 
-			&__action {
+			&:not(.phone-cta--sp) .phone-cta__action {
 				justify-self: stretch;
 			}
 
-			&__action {
+			&:not(.phone-cta--sp) .phone-cta__action {
 				grid-row: 3;
 				margin-top: 2.4rem;
 			}
@@ -666,156 +856,17 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 	}
 
 	/* ================= SP（〜896px） ================= */
-	@include mq-max(md) {
-		&__banner { margin-bottom: 0.8rem; }
+}
 
-		&__header {
-			flex-direction: column;
-			align-items: center;
-			gap: 0.8rem;
-			margin-bottom: 0.8rem;
-			padding: 0;
-			border-bottom: 0;
+/* ================= SP（〜896px） ================= */
+@include mq-max(md) {
+	@include phone-cta-sp-layout;
+}
 
-			&::after { display: none; }
-		}
-
-		&__titles {
-			align-items: center;
-			gap: 0.2rem;
-			text-align: center;
-		}
-
-		&__description { font-size: 1.2rem; }
-
-		// 「▼ 今すぐ電話でかんたん無料査定 ▼」
-		&__heading {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 0.4rem;
-			font-size: 2rem;
-
-			&::before,
-			&::after {
-				content: "";
-				display: block;
-				flex: 0 0 auto;
-				width: 0;
-				height: 0;
-				border-left: 0.8rem solid transparent;
-				border-right: 0.8rem solid transparent;
-				border-top: 1.2rem solid $pc-gold;
-			}
-		}
-
-		&__points {
-			width: 100%;
-			justify-content: space-between;
-			gap: 0.4rem;
-		}
-
-		&__point { flex: 1 1 0; min-width: 0; }
-		&__point-label { padding: 0.1rem 0.4rem 0.2rem; font-size: 0.9rem; }
-		&__point-text { padding: 0.4rem 0.2rem; font-size: 1.2rem; letter-spacing: -0.02em; white-space: nowrap; }
-
-		&--cols-2 &__list,
-		&--cols-3 &__list { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-		&--cols-1 &__list { max-width: none; }
-
-		&__card { gap: 1.2rem; }
-
-		// ロゴ左・リード右
-		&__intro {
-			flex-direction: row;
-			align-items: stretch;
-			gap: 1.6rem;
-		}
-
-		&__logo-box {
-			flex: 0 0 35%;
-			width: auto;
-			height: auto;
-			min-height: 7.5rem;
-			margin: 0;
-			padding: 0.6rem 0.8rem;
-		}
-
-		&__logo { max-height: 6.3rem; } // 枠 7.5rem から上下の余白 0.6rem×2 を引いた高さ
-		&__name { font-size: 1.6rem; }
-
-		&__lead {
-			display: flex;
-			flex: 1 1 auto;
-			flex-direction: column;
-			justify-content: center;
-			min-width: 0;
-		}
-
-		&__lead-text { font-size: 1.3rem; }
-
-		// 左に縦書き「査定無料」、中央にアイコン＋文言、右に矢印
-		// overflow: hidden は吹き出しが切れるので使わず、タブ側の左角を丸める
-		// 高さは Figma の 68px（電話）に合わせる。縦書きタブが押し上げないよう余白と字間を詰める
-		&__button {
-			justify-content: space-between;
-			gap: 0;
-			min-height: 6.8rem;
-			margin-top: 1.4rem;
-			padding: 0 1.6rem 0 0;
-			box-shadow: 0 0 12px rgba(235, 70, 20, 0.4);
-		}
-
-		&__free {
-			display: flex;
-			flex: 0 0 auto;
-			align-self: stretch;
-			align-items: center;
-			justify-content: center;
-			padding: 0.2rem 0.6rem;
-			border-radius: 0.4rem 0 0 0.4rem;
-			background: $pc-free-tab;
-			font-size: 1.4rem;
-			font-weight: 700;
-			line-height: 1.1;
-			letter-spacing: 0.04em;
-			writing-mode: vertical-rl;
-			text-orientation: upright;
-			color: #fff;
-		}
-
-		&__button-body {
-			flex: 1 1 auto;
-			gap: 1.6rem;
-			padding: 0.8rem;
-			font-size: 1.7rem;
-		}
-
-		&__icon {
-			width: 4rem;
-			height: 4rem;
-		}
-
-		&__chevron {
-			display: block;
-			flex: 0 0 auto;
-			width: 1rem;
-			height: 1rem;
-			margin-left: 0.4rem;
-			border-right: 2px solid #fff;
-			border-bottom: 2px solid #fff;
-			transform: rotate(-45deg);
-		}
-
-		&__balloon { top: -1.6rem; }
-
-		&__hours { font-size: 1.1rem; }
-
-		// SP はボタン自体が tel: リンク。モーダルは出さない
-		&__button--modal { display: none; }
-		&__button--tel { display: flex; }
-		&__modal { display: none !important; }
-	}
+// キャンペーンLPのように、画面幅によらず 430px 幅で使う場所。
+// 記事内の電話CTAブロックと同じカードを、PC でも SP の見た目のまま出す
+.phone-cta--sp {
+	@include phone-cta-sp-layout;
 }
 
 // 光の反射（右上から左下へ流れ、しばらく間を置いて繰り返す）
@@ -829,5 +880,272 @@ $pc-orange-grad : linear-gradient(90deg, $pc-orange-from 0%, $pc-orange-to 100%)
 @media (prefers-reduced-motion: reduce) {
 	.phone-cta__button::after {
 		animation: none;
+	}
+}
+
+/*----- ## サービス別の配色 -----*/
+// 既定（上のカスタムプロパティの初期値）は買取。ここでの上書きは回収とクロスセルにだけ効く。
+// 色の出典: Figma「不用品回収の窓口 サイトデザイン」コラム内テーブル・CTAデザイン(1920-40520)、
+// 変数 Master/Key-color/FM-Blue = #4abfd7、不用品新TOP薄背景 = #fffeef。
+
+// 回収のカードは PC で最大 2 列。Figma のカード幅（374px）に近づける。
+// 記事本文を 3 分割すると 1 枚あたり 234px しかなく、ロゴも紹介文も詰まってしまう
+@include mq-min(md) {
+	.phone-cta[data-service="fuyouhin"] .phone-cta__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		max-width: none;
+	}
+}
+
+// 回収のカードは PC でもロゴ左・紹介文右（Figma「回収サービスの回収店舗カード」1920-40605）。
+// 買取の縦積み（subgrid の 3 行）とは組み方が違うので、サービスで分けて指定する。
+// 高さは grid の既定（align-items: stretch）で揃え、ボタンはカードの下端に寄せる
+@include mq-min(md) {
+	.phone-cta:not(.phone-cta--sp) .phone-cta__card[data-service="fuyouhin"] {
+		display: flex;
+		grid-row: auto;
+		flex-direction: column;
+
+		.phone-cta__intro {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: row;
+			align-items: stretch;
+			gap: 1.6rem;
+		}
+
+		.phone-cta__logo-box {
+			flex: 0 0 35%;
+			width: auto;
+			height: auto;
+			min-height: 7.5rem;
+			margin: 0;
+		}
+
+		.phone-cta__lead {
+			display: flex;
+			flex: 1 1 auto;
+			flex-direction: column;
+			justify-content: center;
+			width: auto;
+			min-width: 0;
+		}
+
+		.phone-cta__action {
+			margin-top: auto;
+		}
+	}
+}
+
+// 下の別枠に出す別サービスのカードは、Figma「回収サービスの買取店舗カード」(1920-40637) の
+// 横一列（ロゴ｜紹介文｜ボタン）にする。PC だけで、SP は通常のカードと同じ縦積み
+@include mq-min(md) {
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__list {
+		grid-template-columns: minmax(0, 1fr);
+		max-width: none;
+	}
+
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__card {
+		display: flex;
+		grid-row: auto;
+		flex-direction: row;
+		align-items: center;
+		gap: 2.4rem;
+	}
+
+	// subgrid 用の display: contents を戻して、ロゴと紹介文を横に並べる
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__intro {
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: row;
+		align-items: center;
+		gap: 2.4rem;
+		min-width: 0;
+	}
+
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__logo-box {
+		flex: 0 0 17.5rem;
+		width: 17.5rem;
+		height: auto;
+		min-height: 7.2rem;
+		margin: 0;
+	}
+
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__lead {
+		flex: 1 1 auto;
+		min-width: 0;
+		padding: 0;
+		background: none;
+	}
+
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__action {
+		flex: 0 0 25.6rem;
+		margin-top: 0;
+	}
+
+	.phone-cta:not(.phone-cta--sp) .phone-cta__cross .phone-cta__button {
+		margin-top: 0;
+	}
+}
+
+// 別枠のカードの配色。Figma「回収サービスの買取店のボタン」(1920-40645) に合わせる。
+// 白地・1px の橙枠・橙文字で、外側にやわらかいグロー。アイコンは橙グラデの丸に白抜き
+.phone-cta__cross .phone-cta__card[data-service="kaitori"] {
+	--pc-btn-bg: #fff;
+	--pc-btn-border: 0.1rem solid #f0690e;
+	--pc-btn-text: #f0690e;
+	--pc-btn-shadow: 0 0 0.8rem rgba(240, 105, 14, 0.35);
+	--pc-btn-shadow-hover: 0 0 0.4rem rgba(240, 105, 14, 0.35);
+	--pc-btn-shadow-sp: 0 0 0.8rem rgba(240, 105, 14, 0.35);
+	--pc-lead-bg: #fffeef;
+
+	// 買取の「白丸に橙のアイコン」と逆。橙グラデの丸に白抜きのアイコン
+	.phone-cta__icon {
+		background: linear-gradient(135deg, #eb5210 0%, #f47c0a 100%);
+		color: #fff;
+	}
+
+	// Figma のクロスセルのカードに吹き出しと縦書きタブは無い
+	.phone-cta__balloon,
+	.phone-cta__free {
+		display: none;
+	}
+
+	// 白地のボタンでは光沢が見えないので止める
+	.phone-cta__button::after {
+		animation: none;
+		background-image: none;
+	}
+
+	// 縦書きタブを消した分、左右の余白を揃える
+	.phone-cta__button {
+		padding-left: 1.6rem;
+	}
+}
+
+// 買取。既定値と同じだが、回収のブロックに混ぜたときに親から継承した色を打ち消すために要る
+.phone-cta__card[data-service="kaitori"] {
+	--pc-key: #c4ab46;
+	--pc-key-dark: #a28d3a;
+	--pc-btn-from: #eb4614;
+	--pc-btn-to: #f78b08;
+	--pc-btn-bg: linear-gradient(90deg, #eb4614 0%, #f78b08 100%);
+	--pc-btn-shadow: 0 0 6px rgba(235, 70, 20, 0.4);
+	--pc-btn-shadow-hover: 0 0 3px rgba(235, 70, 20, 0.4);
+	--pc-btn-shadow-sp: 0 0 12px rgba(235, 70, 20, 0.4);
+	--pc-icon: #e04b2d;
+	--pc-free-tab: #f39072;
+	--pc-lead-bg: #f7f7f7;
+}
+
+// 回収（不用品回収の窓口）
+.phone-cta[data-service="fuyouhin"],
+.phone-cta__card[data-service="fuyouhin"] {
+	--pc-key: #0e79de;
+	--pc-key-dark: #0057a8;
+	--pc-btn-from: #4abfd7;
+	--pc-btn-to: #0e79de;
+	--pc-btn-bg: linear-gradient(118deg, #4abfd7 0%, #0e79de 100%);
+	// 下端の濃い帯で厚みを出す（買取のような外側グローは使わない）
+	--pc-btn-shadow: 0 0.3rem 0 #0057a8;
+	--pc-btn-shadow-hover: 0 0.1rem 0 #0057a8;
+	--pc-btn-shadow-sp: 0 0.3rem 0 #0057a8;
+	--pc-icon: #0e79de;
+	--pc-lead-bg: #fffeef;
+}
+
+// 回収のブロックは薄いクリームの地にカードを並べる
+.phone-cta[data-service="fuyouhin"] {
+	padding: 2.4rem 1.6rem;
+	background: #fffeef;
+
+	// バナーはクリームの外（白地）に置く。Figma ではクリームはバナーの下から始まる
+	.phone-cta__banner {
+		margin: -2.4rem -1.6rem 1.6rem;
+		padding: 2.4rem 1.6rem 1.6rem;
+		background: #fff;
+	}
+
+	// 別サービスのカードは地色の外に出す（Figma では白地の別セクション）
+	.phone-cta__cross {
+		margin: 2.4rem -1.6rem -2.4rem;
+		padding: 2.4rem 1.6rem;
+		background: #fff;
+	}
+
+	// 見出しの左右の三角とヘッダの罫線は買取だけの装飾。回収の Figma には無い
+	.phone-cta__heading {
+		&::before,
+		&::after {
+			display: none;
+		}
+	}
+
+	.phone-cta__header {
+		border-bottom: 0;
+
+		&::after {
+			display: none;
+		}
+	}
+
+	// 見出しまわりは中央寄せ（Figma の記事内 CTA）
+	.phone-cta__header {
+		justify-content: center;
+	}
+
+	.phone-cta__titles {
+		align-items: center;
+		text-align: center;
+	}
+
+	// 小見出しは下向きのしっぽが付いた白い吹き出し（Figma 1920-40598）
+	.phone-cta__description {
+		position: relative;
+		display: inline-block;
+		align-self: center;
+		width: fit-content;
+		margin-bottom: 1rem;
+		padding: 0.7rem 2rem;
+		border-radius: 0.6rem;
+		background: #fff;
+		// クリームの地に対して輪郭が出るよう、黒ではなく暖色の影（Figma 実測に合わせる）
+		box-shadow: 0 0.2rem 0.8rem rgba(176, 160, 70, 0.35);
+		color: #6f6f6f;
+
+		&::after {
+			position: absolute;
+			bottom: -0.5rem;
+			left: 50%;
+			border-top: 0.5rem solid #fff;
+			border-right: 0.5rem solid transparent;
+			border-left: 0.5rem solid transparent;
+			transform: translateX(-50%);
+			content: "";
+		}
+	}
+}
+
+// クロスセルのブロック自体は地色を敷かず、白のまま見出しだけ出す。
+// Figma の見出しは1行の文だけなので、買取の装飾（ゴールドの三角と罫線）は出さない
+.phone-cta[data-host-service="fuyouhin"][data-service="kaitori"] {
+	padding: 0;
+	background: none;
+
+	.phone-cta__heading {
+		color: var(--pc-text, #18191e);
+
+		&::before,
+		&::after {
+			display: none;
+		}
+	}
+
+	.phone-cta__header {
+		border-bottom: 0;
+
+		&::after {
+			display: none;
+		}
 	}
 }
