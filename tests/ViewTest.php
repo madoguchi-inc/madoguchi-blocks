@@ -214,7 +214,8 @@ class ViewTest extends TestCase {
 		// カードごとに色と文言を変えるので、サービスと文言は state に乗せて render へ渡す
 		$this->assertSame( 'kaitori', $state['service'] );
 		$this->assertSame( '買取大吉に買取できるか相談する', $state['label'] );
-		// クロスセルのカードに吹き出しは出さない
-		$this->assertSame( '', $state['balloon'] );
+		// 見た目は買取サービスのものをそのまま使うので、吹き出しと縦書きタブは買取の文言
+		$this->assertSame( 'その場でかんたん無料査定！', $state['balloon'] );
+		$this->assertSame( '査定無料', $state['free_tag'] );
 	}
 }

@@ -44,8 +44,8 @@ export const DEFAULT_TEXTS = {
 			kaitori: {
 				shopLabel: '{shop}に買取できるか相談する',
 				webLabel: 'WEB無料査定はこちら',
-				balloon: '',
-				freeTag: '',
+				// ブロックの下に別枠で出すときの見出し
+				crossHeading: '▼ 回収予定の不用品、実は買取できるかもしれません！▼',
 			},
 		},
 	},
@@ -104,4 +104,17 @@ export function textsFor( service, hostService = '' ) {
 			: null;
 	const { cross: _omit, ...texts } = { ...base, ...( cross || {} ) };
 	return texts;
+}
+
+/**
+ * 別サービスのカードをブロックの下に別枠で出すときの見出し。
+ * PHP 側 View::cross_heading() と必ず一致させる。
+ *
+ * @param {string} hostService ブロックのサービス。
+ * @param {string} cardService カードのサービス。
+ * @return {string} 見出し。組み合わせの定義が無ければ空文字。
+ */
+export function crossHeadingFor( hostService, cardService ) {
+	const host = DEFAULT_TEXTS[ hostService ];
+	return ( host && host.cross && host.cross[ cardService ]?.crossHeading ) || '';
 }

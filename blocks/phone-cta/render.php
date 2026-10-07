@@ -15,7 +15,8 @@ $service = Madoguchi_Blocks_Phone_Cta_Services::resolve(
 	isset( $attributes['service'] ) ? $attributes['service'] : null,
 	'' !== $host_service ? $host_service : 'kaitori'
 );
-$items   = isset( $attributes['shops'] ) && is_array( $attributes['shops'] ) ? array_slice( $attributes['shops'], 0, 3 ) : array();
+// 本体と、下の別枠（別サービスのカード）で、それぞれ最大 3 枚まで出す
+$items   = isset( $attributes['shops'] ) && is_array( $attributes['shops'] ) ? array_slice( $attributes['shops'], 0, 6 ) : array();
 if ( empty( $items ) ) {
 	return;
 }
@@ -45,6 +46,33 @@ if ( empty( $cards ) ) {
 	return;
 }
 
+// ブロックのサービスと違うカード（回収の記事に混ぜる買取店など）は、
+// 同じ並びに置かずブロックの下に別枠でまとめる。Figma の記事構成に合わせる
+$main_cards   = array();
+$cross_groups = array();
+foreach ( $cards as $c ) {
+	$card_service = isset( $c['service'] ) ? $c['service'] : $service;
+	if ( $card_service === $service ) {
+		if ( count( $main_cards ) < 3 ) {
+			$main_cards[] = $c;
+		}
+		continue;
+	}
+	if ( ! isset( $cross_groups[ $card_service ] ) ) {
+		$cross_groups[ $card_service ] = array(
+			'heading' => madoguchi_blocks_phone_cta_kses(
+				isset( $attributes['crossHeading'] ) && '' !== $attributes['crossHeading']
+					? $attributes['crossHeading']
+					: Madoguchi_Blocks_Phone_Cta_View::cross_heading( $service, $card_service )
+			),
+			'cards'   => array(),
+		);
+	}
+	if ( count( $cross_groups[ $card_service ]['cards'] ) < 3 ) {
+		$cross_groups[ $card_service ]['cards'][] = $c;
+	}
+}
+
 $heading     = madoguchi_blocks_phone_cta_kses( isset( $attributes['heading'] ) ? $attributes['heading'] : $texts['heading'] );
 $description = madoguchi_blocks_phone_cta_kses( isset( $attributes['description'] ) ? $attributes['description'] : $texts['description'] );
 
@@ -57,7 +85,7 @@ $points = array_slice( $points, 0, 3 );
 
 // 記事内で最初のブロックだけ id="phone-cta"（固定フッターの汎用リンク先）
 $extra = array(
-	'class'          => 'phone-cta phone-cta--cols-' . count( $cards ),
+	'class'          => 'phone-cta phone-cta--cols-' . max( 1, count( $main_cards ) ),
 	'data-phone-cta' => '',
 	'data-service'   => $service,
 	// サイトの主サービス。これと違うサービスのカードはクロスセル用の配色になる
@@ -152,9 +180,23 @@ if ( '' !== $shops_param ) {
 			<?php endif; ?>
 		</header>
 	<?php endif; ?>
-	<ul class="phone-cta__list">
-		<?php foreach ( $cards as $c ) : ?>
-			<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal, $modal_banner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<?php endforeach; ?>
-	</ul>
+	<?php if ( ! empty( $main_cards ) ) : ?>
+		<ul class="phone-cta__list">
+			<?php foreach ( $main_cards as $c ) : ?>
+				<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal, $modal_banner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php endforeach; ?>
+		</ul>
+	<?php endif; ?>
+	<?php foreach ( $cross_groups as $cross_service => $group ) : ?>
+		<div class="phone-cta__cross phone-cta__cross--<?php echo esc_attr( $cross_service ); ?>">
+			<?php if ( '' !== $group['heading'] ) : ?>
+				<p class="phone-cta__cross-heading"><?php echo $group['heading']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+			<?php endif; ?>
+			<ul class="phone-cta__list phone-cta__list--cols-<?php echo (int) count( $group['cards'] ); ?>">
+				<?php foreach ( $group['cards'] as $c ) : ?>
+					<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal, $modal_banner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+	<?php endforeach; ?>
 </section>

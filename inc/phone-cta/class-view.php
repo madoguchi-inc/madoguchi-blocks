@@ -31,6 +31,20 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	}
 
 	/**
+	 * 別サービスのカードをブロックの下に別枠で出すときの見出し。
+	 * 組み合わせの定義が無ければ空文字（見出しを出さない）。
+	 *
+	 * @param string $host_service ブロックのサービス
+	 * @param string $card_service カードのサービス
+	 */
+	public static function cross_heading( string $host_service, string $card_service ): string {
+		$sets = self::text_sets();
+		return isset( $sets[ $host_service ]['cross'][ $card_service ]['cross_heading'] )
+			? (string) $sets[ $host_service ]['cross'][ $card_service ]['cross_heading']
+			: '';
+	}
+
+	/**
 	 * サービスキー => 文言セット。'other' はキーが無いサービスの受け皿。
 	 * 'cross' は「そのサービスのサイトに、別サービスのカードを載せるとき」の上書き。
 	 */
@@ -75,12 +89,13 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'shop_label'           => '{shop}に電話で相談する',
 			'cross'                => array(
 				// 回収の記事に載せる買取店（「回収予定の不用品、実は買取できるかも」の導線）
+				// 見た目は買取サービスのものをそのまま使い、文言だけ回収の記事向けにする
 				'kaitori' => array(
 					'shop_label'      => '{shop}に買取できるか相談する',
 					'web_label'       => 'WEB無料査定はこちら',
 					'web_shop_label'  => '{shop}のWEB無料査定はこちら',
-					'balloon'         => '',
-					'free_tag'        => '', // Figma のクロスセルのカードに縦書きタブは無い
+					// ブロックの下に別枠で出すときの見出し
+					'cross_heading'   => '▼ 回収予定の不用品、実は買取できるかもしれません！▼',
 				),
 			),
 		);

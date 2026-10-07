@@ -19,6 +19,7 @@
 		"service": { "type": "string" },
 		"heading": { "type": "string" },
 		"description": { "type": "string" },
+		"crossHeading": { "type": "string" },
 		"points": {
 			"type": "array",
 			"items": { "type": "string" }

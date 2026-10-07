@@ -24,7 +24,7 @@ import {
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import PhoneCtaIcon from './icons';
-import { textsFor, splitLabel } from './texts';
+import { textsFor, splitLabel, crossHeadingFor as crossHeadingText } from './texts';
 
 const MAX_SHOPS = 3;
 const CUSTOM_BANNER = 'custom';
@@ -169,6 +169,7 @@ export default function Edit( { attributes, setAttributes } ) {
 		heading: savedHeading,
 		description: savedDescription,
 		points: savedPoints,
+		crossHeading,
 		shops,
 		showPcModal,
 		bannerPreset,
@@ -270,6 +271,26 @@ export default function Edit( { attributes, setAttributes } ) {
 	// （既定値を変えると買取の既存記事の保存内容と食い違う）、回収のサイトで置いたときに
 	// 見出しが「無料査定」で始まってしまうのを避ける。
 	// 店舗を選び始めたブロックには触らない（編集中の内容を勝手に変えないため）。
+	// 表示側と同じ振り分け。ブロックのサービスと違うカードは下の別枠にまとめる
+	const mainShops = shops.filter(
+		( item ) => cardServiceOf( item, service ) === service
+	);
+	const crossGroups = shops.reduce( ( acc, item ) => {
+		const cardService = cardServiceOf( item, service );
+		if ( cardService === service ) {
+			return acc;
+		}
+		if ( ! acc[ cardService ] ) {
+			acc[ cardService ] = [];
+		}
+		acc[ cardService ].push( item );
+		return acc;
+	}, {} );
+	const crossServices = Object.keys( crossGroups );
+	// 見出しは記事ごとに書き換えられる。未設定ならサービスの組み合わせの既定文言
+	const crossHeadingFor = ( cross ) =>
+		crossHeading ?? crossHeadingText( service, cross );
+
 	// プレビューに出すバナー（カスタムは選択済み画像、パターンは同梱画像）
 	const bannerPatterns = bannerPatternsFor( service );
 	const bannerPattern = bannerPatternOf( service, bannerPreset );
@@ -547,15 +568,52 @@ export default function Edit( { attributes, setAttributes } ) {
 						) }
 					</p>
 				) : (
-					<ul className="phone-cta__list">
-						{ shops.map( ( item, i ) => (
-							<CardPreview
-								key={ i }
-								service={ service }
-								item={ item }
-							/>
+					<>
+						{ mainShops.length > 0 && (
+							<ul className="phone-cta__list">
+								{ mainShops.map( ( item, i ) => (
+									<CardPreview
+										key={ `main-${ i }` }
+										service={ service }
+										item={ item }
+									/>
+								) ) }
+							</ul>
+						) }
+						{ crossServices.map( ( cross ) => (
+							<div
+								key={ cross }
+								className={ `phone-cta__cross phone-cta__cross--${ cross }` }
+							>
+								<RichText
+									tagName="p"
+									className="phone-cta__cross-heading"
+									value={ crossHeadingFor( cross ) }
+									onChange={ ( v ) =>
+										setAttributes( { crossHeading: v } )
+									}
+									placeholder={ __(
+										'別サービスのカードの見出し',
+										'madoguchi-blocks'
+									) }
+								/>
+								<ul
+									className={ `phone-cta__list phone-cta__list--cols-${ Math.min(
+										3,
+										crossGroups[ cross ].length
+									) }` }
+								>
+									{ crossGroups[ cross ].map( ( item, i ) => (
+										<CardPreview
+											key={ `${ cross }-${ i }` }
+											service={ service }
+											item={ item }
+										/>
+									) ) }
+								</ul>
+							</div>
 						) ) }
-					</ul>
+					</>
 				) }
 				<p className="phone-cta__note">
 					{ __(
