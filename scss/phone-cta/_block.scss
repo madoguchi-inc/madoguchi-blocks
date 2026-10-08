@@ -622,6 +622,9 @@ $pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
 		position: relative;
 		width: min(65rem, 100%);
 		max-height: calc(100vh - 4.8rem);
+		// 下端に余白を持たせる。キャンペーンバナーを出すときだけ、バナー側の
+		// 負のマージンでこれを打ち消してパネルの下端までフチなしで出す
+		padding-bottom: 2.4rem;
 		overflow: auto;
 		border-radius: 0.4rem;
 		background: #fff;
@@ -818,6 +821,7 @@ $pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
 
 	&__modal-banner {
 		margin-top: 1.6rem;
+		margin-bottom: -2.4rem; // パネルの padding-bottom を打ち消し、下端までフチなしで出す
 
 		img { display: block; width: 100%; height: auto; }
 	}
