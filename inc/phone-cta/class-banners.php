@@ -95,8 +95,13 @@ class Madoguchi_Blocks_Phone_Cta_Banners {
 	 */
 	public static function resolve( array $attributes, string $variant = 'pc' ): ?array {
 		// service は render.php と同じ既定値に寄せる（不正な値でバナーだけ消えないように）。
+		// 属性にサービスが無いブロックはサイトの主サービス扱い。ここを買取固定にすると
+		// 回収のサイトで回収のバナーが一致せず、バナーだけ出なくなる
 		// バナーはブロック単位なので、カードごとの上書きは見ない
-		$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attributes['service'] ) ? $attributes['service'] : null );
+		$service = Madoguchi_Blocks_Phone_Cta_Services::resolve(
+			isset( $attributes['service'] ) ? $attributes['service'] : null,
+			madoguchi_blocks_phone_cta_default_service()
+		);
 		$preset  = isset( $attributes['bannerPreset'] ) ? (string) $attributes['bannerPreset'] : self::NONE;
 		$link    = isset( $attributes['bannerLinkUrl'] ) ? trim( (string) $attributes['bannerLinkUrl'] ) : '';
 

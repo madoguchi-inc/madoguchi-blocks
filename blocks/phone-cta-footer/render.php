@@ -8,8 +8,13 @@
 if ( empty( $attributes['isVisible'] ) ) {
 	return;
 }
-$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attributes['service'] ) ? $attributes['service'] : null );
-$texts   = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service );
+// サービス未指定のブロックはサイトの主サービス（設定が無ければ従来どおり買取）
+$host_service = madoguchi_blocks_phone_cta_primary_service();
+$service      = Madoguchi_Blocks_Phone_Cta_Services::resolve(
+	isset( $attributes['service'] ) ? $attributes['service'] : null,
+	madoguchi_blocks_phone_cta_default_service()
+);
+$texts   = Madoguchi_Blocks_Phone_Cta_View::default_texts( $service, $host_service );
 $now     = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
 
 $shop_attr = isset( $attributes['shop'] ) && is_array( $attributes['shop'] ) ? $attributes['shop'] : array();
