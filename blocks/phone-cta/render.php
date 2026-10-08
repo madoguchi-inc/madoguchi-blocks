@@ -13,7 +13,7 @@ $host_service = madoguchi_blocks_phone_cta_primary_service();
 // サービス未指定のブロックはサイトの主サービス。設定が無ければ従来どおり買取
 $service = Madoguchi_Blocks_Phone_Cta_Services::resolve(
 	isset( $attributes['service'] ) ? $attributes['service'] : null,
-	'' !== $host_service ? $host_service : 'kaitori'
+	madoguchi_blocks_phone_cta_default_service()
 );
 // 本体と、下の別枠（別サービスのカード）で、それぞれ最大 3 枚まで出す
 $items   = isset( $attributes['shops'] ) && is_array( $attributes['shops'] ) ? array_slice( $attributes['shops'], 0, 6 ) : array();

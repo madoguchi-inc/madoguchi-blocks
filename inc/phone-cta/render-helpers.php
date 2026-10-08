@@ -125,6 +125,19 @@ function madoguchi_blocks_phone_cta_primary_service() {
 }
 
 /**
+ * サービス未指定のブロック・カードに使う既定サービス。
+ *
+ * block.json から service の既定値を外したので、属性にサービスが入っていない
+ * ブロックが普通にある。そのときはサイトの主サービスに寄せる（設定が無ければ従来どおり買取）。
+ * バナーの解決・店舗の収集・フッターで必ずこれを使う。片方だけ買取に落ちると、
+ * 回収のサイトでバナーが出ない・LPに渡す店舗のサービスがずれる、といった形で壊れる。
+ */
+function madoguchi_blocks_phone_cta_default_service() {
+	$primary = madoguchi_blocks_phone_cta_primary_service();
+	return '' !== $primary ? $primary : 'kaitori';
+}
+
+/**
  * 記事内のすべての電話CTAブロックが出している店舗を、本文に現れる順で集める。
  *
  * キャンペーンLPは「記事で見ていた店舗をそのまま STEP に並べる」ので、バナーの
@@ -171,8 +184,11 @@ function madoguchi_blocks_phone_cta_walk_blocks( array $blocks, array &$found ) 
 		$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
 
 		if ( 'madoguchi/phone-cta' === $name && ( ! isset( $attrs['isVisible'] ) || $attrs['isVisible'] ) ) {
-			// 既定値は block.json と同じく買取。render.php の解決と揃える
-			$service = Madoguchi_Blocks_Phone_Cta_Services::resolve( isset( $attrs['service'] ) ? $attrs['service'] : null );
+			// サービス未指定ならサイトの主サービス。render.php の解決と揃える
+			$service = Madoguchi_Blocks_Phone_Cta_Services::resolve(
+				isset( $attrs['service'] ) ? $attrs['service'] : null,
+				madoguchi_blocks_phone_cta_default_service()
+			);
 			$shops   = isset( $attrs['shops'] ) && is_array( $attrs['shops'] ) ? array_slice( $attrs['shops'], 0, 3 ) : array();
 			foreach ( $shops as $item ) {
 				if ( ! is_array( $item ) || empty( $item['uuid'] ) ) {
@@ -229,10 +245,10 @@ function madoguchi_blocks_phone_cta_cards_from_param( $param, $default_service =
 	if ( '' === trim( $param ) ) {
 		return array();
 	}
-	$host    = madoguchi_blocks_phone_cta_primary_service();
-	$default = Madoguchi_Blocks_Phone_Cta_Services::is_valid( (string) $default_service )
-		? (string) $default_service
-		: ( '' !== $host ? $host : 'kaitori' );
+	$default = Madoguchi_Blocks_Phone_Cta_Services::resolve(
+		$default_service,
+		madoguchi_blocks_phone_cta_default_service()
+	);
 
 	$picks = Madoguchi_Blocks_Phone_Cta_View::parse_shops_param( $param, $default, (int) $max );
 	if ( empty( $picks ) ) {
