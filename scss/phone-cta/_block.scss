@@ -172,7 +172,12 @@ $pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
 	.phone-cta__balloon { top: -1.6rem; }
 
 	.phone-cta__hours { font-size: 1.1rem; }
+}
 
+// 電話ボタンを tel: リンクにするかモーダルにするかは「画面幅」で決める。
+// レイアウトの mixin には入れない。.phone-cta--sp（キャンペーンLP）は 430px 幅の
+// 見た目を PC でも使うだけで、PC では記事内と同じく番号と QR のモーダルを出したい
+@mixin phone-cta-tel-link {
 	// SP はボタン自体が tel: リンク。モーダルは出さない
 	.phone-cta__button--modal { display: none; }
 	.phone-cta__button--tel { display: flex; }
@@ -867,6 +872,7 @@ $pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
 /* ================= SP（〜896px） ================= */
 @include mq-max(md) {
 	@include phone-cta-sp-layout;
+	@include phone-cta-tel-link;
 }
 
 // キャンペーンLPのように、画面幅によらず 430px 幅で使う場所。
