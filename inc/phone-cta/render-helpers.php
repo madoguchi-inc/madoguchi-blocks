@@ -257,6 +257,8 @@ function madoguchi_blocks_phone_cta_cards_from_param( $param, $default_service =
 
 	$repo  = Madoguchi_Blocks_Phone_Cta_Repository::default();
 	$now   = Madoguchi_Blocks_Phone_Cta_Reception::now_jst();
+	// サイトの主サービス。これと違うサービスのカードはクロスセル用の文言・配色になる
+	$host  = madoguchi_blocks_phone_cta_primary_service();
 	$cards = array();
 	foreach ( $picks as $pick ) {
 		$shop = $repo->find( $pick['service'], $pick['uuid'] );
