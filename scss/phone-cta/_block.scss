@@ -14,6 +14,12 @@ $pc-free-tab    : var(--pc-free-tab, #f39072);
 $pc-icon        : var(--pc-icon, #e04b2d); // Figma のアイコン（phone-filled / touch）の塗り色
 $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb4614) 0%, var(--pc-btn-to, #f78b08) 100%));
 
+// PC モーダルの色。カード側の「ボタンの地色」「紹介文の地色」とは別に持つ。
+// クロスセルの買取カードはボタンが白地・紹介文がクリームなので、同じ変数を共有すると
+// モーダルの番号が白く消え、電話欄がクリームになってしまう（モーダルは買取の配色のまま出す）
+$pc-num-grad     : var(--pc-num-bg, linear-gradient(90deg, var(--pc-btn-from, #eb4614) 0%, var(--pc-btn-to, #f78b08) 100%));
+$pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
+
 // SP（〜896px）のレイアウト。キャンペーンLPのように画面幅によらず 430px 幅で
 // 使う場所（.phone-cta--sp）でも同じ見た目にできるよう mixin にしている。
 @mixin phone-cta-sp-layout {
@@ -706,7 +712,7 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 		gap: 1.6rem;
 		margin: 1.6rem 2.4rem 0;
 		padding: 1.6rem 3.2rem;
-		background: $pc-lead-bg;
+		background: $pc-modal-tel-bg;
 	}
 
 	&__modal-tel-icon {
@@ -740,7 +746,7 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	// 番号は Figma どおりオレンジのグラデ文字
 	&__modal-number {
 		margin: 0;
-		background: $pc-orange-grad;
+		background: $pc-num-grad;
 		background-clip: text;
 		-webkit-background-clip: text;
 		font-size: 4rem;
@@ -999,8 +1005,9 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	--pc-btn-shadow-sp: 0 0 0.8rem rgba(240, 105, 14, 0.35);
 	--pc-lead-bg: #fffeef;
 
-	// 買取の「白丸に橙のアイコン」と逆。橙グラデの丸に白抜きのアイコン
-	.phone-cta__icon {
+	// 買取の「白丸に橙のアイコン」と逆。橙グラデの丸に白抜きのアイコン。
+	// ボタンの中だけに効かせる。PC モーダルの電話アイコンは買取のまま（白丸に橙）にしたい
+	.phone-cta__button .phone-cta__icon {
 		background: linear-gradient(135deg, #eb5210 0%, #f47c0a 100%);
 		color: #fff;
 	}
@@ -1036,6 +1043,9 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	--pc-icon: #e04b2d;
 	--pc-free-tab: #f39072;
 	--pc-lead-bg: #f7f7f7;
+	// モーダルは買取の配色のまま出す。クロスセルでカード側の地色を変えても引きずられないよう別に持つ
+	--pc-num-bg: linear-gradient(90deg, #eb4614 0%, #f78b08 100%);
+	--pc-modal-tel-bg: #f7f7f7;
 }
 
 // 回収（不用品回収の窓口）
@@ -1052,6 +1062,7 @@ $pc-orange-grad : var(--pc-btn-bg, linear-gradient(90deg, var(--pc-btn-from, #eb
 	--pc-btn-shadow-sp: 0 0.3rem 0 #0057a8;
 	--pc-icon: #0e79de;
 	--pc-lead-bg: #fffeef;
+	--pc-num-bg: linear-gradient(118deg, #4abfd7 0%, #0e79de 100%);
 }
 
 // 回収のブロックは薄いクリームの地にカードを並べる
