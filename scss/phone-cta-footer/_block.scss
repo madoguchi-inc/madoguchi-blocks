@@ -363,8 +363,12 @@ $pcf-fuyouhin-grad-sp : linear-gradient(145deg, $pcf-fuyouhin-sky 9.2%, $pcf-fuy
 
 		.phone-cta-footer__buttons { gap: 0.8rem; }
 
+		// Figma どおり等幅。flex-basis 0 だと左右の padding 差で WEB 側が広くなるので 50% にする
 		.phone-cta-footer__web,
-		.phone-cta-footer__tel { height: 5.4rem; }
+		.phone-cta-footer__tel {
+			flex: 1 1 50%;
+			height: 5.4rem;
+		}
 
 		.phone-cta-footer__web {
 			padding: 1rem 1.4rem;
@@ -381,21 +385,23 @@ $pcf-fuyouhin-grad-sp : linear-gradient(145deg, $pcf-fuyouhin-sky 9.2%, $pcf-fuy
 			font-size: 1rem;
 		}
 
+		// 店名が長いと 3 行に折り返すので、Figma（左右 16px・14px・アイコン 26px）より詰める。
+		// 「店名に／電話で相談する」の 2 行に、430px 幅で 11 文字・390px 幅で 10 文字まで収まる
 		.phone-cta-footer__tel {
-			padding: 1rem 1.6rem;
-			gap: 0.8rem;
+			padding: 1rem 0.6rem;
+			gap: 0.6rem;
 			background: $pcf-fuyouhin-grad-sp;
 		}
 
 		// 「［回収業者］に」で改行して 2 行（改行はベースの SP 指定 __tel-shop: block）
 		.phone-cta-footer__tel-main {
-			gap: 0.8rem;
-			font-size: 1.4rem;
+			gap: 0.6rem;
+			font-size: 1.3rem;
 			line-height: 1.2;
 
 			.phone-cta__icon {
-				width: 2.6rem;
-				height: 2.6rem;
+				width: 2.4rem;
+				height: 2.4rem;
 			}
 		}
 	}
