@@ -21,6 +21,9 @@ export const DEFAULT_TEXTS = {
 		webButtonSub: '24時間年中無休で受付中！',
 		webButton: 'オンライン無料一括査定',
 		webButtonSp: 'オンライン一括査定',
+		webButtonBadge: '', // 空なら WEB ボタンの頭はアイコン
+		footerHasCatch: true, // 固定フッターにキャッチ行を出すか
+		footerHasBalloon: true, // 固定フッターの電話ボタンに吹き出し行を出すか
 		shopLabel: '{shop}に電話で査定額を聞く',
 	},
 	// 回収。Figma「不用品回収の窓口 サイトデザイン」コラム内テーブル・CTAデザイン。
@@ -36,8 +39,12 @@ export const DEFAULT_TEXTS = {
 		genericLabel: '電話で相談する',
 		webLabel: 'WEBでカンタン無料お見積もりはこちら',
 		webButtonSub: '24時間年中無休で受付中！',
-		webButton: 'オンライン無料一括見積もり',
-		webButtonSp: 'オンライン一括見積もり',
+		// 固定フッターは Figma「追従CTA」どおり「[無料] WEB一括見積もり」（PC / SP 共通）
+		webButton: 'WEB一括見積もり',
+		webButtonSp: 'WEB一括見積もり',
+		webButtonBadge: '無料',
+		footerHasCatch: false, // 回収の追従CTA はキャッチ行・吹き出しを持たない
+		footerHasBalloon: false,
 		shopLabel: '{shop}に電話で相談する',
 		// 回収の記事に載せる買取店（「回収予定の不用品、実は買取できるかも」の導線）
 		cross: {
@@ -62,6 +69,9 @@ export const DEFAULT_TEXTS = {
 		webButtonSub: '24時間年中無休で受付中！',
 		webButton: 'オンライン無料一括見積もり',
 		webButtonSp: 'オンライン一括見積もり',
+		webButtonBadge: '',
+		footerHasCatch: true,
+		footerHasBalloon: true,
 		shopLabel: '{shop}に電話で見積もりを聞く',
 	},
 };

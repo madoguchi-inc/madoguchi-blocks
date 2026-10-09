@@ -75,12 +75,16 @@ export default function Edit( { attributes, setAttributes } ) {
 
 	// 静的な編集キャンバスでは position: fixed を解除して見せる（暗い半透明の背景が
 	// 白いキャンバスでは薄いので、編集中だけ不透明に近づける）
+	// 回収のようにクリーム地のサービスは style.css の背景をそのまま使う
 	const blockProps = useBlockProps( {
 		className: 'phone-cta-footer',
+		'data-service': service,
 		style: {
 			position: 'relative',
 			borderRadius: 8,
-			background: 'rgba(24, 25, 30, 0.85)',
+			...( texts.webButtonBadge
+				? {}
+				: { background: 'rgba(24, 25, 30, 0.85)' } ),
 		},
 	} );
 
@@ -124,22 +128,24 @@ export default function Edit( { attributes, setAttributes } ) {
 								showLead={ false }
 								showWebUrl={ false }
 							/>
-							<TextControl
-								label={ __(
-									'吹き出し文言',
-									'madoguchi-blocks'
-								) }
-								help={ __(
-									'空なら「その場でかんたん無料査定！」。PC のみ表示（SP では省略）。',
-									'madoguchi-blocks'
-								) }
-								value={ item.balloonText || '' }
-								onChange={ ( balloonText ) =>
-									setAttributes( {
-										shop: { ...item, balloonText },
-									} )
-								}
-							/>
+							{ texts.footerHasBalloon && (
+								<TextControl
+									label={ __(
+										'吹き出し文言',
+										'madoguchi-blocks'
+									) }
+									help={ __(
+										'空なら「その場でかんたん無料査定！」。PC のみ表示（SP では省略）。',
+										'madoguchi-blocks'
+									) }
+									value={ item.balloonText || '' }
+									onChange={ ( balloonText ) =>
+										setAttributes( {
+											shop: { ...item, balloonText },
+										} )
+									}
+								/>
+							) }
 						</>
 					) : (
 						<Button
@@ -152,26 +158,33 @@ export default function Edit( { attributes, setAttributes } ) {
 					{ ! shop && (
 						<p className="description">
 							{ __(
-								'店舗を指定しない場合は「電話で査定額を聞く」の汎用文言で、記事内の電話CTAへスクロールします。',
+								'店舗を指定しない場合は「%s」の汎用文言で、記事内の電話CTAへスクロールします。',
 								'madoguchi-blocks'
-							) }
+							).replace( '%s', texts.genericLabel ) }
 						</p>
 					) }
 				</PanelBody>
-				<PanelBody
-					title={ __( 'キャッチコピー', 'madoguchi-blocks' ) }
-					initialOpen={ false }
-				>
-					<TextControl
-						label={ __( 'バッジ（ゴールド）', 'madoguchi-blocks' ) }
-						help={ __(
-							'空にするとバッジを出しません。',
-							'madoguchi-blocks'
-						) }
-						value={ catchBadge || '' }
-						onChange={ ( v ) => setAttributes( { catchBadge: v } ) }
-					/>
-				</PanelBody>
+				{ texts.footerHasCatch && (
+					<PanelBody
+						title={ __( 'キャッチコピー', 'madoguchi-blocks' ) }
+						initialOpen={ false }
+					>
+						<TextControl
+							label={ __(
+								'バッジ（ゴールド）',
+								'madoguchi-blocks'
+							) }
+							help={ __(
+								'空にするとバッジを出しません。',
+								'madoguchi-blocks'
+							) }
+							value={ catchBadge || '' }
+							onChange={ ( v ) =>
+								setAttributes( { catchBadge: v } )
+							}
+						/>
+					</PanelBody>
+				) }
 				<PanelBody
 					title={ __( 'WEB ボタン・表示', 'madoguchi-blocks' ) }
 					initialOpen={ false }
@@ -210,27 +223,37 @@ export default function Edit( { attributes, setAttributes } ) {
 						'madoguchi-blocks'
 					) }
 				</p>
-				<p className="phone-cta-footer__catch">
-					{ ( catchBadge || '' ).trim() !== '' && (
-						<span className="phone-cta-footer__catch-badge">
-							{ catchBadge }
-						</span>
-					) }
-					<RichText
-						tagName="span"
-						className="phone-cta-footer__catch-text"
-						value={ catchText }
-						onChange={ ( v ) => setAttributes( { catchText: v } ) }
-						placeholder={ __(
-							'キャッチコピー',
-							'madoguchi-blocks'
+				{ texts.footerHasCatch && (
+					<p className="phone-cta-footer__catch">
+						{ ( catchBadge || '' ).trim() !== '' && (
+							<span className="phone-cta-footer__catch-badge">
+								{ catchBadge }
+							</span>
 						) }
-					/>
-				</p>
+						<RichText
+							tagName="span"
+							className="phone-cta-footer__catch-text"
+							value={ catchText }
+							onChange={ ( v ) =>
+								setAttributes( { catchText: v } )
+							}
+							placeholder={ __(
+								'キャッチコピー',
+								'madoguchi-blocks'
+							) }
+						/>
+					</p>
+				) }
 				<div className="phone-cta-footer__buttons">
 					{ showWebButton && (
 						<span className="phone-cta-footer__web">
-							<PhoneCtaIcon iconKey="touch" />
+							{ texts.webButtonBadge ? (
+								<span className="phone-cta-footer__web-badge">
+									{ texts.webButtonBadge }
+								</span>
+							) : (
+								<PhoneCtaIcon iconKey="touch" />
+							) }
 							<span className="phone-cta-footer__web-main phone-cta-footer__web-main--pc">
 								{ texts.webButton }
 							</span>
@@ -243,9 +266,11 @@ export default function Edit( { attributes, setAttributes } ) {
 						</span>
 					) }
 					<span className="phone-cta-footer__tel">
-						<span className="phone-cta-footer__balloon">
-							{ item.balloonText || texts.balloon }
-						</span>
+						{ texts.footerHasBalloon && (
+							<span className="phone-cta-footer__balloon">
+								{ item.balloonText || texts.balloon }
+							</span>
+						) }
 						<span className="phone-cta-footer__tel-main">
 							<PhoneCtaIcon iconKey="phone" />
 							<span className="phone-cta-footer__tel-label">
