@@ -66,6 +66,9 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'web_button_sub'       => '24時間年中無休で受付中！',
 			'web_button'           => 'オンライン無料一括査定',
 			'web_button_sp'        => 'オンライン一括査定', // SP の黒ボタンは Figma 上この短い文言
+			'web_button_badge'     => '', // 空なら WEB ボタンの頭はアイコン
+			'footer_has_catch'     => true, // 固定フッターにキャッチ行を出すか
+			'footer_has_balloon'   => true, // 固定フッターの電話ボタンに吹き出し行を出すか
 			'shop_label'           => '{shop}に電話で査定額を聞く',
 		);
 
@@ -84,8 +87,12 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'web_label_parts'      => array( 'WEBでカンタン', '無料お見積もりはこちら' ),
 			'web_shop_label'       => '',
 			'web_button_sub'       => '24時間年中無休で受付中！',
-			'web_button'           => 'オンライン無料一括見積もり',
-			'web_button_sp'        => 'オンライン一括見積もり',
+			// 固定フッターは Figma「追従CTA」どおり「[無料] WEB一括見積もり」（PC / SP 共通）
+			'web_button'           => 'WEB一括見積もり',
+			'web_button_sp'        => 'WEB一括見積もり',
+			'web_button_badge'     => '無料',
+			'footer_has_catch'     => false, // 回収の追従CTA はキャッチ行・吹き出しを持たない
+			'footer_has_balloon'   => false,
 			'shop_label'           => '{shop}に電話で相談する',
 			'cross'                => array(
 				// 回収の記事に載せる買取店（「回収予定の不用品、実は買取できるかも」の導線）
@@ -115,6 +122,9 @@ class Madoguchi_Blocks_Phone_Cta_View {
 			'web_button_sub'       => '24時間年中無休で受付中！',
 			'web_button'           => 'オンライン無料一括見積もり',
 			'web_button_sp'        => 'オンライン一括見積もり',
+			'web_button_badge'     => '',
+			'footer_has_catch'     => true,
+			'footer_has_balloon'   => true,
 			'shop_label'           => '{shop}に電話で見積もりを聞く',
 		);
 

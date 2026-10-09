@@ -275,3 +275,134 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 		&__tel-shop { display: block; } // 「おたからやに」で改行して 2 行に
 	}
 }
+
+/* ================= 回収 ================= */
+// Figma「不用品回収の窓口 サイトデザイン」追従CTA_PC_1 / 追従CTA_1（1830:92641 / 1830:92642）
+// キャッチ行・吹き出しは持たない（render.php が出さない）。クリーム地に白枠ボタン＋青グラデの電話ボタン
+$pcf-fuyouhin-cream   : rgba(255, 254, 239, 0.85);
+$pcf-fuyouhin-sky     : #4abfd7;
+$pcf-fuyouhin-blue    : #107adf;
+$pcf-fuyouhin-ribbon  : linear-gradient(-70deg, #fbde36 13.4%, #edf643 97.7%);
+$pcf-fuyouhin-grad    : linear-gradient(156deg, $pcf-fuyouhin-sky 9.2%, $pcf-fuyouhin-blue 82.9%);
+$pcf-fuyouhin-grad-sp : linear-gradient(145deg, $pcf-fuyouhin-sky 9.2%, $pcf-fuyouhin-blue 82.9%);
+
+.phone-cta-footer[data-service="fuyouhin"] {
+	padding: 1.6rem;
+	background: $pcf-fuyouhin-cream;
+	box-shadow: 0 -1px 20px rgba(0, 0, 0, 0.1);
+	color: $pcf-fuyouhin-blue;
+
+	.phone-cta-footer__editor-hint { color: rgba(0, 0, 0, 0.55); }
+
+	.phone-cta-footer__buttons { gap: 2.4rem; }
+
+	.phone-cta-footer__web,
+	.phone-cta-footer__tel {
+		box-sizing: border-box;
+		height: 6.2rem;
+		box-shadow: none;
+	}
+
+	// 白地＋水色の枠：「[無料] WEB一括見積もり」。上辺に黄色のリボン「24時間年中無休で受付中！」
+	.phone-cta-footer__web {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.8rem;
+		padding: 0.8rem 3.2rem;
+		border: 2px solid $pcf-fuyouhin-sky;
+		background: #fff;
+		color: $pcf-fuyouhin-blue !important;
+	}
+
+	.phone-cta-footer__web-badge {
+		display: flex;
+		flex: 0 0 auto;
+		align-items: center;
+		justify-content: center;
+		width: 3.4rem;
+		height: 2.5rem;
+		border-radius: 0.2rem;
+		background: $pcf-fuyouhin-blue;
+		font-size: 1.2rem;
+		line-height: 1.7;
+		color: #fff;
+	}
+
+	.phone-cta-footer__web-main {
+		font-size: 2rem;
+		line-height: 1.3;
+		color: $pcf-fuyouhin-blue;
+	}
+
+	.phone-cta-footer__web-sub {
+		position: absolute;
+		top: -1.1rem;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.2rem 0.4rem 0.2rem 0.7rem;
+		background: $pcf-fuyouhin-ribbon;
+		font-size: 1.2rem;
+		line-height: 1.4;
+		white-space: nowrap;
+		color: #000;
+	}
+
+	// 青グラデ：「［回収業者］に電話で相談する」
+	.phone-cta-footer__tel {
+		padding: 0.8rem 2.4rem;
+		background: $pcf-fuyouhin-grad;
+	}
+
+	.phone-cta-footer__tel-main .phone-cta__icon { color: $pcf-fuyouhin-blue; }
+
+	/* ---- SP（〜896px）: 2 ボタンを等幅で横並び ---- */
+	@include mq-max(md) {
+		padding: 2rem 1.6rem 1.6rem; // 上はリボンのはみ出し分を広めに取る
+
+		.phone-cta-footer__buttons { gap: 0.8rem; }
+
+		// Figma どおり等幅。flex-basis 0 だと左右の padding 差で WEB 側が広くなるので 50% にする
+		.phone-cta-footer__web,
+		.phone-cta-footer__tel {
+			flex: 1 1 50%;
+			height: 5.4rem;
+		}
+
+		.phone-cta-footer__web {
+			padding: 1rem 1.4rem;
+			gap: 0.8rem;
+		}
+
+		.phone-cta-footer__web-main {
+			font-size: 1.5rem;
+			line-height: 1.7;
+		}
+
+		.phone-cta-footer__web-sub {
+			top: -0.9rem;
+			font-size: 1rem;
+		}
+
+		// 店名が長いと 3 行に折り返すので、Figma（左右 16px・14px・アイコン 26px）より詰める。
+		// 「店名に／電話で相談する」の 2 行に、430px 幅で 11 文字・390px 幅で 10 文字まで収まる
+		.phone-cta-footer__tel {
+			padding: 1rem 0.6rem;
+			gap: 0.6rem;
+			background: $pcf-fuyouhin-grad-sp;
+		}
+
+		// 「［回収業者］に」で改行して 2 行（改行はベースの SP 指定 __tel-shop: block）
+		.phone-cta-footer__tel-main {
+			gap: 0.6rem;
+			font-size: 1.3rem;
+			line-height: 1.2;
+
+			.phone-cta__icon {
+				width: 2.4rem;
+				height: 2.4rem;
+			}
+		}
+	}
+}

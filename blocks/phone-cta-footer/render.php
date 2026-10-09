@@ -2,6 +2,7 @@
 /**
  * 電話CTA 固定フッター。1 記事に 1 つだけ出力する。
  * 見た目は Figma「みんなの買取」固定フッター（PC / SP）に合わせる。
+ * 回収（data-service="fuyouhin"）は Figma「不用品回収の窓口 サイトデザイン」追従CTA に合わせる。
  *
  * @var array $attributes
  */
@@ -61,7 +62,11 @@ if ( 'web' === $state['mode'] ) {
 } else {
 	$tel_href = $state['tel_href'];
 }
-$has_catch = '' !== trim( wp_strip_all_tags( $catch ) ) || '' !== trim( $catch_badge );
+// 回収など、Figma 上キャッチ行を持たないサービスでは属性に文言が残っていても出さない
+$has_catch   = ! empty( $texts['footer_has_catch'] )
+	&& ( '' !== trim( wp_strip_all_tags( $catch ) ) || '' !== trim( $catch_badge ) );
+$has_balloon = ! empty( $texts['footer_has_balloon'] ) && '' !== $state['balloon'];
+$web_badge   = isset( $texts['web_button_badge'] ) ? (string) $texts['web_button_badge'] : '';
 ?>
 <div <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	<?php if ( $has_catch ) : ?>
@@ -77,7 +82,11 @@ $has_catch = '' !== trim( wp_strip_all_tags( $catch ) ) || '' !== trim( $catch_b
 	<div class="phone-cta-footer__buttons">
 		<?php if ( $show_web ) : ?>
 			<a class="phone-cta-footer__web" href="<?php echo esc_url( $web_url ); ?>">
-				<?php echo madoguchi_blocks_phone_cta_icon( 'touch' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php if ( '' !== $web_badge ) : ?>
+					<span class="phone-cta-footer__web-badge"><?php echo esc_html( $web_badge ); ?></span>
+				<?php else : ?>
+					<?php echo madoguchi_blocks_phone_cta_icon( 'touch' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php endif; ?>
 				<span class="phone-cta-footer__web-main phone-cta-footer__web-main--pc"><?php echo esc_html( $texts['web_button'] ); ?></span>
 				<span class="phone-cta-footer__web-main phone-cta-footer__web-main--sp"><?php echo esc_html( $texts['web_button_sp'] ); ?></span>
 				<span class="phone-cta-footer__web-sub"><?php echo esc_html( $texts['web_button_sub'] ); ?></span>
@@ -87,7 +96,7 @@ $has_catch = '' !== trim( wp_strip_all_tags( $catch ) ) || '' !== trim( $catch_b
 			<a class="phone-cta-footer__tel<?php echo 'web' === $state['mode'] ? ' phone-cta-footer__tel--web' : ''; ?>"
 				href="<?php echo esc_url( $tel_href ); ?>"
 				<?php echo 'web' === $state['mode'] ? 'target="_blank" rel="noopener"' : ''; ?>>
-				<?php if ( '' !== $state['balloon'] ) : ?>
+				<?php if ( $has_balloon ) : ?>
 					<span class="phone-cta-footer__balloon"><?php echo esc_html( $state['balloon'] ); ?></span>
 				<?php endif; ?>
 				<span class="phone-cta-footer__tel-main">
