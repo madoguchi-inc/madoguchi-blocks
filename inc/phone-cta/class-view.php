@@ -13,6 +13,42 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	const SHOPS_QUERY_KEY = 'shops';
 
 	/**
+	 * 受付時間外の WEB 査定リンクに付ける流入パラメータ。
+	 * 遷移先（ekaitori.com など）が `inflow` をCV箇所として保存し、電話CTA経由のCVを判別する。
+	 */
+	const OFF_HOURS_INFLOW_KEY   = 'inflow';
+	const OFF_HOURS_INFLOW_VALUE = 'tel_off_hours';
+
+	/**
+	 * 受付時間外の WEB 査定リンクに `inflow=tel_off_hours` を付ける。
+	 *
+	 * - 既に `inflow` が付いている URL は触らない（回収のクロスセル先などが別の意味で使っているため）
+	 * - utm などの既存クエリ・`#` 以降はそのまま残す
+	 * - WordPress に依存しないよう add_query_arg は使わない
+	 *
+	 * @param string $url 管理画面または記事で指定された URL
+	 * @return string 空なら空のまま
+	 */
+	public static function with_off_hours_inflow( string $url ): string {
+		if ( '' === $url ) {
+			return '';
+		}
+		$fragment = '';
+		$hash_pos = strpos( $url, '#' );
+		if ( false !== $hash_pos ) {
+			$fragment = substr( $url, $hash_pos );
+			$url      = substr( $url, 0, $hash_pos );
+		}
+		$query = (string) parse_url( $url, PHP_URL_QUERY );
+		parse_str( $query, $params );
+		if ( array_key_exists( self::OFF_HOURS_INFLOW_KEY, $params ) ) {
+			return $url . $fragment;
+		}
+		$separator = '' === $query ? ( false === strpos( $url, '?' ) ? '?' : '' ) : '&';
+		return $url . $separator . self::OFF_HOURS_INFLOW_KEY . '=' . self::OFF_HOURS_INFLOW_VALUE . $fragment;
+	}
+
+	/**
 	 * サービス別の既定文言。
 	 * Figma「みんなの買取」202607_電話送客プロジェクト（コラム_PC / コラム_SP / 固定フッター）の文言を既定とする。
 	 * src/phone-cta/texts.js の DEFAULT_TEXTS と必ず一致させる。
@@ -230,6 +266,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		$fallback = isset( $item['webUrl'] ) && '' !== trim( (string) $item['webUrl'] )
 			? trim( (string) $item['webUrl'] )
 			: ( isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '' );
+		$fallback = self::with_off_hours_inflow( $fallback );
 		if ( $is_open ) {
 			$mode = 'tel';
 		} elseif ( '' !== $fallback ) {
@@ -401,7 +438,7 @@ class Madoguchi_Blocks_Phone_Cta_View {
 		$phone_number = isset( $number['phone_number'] ) ? (string) $number['phone_number'] : '';
 		// 番号が空なら発信できないので受付中とは扱わない（href="" のボタンを出さないため）
 		$is_open      = '' !== $phone_number && Madoguchi_Blocks_Phone_Cta_Reception::is_open( $shop, $now );
-		$fallback     = isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '';
+		$fallback     = self::with_off_hours_inflow( isset( $shop['web_fallback_url'] ) ? trim( (string) $shop['web_fallback_url'] ) : '' );
 		if ( $is_open ) {
 			$mode = 'tel';
 		} elseif ( '' !== $fallback ) {

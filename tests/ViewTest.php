@@ -82,7 +82,7 @@ class ViewTest extends TestCase {
 	public function test_card_state_closed_with_fallback_is_web(): void {
 		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array(), $this->now( '2026-09-16 21:00' ) );
 		$this->assertSame( 'web', $state['mode'] );
-		$this->assertSame( 'https://lp.example/', $state['fallback_url'] );
+		$this->assertSame( 'https://lp.example/?inflow=tel_off_hours', $state['fallback_url'] );
 	}
 
 	public function test_card_state_closed_without_fallback_keeps_tel(): void {
@@ -105,15 +105,33 @@ class ViewTest extends TestCase {
 		// カード単位の指定があればマスタより優先する
 		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array( 'webUrl' => 'https://article.example/lp' ), $closed, 'kaitori' );
 		$this->assertSame( 'web', $state['mode'] );
-		$this->assertSame( 'https://article.example/lp', $state['fallback_url'] );
+		$this->assertSame( 'https://article.example/lp?inflow=tel_off_hours', $state['fallback_url'] );
 
 		// 空白のみならマスタの値を使う
 		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop(), array( 'webUrl' => '  ' ), $closed, 'kaitori' );
-		$this->assertSame( 'https://lp.example/', $state['fallback_url'] );
+		$this->assertSame( 'https://lp.example/?inflow=tel_off_hours', $state['fallback_url'] );
 
 		// マスタが空でもカード単位の指定があれば WEB ボタンになる
 		$state = Madoguchi_Blocks_Phone_Cta_View::card_state( $this->shop( array( 'web_fallback_url' => '' ) ), array( 'webUrl' => 'https://article.example/lp' ), $closed, 'kaitori' );
 		$this->assertSame( 'web', $state['mode'] );
+	}
+
+	public function test_with_off_hours_inflow(): void {
+		$cases = array(
+			// 素の URL・既存クエリ・# 付きはそれぞれ正しくつなぐ
+			'https://ekaitori.com/'                                   => 'https://ekaitori.com/?inflow=tel_off_hours',
+			'https://ekaitori.com/?utm_source=seo&utm_medium=column'  => 'https://ekaitori.com/?utm_source=seo&utm_medium=column&inflow=tel_off_hours',
+			'https://ekaitori.com/form#top'                           => 'https://ekaitori.com/form?inflow=tel_off_hours#top',
+			'https://ekaitori.com/?a=1#top'                           => 'https://ekaitori.com/?a=1&inflow=tel_off_hours#top',
+			'https://ekaitori.com/?'                                  => 'https://ekaitori.com/?inflow=tel_off_hours',
+			// 既に inflow があるものは上書きしない（回収のクロスセル先など）
+			'https://oyobee.com/?inflow=fuyouhin'                     => 'https://oyobee.com/?inflow=fuyouhin',
+			'https://ekaitori.com/?inflow=&x=1'                       => 'https://ekaitori.com/?inflow=&x=1',
+			''                                                        => '',
+		);
+		foreach ( $cases as $in => $expected ) {
+			$this->assertSame( $expected, Madoguchi_Blocks_Phone_Cta_View::with_off_hours_inflow( (string) $in ), (string) $in );
+		}
 	}
 
 	public function test_card_state_without_numbers_is_null(): void {
@@ -132,6 +150,7 @@ class ViewTest extends TestCase {
 
 		$s = Madoguchi_Blocks_Phone_Cta_View::footer_state( $this->shop(), $attrs, $closed, 'kaitori' );
 		$this->assertSame( 'web', $s['mode'] );
+		$this->assertSame( 'https://lp.example/?inflow=tel_off_hours', $s['fallback_url'] );
 
 		$s = Madoguchi_Blocks_Phone_Cta_View::footer_state( $this->shop( array( 'web_fallback_url' => '' ) ), $attrs, $closed, 'kaitori' );
 		$this->assertSame( 'web_only', $s['mode'] );
