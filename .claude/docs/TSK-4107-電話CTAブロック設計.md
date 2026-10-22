@@ -273,6 +273,7 @@
   見出し・説明・POINT・バナーはブロック単位なのでブロックの `service` のまま。
   ブロックのサービスを変えたときは、サービスを明示したカードは残し、「ブロックに従う」カードの店舗選択だけリセットする
 - WEB 査定のリンク先は **記事のカード単位の `webUrl` を優先**し、空なら店舗マスタの `web_fallback_url` を使う（記事ごとに専用 LP へ送りたい場合に使う）。固定フッターはマスタの値のみ
+- 時間外の WEB 査定リンク（記事カード・固定フッターとも）には `inflow=tel_off_hours` を自動で付ける（`View::with_off_hours_inflow`）。遷移先の ekaitori.com がこれをCV箇所として保存し、電話CTAの時間外経由のCVを判別する。既に `inflow` が付いている URL（回収のクロスセル先 `?inflow=fuyouhin` など）は上書きしない。固定フッターの常設 WEB ボタン（`webButtonUrl`）は対象外
 
 - カード内は Figma どおり「ロゴ／紹介文／ボタン／受付時間」のみ。「通話料無料」バッジは出さない。`is_toll_free=false` の番号だけ `phone-cta__note`「通話料はお客様のご負担となります」
 - カードは行内で等高、中身は上下中央寄せ（Figma の justify-center）
