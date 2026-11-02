@@ -349,6 +349,8 @@ $pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
 		padding: 1.6rem;
 		border: 1px solid $pc-border;
 		background: #fff;
+		// 枠線だけだと背景に溶けるので、軽い影でカードらしく浮かせる（ボタンのグローより弱く）
+		box-shadow: 0 0.2rem 0.8rem rgba(0, 0, 0, 0.08);
 	}
 
 	&__intro {
