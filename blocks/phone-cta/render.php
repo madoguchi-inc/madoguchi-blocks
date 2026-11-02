@@ -181,6 +181,8 @@ if ( '' !== $shops_param ) {
 		</header>
 	<?php endif; ?>
 	<?php if ( ! empty( $main_cards ) ) : ?>
+		<?php // ステマ規制対応の PR 表記。カード一覧全体にかける（枠は付けない）。編集で消せないよう固定文言 ?>
+		<p class="phone-cta__pr"><?php echo esc_html( Madoguchi_Blocks_Phone_Cta_View::PR_LABEL ); ?></p>
 		<ul class="phone-cta__list">
 			<?php foreach ( $main_cards as $c ) : ?>
 				<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal, $modal_banner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -192,6 +194,7 @@ if ( '' !== $shops_param ) {
 			<?php if ( '' !== $group['heading'] ) : ?>
 				<p class="phone-cta__cross-heading"><?php echo $group['heading']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 			<?php endif; ?>
+			<p class="phone-cta__pr phone-cta__pr--cols-<?php echo (int) count( $group['cards'] ); ?>"><?php echo esc_html( Madoguchi_Blocks_Phone_Cta_View::PR_LABEL ); ?></p>
 			<ul class="phone-cta__list phone-cta__list--cols-<?php echo (int) count( $group['cards'] ); ?>">
 				<?php foreach ( $group['cards'] as $c ) : ?>
 					<?php echo madoguchi_blocks_phone_cta_card_html( $c, $show_pc_modal, $modal_banner ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>

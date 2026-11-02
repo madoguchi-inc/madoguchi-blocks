@@ -21,6 +21,22 @@ $pcf-orange-grad : linear-gradient(90deg, $pcf-orange-from 0%, $pcf-orange-to 10
 	background: linear-gradient(180deg, rgba(24, 25, 30, 0.6) 0%, rgba(24, 25, 30, 0.4) 100%);
 	color: #fff;
 
+	// PR 表記（ステマ規制対応）。右上に小さく、枠なし。
+	// 色は inherit にしない。REST 配信時はルートの文字色が隔離用の基礎スタイルで #000 に固定されるため、
+	// 引き継ぐと暗い地に黒で沈む。サービスごとに明示する（回収は下の data-service="fuyouhin" で上書き）
+	&__pr {
+		position: absolute;
+		top: 0.4rem;
+		right: 0.8rem;
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 400;
+		line-height: 1.2;
+		letter-spacing: 0.05em;
+		color: rgba(255, 255, 255, 0.85);
+		pointer-events: none;
+	}
+
 	// エディタ専用の注記（render.php では出力しないクラス）
 	&__editor-hint {
 		margin: 0;
@@ -293,6 +309,8 @@ $pcf-fuyouhin-grad-sp : linear-gradient(145deg, $pcf-fuyouhin-sky 9.2%, $pcf-fuy
 	color: $pcf-fuyouhin-blue;
 
 	.phone-cta-footer__editor-hint { color: rgba(0, 0, 0, 0.55); }
+	// クリーム地なので白では読めない。注記と同じ濃さのグレーにする
+	.phone-cta-footer__pr { color: rgba(0, 0, 0, 0.55); }
 
 	.phone-cta-footer__buttons { gap: 2.4rem; }
 

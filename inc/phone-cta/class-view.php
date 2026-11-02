@@ -20,6 +20,13 @@ class Madoguchi_Blocks_Phone_Cta_View {
 	const OFF_HOURS_INFLOW_VALUE = 'tel_off_hours';
 
 	/**
+	 * 電話CTA（記事内カード・追従CTA）に出す広告表記。
+	 * 掲載店舗への送客は広告にあたるため、ステマ規制（景品表示法）に沿って必ず出す。
+	 * 編集画面で消せないよう属性にせず固定にしている。エディタのプレビューは src/phone-cta/texts.js の PR_LABEL と揃える
+	 */
+	const PR_LABEL = 'PR';
+
+	/**
 	 * 受付時間外の WEB 査定リンクに `inflow=tel_off_hours` を付ける。
 	 *
 	 * - 既に `inflow` が付いている URL は触らない（回収のクロスセル先などが別の意味で使っているため）
