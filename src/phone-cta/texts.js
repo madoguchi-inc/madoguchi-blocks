@@ -7,6 +7,10 @@
 
 const POINTS = [ '強引な営業なし', '個人情報必要なし', '相談だけでもOK' ];
 
+// ステマ規制対応の広告表記（記事内カード・追従CTA 共通の固定文言）。
+// PHP 側の Madoguchi_Blocks_Phone_Cta_View::PR_LABEL と必ず一致させる
+export const PR_LABEL = 'PR';
+
 export const DEFAULT_TEXTS = {
 	kaitori: {
 		description: '複数の買取店で査定してもらうことが高く売るコツ！',

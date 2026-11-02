@@ -23,7 +23,7 @@ import {
 import { useServices, useShopDetail } from '../phone-cta/use-shops';
 import ShopPicker from '../phone-cta/shop-picker';
 import PhoneCtaIcon from '../phone-cta/icons';
-import { textsFor, splitLabel } from '../phone-cta/texts';
+import { textsFor, splitLabel, PR_LABEL } from '../phone-cta/texts';
 
 // サイトの主サービス（設定 > Madoguchi Blocks）。これと違うサービスならクロスセル用の文言になる
 const PRIMARY_SERVICE =
@@ -217,6 +217,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
+				<span className="phone-cta-footer__pr">{ PR_LABEL }</span>
 				<p className="phone-cta-footer__editor-hint">
 					{ __(
 						'表示側では画面の下に固定表示されます（1 記事に 1 つ。記事内のどこに置いても同じ）',

@@ -299,6 +299,27 @@ $pc-modal-tel-bg : var(--pc-modal-tel-bg, var(--pc-lead-bg, #f7f7f7));
 		color: $pc-gold-dark;
 	}
 
+	/* ---- PR 表記（ステマ規制対応） ---- */
+	// ウリドキの見せ方に合わせ、カード一覧全体に 1 か所だけ、枠なしの小さな文字で右上に出す。
+	// 1 列のときは一覧が中央寄せ・最大幅つきになるので、表記も同じ幅に揃えて一覧の右端に置く
+	&__pr {
+		margin: 0 0 0.4rem;
+		font-size: 1.1rem;
+		font-weight: 400;
+		line-height: 1.4;
+		letter-spacing: 0.05em;
+		text-align: right;
+		color: #888;
+	}
+
+	// 本体の表記はブロック直下（別枠の表記は __cross の中なので当たらない）。別枠は自分の件数で決める
+	&--cols-1 > &__pr,
+	&__cross &__pr--cols-1 {
+		max-width: 36rem;
+		margin-right: auto;
+		margin-left: auto;
+	}
+
 	/* ---- カード一覧 ---- */
 	&__list {
 		display: grid;

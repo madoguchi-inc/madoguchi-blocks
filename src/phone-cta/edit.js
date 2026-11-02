@@ -24,7 +24,12 @@ import {
 import { useServices, useShopDetail } from './use-shops';
 import ShopPicker from './shop-picker';
 import PhoneCtaIcon from './icons';
-import { textsFor, splitLabel, crossHeadingFor as crossHeadingText } from './texts';
+import {
+	textsFor,
+	splitLabel,
+	crossHeadingFor as crossHeadingText,
+	PR_LABEL,
+} from './texts';
 
 const MAX_SHOPS = 3;
 const CUSTOM_BANNER = 'custom';
@@ -570,6 +575,9 @@ export default function Edit( { attributes, setAttributes } ) {
 				) : (
 					<>
 						{ mainShops.length > 0 && (
+							<p className="phone-cta__pr">{ PR_LABEL }</p>
+						) }
+						{ mainShops.length > 0 && (
 							<ul className="phone-cta__list">
 								{ mainShops.map( ( item, i ) => (
 									<CardPreview
@@ -597,6 +605,14 @@ export default function Edit( { attributes, setAttributes } ) {
 										'madoguchi-blocks'
 									) }
 								/>
+								<p
+									className={ `phone-cta__pr phone-cta__pr--cols-${ Math.min(
+										3,
+										crossGroups[ cross ].length
+									) }` }
+								>
+									{ PR_LABEL }
+								</p>
 								<ul
 									className={ `phone-cta__list phone-cta__list--cols-${ Math.min(
 										3,

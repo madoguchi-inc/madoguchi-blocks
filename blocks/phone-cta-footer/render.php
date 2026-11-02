@@ -69,6 +69,8 @@ $has_balloon = ! empty( $texts['footer_has_balloon'] ) && '' !== $state['balloon
 $web_badge   = isset( $texts['web_button_badge'] ) ? (string) $texts['web_button_badge'] : '';
 ?>
 <div <?php echo $wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<?php // ステマ規制対応の PR 表記。右上に小さく出す（記事内の電話CTAと同じ固定文言） ?>
+	<span class="phone-cta-footer__pr"><?php echo esc_html( Madoguchi_Blocks_Phone_Cta_View::PR_LABEL ); ?></span>
 	<?php if ( $has_catch ) : ?>
 		<p class="phone-cta-footer__catch">
 			<?php if ( '' !== trim( $catch_badge ) ) : ?>
